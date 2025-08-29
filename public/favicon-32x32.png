@@ -1,0 +1,29 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="192" height="192" rx="24" fill="#0ea5e9"/>
+  <circle cx="96" cy="96" r="80" fill="#ffffff"/>
+  <circle cx="96" cy="96" r="70" fill="#0ea5e9"/>
+  
+  <!-- Karides gövdesi -->
+  <ellipse cx="96" cy="96" rx="45" ry="25" fill="#ffffff"/>
+  <ellipse cx="96" cy="96" rx="40" ry="20" fill="#0ea5e9"/>
+  
+  <!-- Karides kuyruğu -->
+  <path d="M141 96 Q160 86 160 96 Q160 106 141 96" fill="#ffffff"/>
+  <path d="M141 96 Q155 91 155 96 Q155 101 141 96" fill="#0ea5e9"/>
+  
+  <!-- Karides antenleri -->
+  <path d="M85 85 Q75 75 70 70" stroke="#ffffff" stroke-width="3" fill="none"/>
+  <path d="M107 85 Q117 75 122 70" stroke="#ffffff" stroke-width="3" fill="none"/>
+  
+  <!-- Karides gözleri -->
+  <circle cx="88" cy="88" r="4" fill="#ffffff"/>
+  <circle cx="104" cy="88" r="4" fill="#ffffff"/>
+  <circle cx="88" cy="88" r="2" fill="#0ea5e9"/>
+  <circle cx="104" cy="88" r="2" fill="#0ea5e9"/>
+  
+  <!-- Su kabarcıkları -->
+  <circle cx="40" cy="40" r="3" fill="#ffffff" opacity="0.6"/>
+  <circle cx="160" cy="60" r="2" fill="#ffffff" opacity="0.6"/>
+  <circle cx="50" cy="150" r="2" fill="#ffffff" opacity="0.6"/>
+  <circle cx="140" cy="140" r="3" fill="#ffffff" opacity="0.6"/>
+</svg>
