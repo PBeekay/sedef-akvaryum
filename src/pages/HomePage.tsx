@@ -68,17 +68,11 @@ const HomePage: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
-                                    <Link
+                  <Link
                     to={heroSlides[currentSlide].buttonLink}
                     className="btn-primary text-center"
                   >
                     {heroSlides[currentSlide].buttonText}
-                  </Link>
-                  <Link
-                    to="/guide"
-                    className="btn-outline border-white text-white hover:bg-white hover:text-primary-600 text-center"
-                  >
-                    📚 Rehberi İncele
                   </Link>
                   <PWAInstallButton className="btn-outline border-white text-white hover:bg-white hover:text-primary-600" />
                 </div>
@@ -108,9 +102,9 @@ const HomePage: React.FC = () => {
                              if (parent) {
                                parent.innerHTML = `
                                  <div class="w-full h-96 flex items-center justify-center text-white text-4xl font-bold"
-                                      style="background: ${slide.id === 1 ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)' :
-                                                          slide.id === 2 ? 'linear-gradient(135deg, #10b981, #047857)' :
-                                                          'linear-gradient(135deg, #f59e0b, #d97706)'}">
+                                      style="background: ${slide.id === 1 ? 'linear-gradient(135deg, #1a237e, #3949ab)' :
+                                                          slide.id === 2 ? 'linear-gradient(135deg, #4a148c, #8e24aa)' :
+                                                          'linear-gradient(135deg, #d84315, #f4511e)'}">
                                    <div class="text-center">
                                      <div class="text-6xl mb-4">${slide.icon}</div>
                                      <div class="text-2xl">${slide.title}</div>
@@ -227,7 +221,7 @@ const HomePage: React.FC = () => {
               to="/category/fish"
               className="btn-primary"
             >
-              Tüm Ürünleri Görüntüle
+              🐠 Balıkları Keşfet
             </Link>
           </div>
         </div>

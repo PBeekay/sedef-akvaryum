@@ -4,9 +4,10 @@ import { Product } from '../types/Product';
 
 interface ProductCardProps {
   product: Product;
+  showDetails?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = memo(({ product, showDetails = false }) => {
   const getStockStatus = () => {
     if (!product.inStock) return { text: 'Stokta Yok', color: 'bg-red-500' };
     return { text: 'Stokta', color: 'bg-green-500' };
@@ -45,9 +46,11 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product }) => {
             <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors duration-200">
               {product.name}
             </h3>
-            <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-              {product.shortDescription}
-            </p>
+            {showDetails && (
+              <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                {product.shortDescription}
+              </p>
+            )}
           </div>
         </div>
       </Link>

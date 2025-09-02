@@ -184,8 +184,10 @@ const SearchPage: React.FC = () => {
                 <option value="all">Tümü</option>
                 <option value="shrimp">🦐 Karides</option>
                 <option value="fish">🐠 Balık</option>
+                <option value="plants">🌿 Bitkiler</option>
+                <option value="equipment">🔧 Ekipman</option>
+                <option value="accessories">🎣 Aksesuarlar</option>
                 <option value="food">🍖 Yem</option>
-                <option value="accessories">🔧 Aksesuar</option>
               </select>
             </div>
 

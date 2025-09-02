@@ -61,6 +61,39 @@ const defaultSliderData: SliderData[] = [
   },
   {
     id: 2,
+    title: "Çalışma Saatlerimiz",
+    subtitle: "Hizmetinizdeyiz",
+    description: "Her gün sabah 10:00 - akşam 20:00 arası hizmetinizdeyiz. Pazar günleri kapalıyız. Adres: Eskişehir, Telefon: 0555 123 45 67",
+    image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?q=80&w=1926&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "info",
+    icon: "🕐",
+    buttonText: "İletişim Bilgileri",
+    buttonLink: "/contact"
+  },
+  {
+    id: 3,
+    title: "Kargo & Teslimat",
+    subtitle: "Anlaşmalı Kargo",
+    description: "Anlaşmalı kargo firmaları ile güvenli teslimat. 2000 TL üzeri alışverişlerde ücretsiz kargo! Alıcı ödemeli gönderim seçeneği de mevcut.",
+    image: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "shipping",
+    icon: "📦",
+    buttonText: "Teslimat Bilgileri",
+    buttonLink: "/contact"
+  },
+  {
+    id: 4,
+    title: "Kalite Asla Tesadüf Değildir",
+    subtitle: "1965'ten Günümüze",
+    description: "Arkasında emek, alın teri, bilgi ve tecrübe vardır. Amcadan babaya, babadan oğula, Ankaradan İstanbul'a, İstanbul'dan Eskişehir'e uzanan 58 yıllık güven ve kalite geleneği.",
+    image: "https://images.unsplash.com/photo-1587764379873-97837921fd44?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "about",
+    icon: "🏆",
+    buttonText: "Hakkımızda",
+    buttonLink: "/contact"
+  },
+  {
+    id: 5,
     title: "Canlı Karidesler",
     subtitle: "Temizlik Uzmanları",
     description: "Akvaryumunuzu temiz tutan canlı karidesler. Hem güzel hem de faydalı dostlarınız.",
@@ -71,7 +104,7 @@ const defaultSliderData: SliderData[] = [
     buttonLink: "/category/shrimp"
   },
   {
-    id: 3,
+    id: 6,
     title: "Premium Balık Yemleri",
     subtitle: "Sağlıklı Beslenme",
     description: "Balıklarınızın sağlığı için özel olarak seçilmiş premium yemler ve besin takviyeleri.",

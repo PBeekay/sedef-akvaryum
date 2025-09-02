@@ -7,8 +7,6 @@ const CategoryPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const [sortBy, setSortBy] = useState<'name' | 'price-low' | 'price-high'>('name');
   const [filterInStock, setFilterInStock] = useState(false);
-  const [filterDifficulty, setFilterDifficulty] = useState<string>('');
-
 
   const category = categories.find(cat => cat.id === categoryId);
   const allProducts = getProductsByCategory(categoryId || '');
@@ -21,13 +19,6 @@ const CategoryPage: React.FC = () => {
       filtered = filtered.filter(product => product.inStock);
     }
 
-    // Filter by difficulty (for shrimp and fish categories)
-    if (filterDifficulty && (categoryId === 'shrimp' || categoryId === 'fish')) {
-      filtered = filtered.filter(product => product.difficulty === filterDifficulty);
-    }
-
-
-
     // Sort products
     switch (sortBy) {
       case 'price-low':
@@ -38,7 +29,7 @@ const CategoryPage: React.FC = () => {
       default:
         return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
     }
-  }, [allProducts, sortBy, filterInStock, filterDifficulty, categoryId]);
+  }, [allProducts, sortBy, filterInStock]);
 
   if (!category) {
     return (
@@ -99,55 +90,6 @@ const CategoryPage: React.FC = () => {
                </select>
              </div>
             </div>
-
-            {/* Karides Özel Filtreleri */}
-            {categoryId === 'shrimp' && (
-              <div className="border-t border-gray-200 pt-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Karides Filtreleri</h3>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex items-center space-x-2">
-                    <label className="text-sm text-gray-700">Zorluk:</label>
-                    <select
-                      value={filterDifficulty}
-                      onChange={(e) => setFilterDifficulty(e.target.value)}
-                      className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    >
-                      <option value="">Tümü</option>
-                      <option value="Kolay">Kolay</option>
-                      <option value="Orta">Orta</option>
-                      <option value="Zor">Zor</option>
-                    </select>
-                  </div>
-                  
-
-                </div>
-              </div>
-            )}
-
-            {/* Balık Özel Filtreleri */}
-            {categoryId === 'fish' && (
-              <div className="border-t border-gray-200 pt-4">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Balık Filtreleri</h3>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="flex items-center space-x-2">
-                    <label className="text-sm text-gray-700">Zorluk:</label>
-                    <select
-                      value={filterDifficulty}
-                      onChange={(e) => setFilterDifficulty(e.target.value)}
-                      className="border border-gray-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    >
-                      <option value="">Tümü</option>
-                      <option value="Çok Kolay">Çok Kolay</option>
-                      <option value="Kolay">Kolay</option>
-                      <option value="Orta">Orta</option>
-                      <option value="Zor">Zor</option>
-                    </select>
-                  </div>
-                  
-
-                </div>
-              </div>
-            )}
           </div>
         </div>
 

@@ -42,6 +42,47 @@ A modern, responsive pet shop website built with React, TypeScript, and Tailwind
 - **Typography**: Professional font (Inter) for better readability
 - **Color Scheme**: Blue and purple gradient theme
 
+## ⚡ Performance Optimizations
+
+### Code Splitting & Lazy Loading
+- **Route-based Code Splitting**: Each page component is loaded only when needed
+- **Suspense Boundaries**: Smooth loading states with fallback components
+- **Dynamic Imports**: Components are imported dynamically to reduce initial bundle size
+
+### Image Optimization
+- **Lazy Loading**: Images load only when they come into view
+- **Progressive Loading**: Placeholder images while content loads
+- **WebP Support**: Modern image format support for better compression
+- **Intersection Observer**: Efficient scroll-based loading detection
+- **Quality Optimization**: Automatic image quality adjustment based on device
+
+### Caching Strategies
+- **Memory Cache**: In-memory caching for frequently accessed data
+- **LocalStorage Cache**: Persistent caching for offline support
+- **Service Worker Cache**: Advanced caching strategies for PWA
+- **Cache Decorators**: Easy-to-use caching for functions and API calls
+
+### Virtual Scrolling
+- **Large List Optimization**: Efficient rendering of long product lists
+- **Viewport-based Rendering**: Only visible items are rendered
+- **Overscan Support**: Pre-loading items just outside viewport
+- **Performance Monitoring**: Real-time performance metrics
+
+### Service Worker Optimization
+- **Multiple Cache Strategies**: 
+  - Cache First for static assets
+  - Network First for API requests
+  - Stale While Revalidate for dynamic content
+- **Background Sync**: Offline action handling
+- **Push Notifications**: Enhanced notification system
+- **Automatic Cleanup**: Periodic cache maintenance
+
+### Performance Monitoring
+- **Real-time Metrics**: FPS, memory usage, render times
+- **Development Tools**: Performance monitor component
+- **Cache Analytics**: Hit rates and performance statistics
+- **Bundle Analysis**: Webpack bundle analyzer integration
+
 ## 🛠️ Technology Stack
 
 - **React 18**: Modern React with functional components and hooks
@@ -49,6 +90,8 @@ A modern, responsive pet shop website built with React, TypeScript, and Tailwind
 - **TailwindCSS**: Utility-first CSS framework
 - **React Router**: Client-side routing
 - **Responsive Design**: Mobile-first approach
+- **PWA Support**: Progressive Web App capabilities
+- **Service Worker**: Advanced caching and offline support
 
 ## 📦 Installation
 
@@ -75,6 +118,16 @@ A modern, responsive pet shop website built with React, TypeScript, and Tailwind
 
 - `npm start` - Runs the app in development mode
 - `npm run build` - Builds the app for production
+- `npm run build:prod` - Production build without source maps
+- `npm run build:analyze` - Build and analyze bundle size
+- `npm run build:lighthouse` - Build and run Lighthouse audit
+- `npm run performance` - Performance testing with Lighthouse
+- `npm run performance:dev` - Development performance testing
+- `npm run analyze:webpack` - Webpack bundle analysis
+- `npm run analyze:size` - Size limit analysis
+- `npm run preview:build` - Preview production build
+- `npm run clean` - Clean build and cache
+- `npm run cache:clear` - Clear cache and restart
 - `npm test` - Launches the test runner
 - `npm run eject` - Ejects from Create React App (not recommended)
 
@@ -82,114 +135,97 @@ A modern, responsive pet shop website built with React, TypeScript, and Tailwind
 
 ```
 src/
-├── components/          # Reusable UI components
-│   ├── Navbar.tsx      # Navigation bar component
-│   ├── Footer.tsx      # Footer component
-│   ├── ProductCard.tsx # Product card component
-│   └── WhatsAppButton.tsx # WhatsApp integration component
-├── pages/              # Page components
-│   ├── HomePage.tsx    # Homepage component
+├── components/              # Reusable UI components
+│   ├── Navbar.tsx          # Navigation bar component
+│   ├── Footer.tsx          # Footer component
+│   ├── ProductCard.tsx     # Product card component
+│   ├── WhatsAppButton.tsx  # WhatsApp integration component
+│   ├── ImageOptimizer.tsx  # Optimized image component
+│   ├── VirtualProductList.tsx # Virtual scrolling for large lists
+│   └── PerformanceMonitor.tsx # Performance monitoring component
+├── pages/                  # Page components (lazy loaded)
+│   ├── HomePage.tsx        # Homepage component
 │   ├── ProductDetailPage.tsx # Product detail page
-│   ├── CategoryPage.tsx # Category listing page
-│   └── ContactPage.tsx # Contact page
-├── data/               # Data files
-│   └── products.ts     # Product data and utilities
-├── App.tsx             # Main app component
-├── index.tsx           # App entry point
-└── index.css           # Global styles and TailwindCSS imports
+│   ├── CategoryPage.tsx    # Category listing page
+│   └── ContactPage.tsx     # Contact page
+├── hooks/                  # Custom React hooks
+│   ├── usePerformance.ts   # Performance monitoring hook
+│   └── usePWA.ts          # PWA functionality hook
+├── utils/                  # Utility functions
+│   ├── cache.ts            # Caching utilities
+│   ├── lazyLoad.ts         # Lazy loading utilities
+│   └── security.ts         # Security utilities
+├── data/                   # Data files
+│   └── products.ts         # Product data and utilities
+├── App.tsx                 # Main app component with lazy loading
+├── index.tsx               # App entry point
+└── index.css               # Global styles and TailwindCSS imports
 ```
 
-## 🎨 Customization
+## 🔧 Performance Configuration
 
-### Colors
-The website uses a custom color scheme defined in `tailwind.config.js`:
-- Primary: Blue shades (`primary-50` to `primary-900`)
-- Secondary: Purple shades (`secondary-50` to `secondary-900`)
+### Bundle Size Limits
+- JavaScript: 500 KB
+- CSS: 100 KB
 
-### Products
-Add or modify products in `src/data/products.ts`:
-- Update product information
-- Add new categories
-- Modify pricing and descriptions
+### Caching Configuration
+- Memory Cache: 5 minutes TTL, 100 items max
+- LocalStorage Cache: 24 hours TTL
+- Service Worker: Multiple cache strategies
 
-### WhatsApp Integration
-Update the phone number in `src/components/WhatsAppButton.tsx`:
-```typescript
-phoneNumber = "+1234567890" // Replace with actual phone number
-```
+### Image Optimization
+- Lazy loading threshold: 50px before viewport
+- WebP format support
+- Quality optimization: 80% default
+- Priority loading for above-the-fold images
 
-## 📱 Responsive Design
+## 📊 Performance Monitoring
 
-The website is fully responsive and works on:
-- Desktop computers
-- Tablets
-- Mobile phones
-- All modern browsers
+The app includes comprehensive performance monitoring:
 
-## 🔧 Configuration
+- **Real-time FPS tracking**
+- **Memory usage monitoring**
+- **Render time analysis**
+- **Cache hit rate statistics**
+- **Component mount tracking**
+- **Page load performance metrics**
 
-### Environment Variables
-Create a `.env` file in the root directory for any environment-specific configurations:
-```
-REACT_APP_WHATSAPP_NUMBER=+1234567890
-REACT_APP_STORE_NAME=Pet Paradise
-```
-
-### TailwindCSS Configuration
-Customize the design system in `tailwind.config.js`:
-- Colors
-- Fonts
-- Animations
-- Breakpoints
+Access the performance monitor in development mode (top-right corner) to view real-time metrics.
 
 ## 🚀 Deployment
 
-### Build for Production
+### Production Build
 ```bash
-npm run build
+npm run build:prod
 ```
 
-### Deploy to Netlify
-1. Connect your repository to Netlify
-2. Set build command: `npm run build`
-3. Set publish directory: `build`
+### Performance Audit
+```bash
+npm run build:lighthouse
+```
 
-### Deploy to Vercel
-1. Install Vercel CLI: `npm i -g vercel`
-2. Run: `vercel`
+### Bundle Analysis
+```bash
+npm run build:analyze
+```
 
-## 📞 Support
+## 📈 Performance Best Practices
 
-For support or questions:
-- Email: info@petparadise.com
-- Phone: +1 (555) 123-4567
-- WhatsApp: Use the floating chat button on the website
-
-## 📄 License
-
-This project is licensed under the MIT License.
+1. **Use VirtualProductList for large product lists**
+2. **Implement ImageOptimizer for all images**
+3. **Use cache decorators for expensive operations**
+4. **Monitor performance metrics in development**
+5. **Regular bundle size analysis**
+6. **Lighthouse audits before deployment**
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly
+4. Run performance tests
 5. Submit a pull request
 
-## 🎯 Future Enhancements
+## 📄 License
 
-- [ ] Shopping cart functionality
-- [ ] User authentication
-- [ ] Product reviews and ratings
-- [ ] Advanced filtering options
-- [ ] Payment integration
-- [ ] Admin dashboard
-- [ ] Blog section
-- [ ] Newsletter subscription
-- [ ] Social media integration
-- [ ] Multi-language support
-
----
-
-**Built with ❤️ for pet lovers everywhere**
+This project is licensed under the MIT License.

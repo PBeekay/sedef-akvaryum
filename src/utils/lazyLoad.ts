@@ -1,17 +1,22 @@
-import { lazy, ComponentType } from 'react';
+import React, { lazy, ComponentType, Suspense } from 'react';
 
-// Lazy load components with error boundary
+// Lazy load components with optional fallback component
 export const lazyLoad = <T extends ComponentType<any>>(
   importFunc: () => Promise<{ default: T }>,
-  fallback?: React.ComponentType
+  FallbackComponent?: ComponentType
 ) => {
   const LazyComponent = lazy(importFunc);
-  
-  return (props: React.ComponentProps<T>) => (
-    <React.Suspense fallback={fallback ? <fallback /> : <div>Loading...</div>}>
-      <LazyComponent {...props} />
-    </React.Suspense>
-  );
+
+  return (props: React.ComponentProps<T>) =>
+    React.createElement(
+      Suspense,
+      {
+        fallback: FallbackComponent
+          ? React.createElement(FallbackComponent)
+          : React.createElement('div', null, 'Loading...')
+      },
+      React.createElement(LazyComponent, props)
+    );
 };
 
 // Preload components for better UX
@@ -20,4 +25,5 @@ export const preloadComponent = (importFunc: () => Promise<any>) => {
     importFunc();
   };
 };
+
 

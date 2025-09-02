@@ -26,20 +26,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Arama sonuçlarını filtrele
-  const searchProducts = (searchQuery: string): Product[] => {
+  // Arama sonuçlarını filtrele (stable reference for hooks)
+  const searchProducts = useCallback((searchQuery: string): Product[] => {
     if (!searchQuery.trim()) return [];
-    
-    const query = searchQuery.toLowerCase();
-    return products.filter(product => 
-      product.name.toLowerCase().includes(query) ||
-      product.description.toLowerCase().includes(query) ||
-      product.category.toLowerCase().includes(query) ||
-      (product.species && product.species.toLowerCase().includes(query)) ||
-      (product.color && product.color.toLowerCase().includes(query)) ||
-      (product.colors && product.colors.some(color => color.toLowerCase().includes(query)))
-    ).slice(0, 8); // Maksimum 8 sonuç
-  };
+
+    const loweredQuery = searchQuery.toLowerCase();
+    return products
+      .filter((product) =>
+        product.name.toLowerCase().includes(loweredQuery) ||
+        product.description.toLowerCase().includes(loweredQuery) ||
+        product.category.toLowerCase().includes(loweredQuery) ||
+        (product.species && product.species.toLowerCase().includes(loweredQuery)) ||
+        (product.color && product.color.toLowerCase().includes(loweredQuery)) ||
+        (product.colors && product.colors.some((color) => color.toLowerCase().includes(loweredQuery)))
+      )
+      .slice(0, 8);
+  }, []);
 
   const handleProductClick = useCallback((product: Product) => {
     navigate(`/product/${product.id}`);

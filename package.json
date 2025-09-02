@@ -18,12 +18,21 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "build:analyze": "GENERATE_SOURCEMAP=false react-scripts build && npx webpack-bundle-analyzer build/static/js/*.js",
+    "build:prod": "GENERATE_SOURCEMAP=false react-scripts build",
+    "build:analyze-bundle": "npm run build:prod && npx webpack-bundle-analyzer build/static/js/*.js",
+    "build:lighthouse": "npm run build:prod && npm run lighthouse",
     "test": "react-scripts test",
     "test:coverage": "react-scripts test --coverage --watchAll=false",
     "test:ci": "react-scripts test --coverage --watchAll=false --ci",
     "eject": "react-scripts eject",
     "lighthouse": "npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html",
-    "performance": "npm run build && npm run lighthouse"
+    "performance": "npm run build:prod && npm run lighthouse",
+    "performance:dev": "npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-dev-report.html",
+    "analyze:webpack": "npx webpack-bundle-analyzer build/static/js/*.js",
+    "analyze:size": "npx size-limit",
+    "preview:build": "npx serve -s build",
+    "clean": "rm -rf build node_modules/.cache",
+    "cache:clear": "npm run clean && npm start"
   },
   "eslintConfig": {
     "extends": [
@@ -52,6 +61,19 @@
     "jest": "^27.5.1",
     "jest-environment-jsdom": "^30.1.1",
     "postcss": "^8.4.0",
-    "tailwindcss": "^3.3.0"
-  }
+    "tailwindcss": "^3.3.0",
+    "webpack-bundle-analyzer": "^4.9.1",
+    "size-limit": "^10.0.0",
+    "serve": "^14.2.1"
+  },
+  "size-limit": [
+    {
+      "path": "build/static/js/*.js",
+      "limit": "500 KB"
+    },
+    {
+      "path": "build/static/css/*.css",
+      "limit": "100 KB"
+    }
+  ]
 }

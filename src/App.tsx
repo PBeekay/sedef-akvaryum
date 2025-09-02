@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -6,17 +6,27 @@ import WhatsAppButton from './components/WhatsAppButton';
 import PWAInstallButton from './components/PWAInstallButton';
 import OfflinePage from './components/OfflinePage';
 import ErrorBoundary from './components/ErrorBoundary';
-import HomePage from './pages/HomePage';
-import ProductDetailPage from './pages/ProductDetailPage';
-import CategoryPage from './pages/CategoryPage';
-import ContactPage from './pages/ContactPage';
+import LoadingSpinner from './components/LoadingSpinner';
 
-import AdminPage from './pages/AdminPage';
-import AdminLoginPage from './pages/AdminLoginPage';
-import SearchPage from './pages/SearchPage';
-import NotFoundPage from './pages/NotFoundPage';
 import { AdminProvider } from './context/AdminContext';
 import { StockProvider } from './context/StockContext';
+
+// Lazy load page components
+const HomePage = lazy(() => import('./pages/HomePage'));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'));
+const CategoryPage = lazy(() => import('./pages/CategoryPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
+const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+
+// Loading component for Suspense fallback
+const PageLoader: React.FC = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <LoadingSpinner size="lg" />
+  </div>
+);
 
 function App() {
   return (
@@ -28,17 +38,18 @@ function App() {
             <Navbar />
 
             <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/product/:id" element={<ProductDetailPage />} />
-                <Route path="/category/:categoryId" element={<CategoryPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-
-                      <Route path="/search" element={<SearchPage />} />
-                      <Route path="/admin/login" element={<AdminLoginPage />} />
-                      <Route path="/admin" element={<AdminPage />} />
-                      <Route path="*" element={<NotFoundPage />} />
-              </Routes>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/product/:id" element={<ProductDetailPage />} />
+                  <Route path="/category/:categoryId" element={<CategoryPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/admin/login" element={<AdminLoginPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Suspense>
             </main>
 
             <Footer />
@@ -54,6 +65,9 @@ function App() {
 
             {/* Offline Page */}
             <OfflinePage />
+
+            {/* Performance Monitor (Development Only) */}
+            
                       </div>
           </Router>
         </StockProvider>

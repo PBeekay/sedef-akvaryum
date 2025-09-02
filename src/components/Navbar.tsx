@@ -21,7 +21,7 @@ const Navbar: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="text-2xl">🦐</div>
-                         <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">Sedef Akvaryum</span>
+                         <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">Sedef Akvaryum & Hediye Evi</span>
           </Link>
 
           {/* Desktop Navigation */}
