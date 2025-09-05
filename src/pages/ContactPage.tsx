@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import WhatsAppButton from '../components/WhatsAppButton';
 import { SEDEF_AKVARYUM_GOOGLE_MAPS_URL } from '../utils/googlePlaces';
+import { sanitizeInput, validateEmail } from '../utils/security';
 
 const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -13,17 +14,33 @@ const ContactPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    
+    // Input sanitization
+    const sanitizedValue = sanitizeInput(value);
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: sanitizedValue
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Form validation
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      alert('Lütfen tüm zorunlu alanları doldurun!');
+      return;
+    }
+    
+    if (!validateEmail(formData.email)) {
+      alert('Lütfen geçerli bir e-posta adresi girin!');
+      return;
+    }
+    
     // In a real app, you would send this data to your backend
     console.log('Form submitted:', formData);
-         alert('Mesajınız için teşekkürler! En kısa sürede size geri döneceğiz.');
+    alert('Mesajınız için teşekkürler! En kısa sürede size geri döneceğiz.');
     setFormData({
       name: '',
       email: '',

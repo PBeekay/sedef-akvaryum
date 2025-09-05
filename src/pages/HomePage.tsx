@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { categories, getFeaturedProducts, getNewProducts } from '../data/products';
+import { categories } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import PWAInstallButton from '../components/PWAInstallButton';
 import ReviewsSlider from '../components/ReviewsSlider';
@@ -8,9 +8,20 @@ import { useAdmin } from '../context/AdminContext';
 // import shrimpImage from '../assets/shrimp.jpeg';
 
 const HomePage: React.FC = () => {
-  const featuredProducts = getFeaturedProducts();
-  const newProducts = getNewProducts();
-  const { sliderData } = useAdmin();
+  const { sliderData, products } = useAdmin();
+  
+  // Debug: Log products when they change
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('=== HomePage Products Update ===');
+      console.log('Total products from AdminContext:', products.length);
+      console.log('Products:', products.map(p => ({ id: p.id, name: p.name })));
+    }
+  }, [products]);
+  
+  // Get featured and new products from admin context
+  const featuredProducts = products.filter(product => product.featured);
+  const newProducts = products.filter(product => product.new);
 
   // Hero slider data from admin context
   const heroSlides = sliderData;
@@ -95,26 +106,46 @@ const HomePage: React.FC = () => {
                            className="w-full h-96 object-cover"
                            onError={(e) => {
                              const target = e.target as HTMLImageElement;
-                             console.error('❌ Image failed to load:', slide.title, slide.image);
+                             if (process.env.NODE_ENV === 'development') {
+                               console.error('❌ Image failed to load:', slide.title, slide.image);
+                             }
                              // Fallback to gradient background
                              target.style.display = 'none';
                              const parent = target.parentElement;
                              if (parent) {
-                               parent.innerHTML = `
-                                 <div class="w-full h-96 flex items-center justify-center text-white text-4xl font-bold"
-                                      style="background: ${slide.id === 1 ? 'linear-gradient(135deg, #1a237e, #3949ab)' :
-                                                          slide.id === 2 ? 'linear-gradient(135deg, #4a148c, #8e24aa)' :
-                                                          'linear-gradient(135deg, #d84315, #f4511e)'}">
-                                   <div class="text-center">
-                                     <div class="text-6xl mb-4">${slide.icon}</div>
-                                     <div class="text-2xl">${slide.title}</div>
-                                   </div>
-                                 </div>
-                               `;
+                               // Clear existing content safely
+                               parent.textContent = '';
+                               
+                               // Create elements safely without innerHTML
+                               const slideDiv = document.createElement('div');
+                               slideDiv.className = 'w-full h-96 flex items-center justify-center text-white text-4xl font-bold';
+                               
+                               const backgroundStyle = slide.id === 1 ? 'linear-gradient(135deg, #1a237e, #3949ab)' :
+                                                      slide.id === 2 ? 'linear-gradient(135deg, #4a148c, #8e24aa)' :
+                                                      'linear-gradient(135deg, #d84315, #f4511e)';
+                               slideDiv.style.background = backgroundStyle;
+                               
+                               const centerDiv = document.createElement('div');
+                               centerDiv.className = 'text-center';
+                               
+                               const iconDiv = document.createElement('div');
+                               iconDiv.className = 'text-6xl mb-4';
+                               iconDiv.textContent = slide.icon;
+                               
+                               const titleDiv = document.createElement('div');
+                               titleDiv.className = 'text-2xl';
+                               titleDiv.textContent = slide.title;
+                               
+                               centerDiv.appendChild(iconDiv);
+                               centerDiv.appendChild(titleDiv);
+                               slideDiv.appendChild(centerDiv);
+                               parent.appendChild(slideDiv);
                              }
                            }}
                            onLoad={() => {
-                             console.log('✅ Image loaded successfully:', slide.title);
+                             if (process.env.NODE_ENV === 'development') {
+                               console.log('✅ Image loaded successfully:', slide.title);
+                             }
                            }}
                          />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>

@@ -1,52 +1,61 @@
 import bcrypt from 'bcryptjs';
+import DOMPurify from 'dompurify';
+import { SignJWT, jwtVerify } from 'jose';
 
-// Environment variables (gerçek uygulamada .env dosyasından alınmalı)
-const JWT_SECRET = process.env.REACT_APP_JWT_SECRET || 'sedef-akvaryum-secret-key-2024';
+// Environment variables - .env dosyasından alınmalı
+const JWT_SECRET = process.env.REACT_APP_JWT_SECRET || 'sedef-akvaryum-dev-secret-key-2024';
 const SALT_ROUNDS = 12;
 
-// Browser-compatible JWT Token işlemleri
-export const generateToken = (payload: any): string => {
-  const header = { alg: 'HS256', typ: 'JWT' };
-  const now = Math.floor(Date.now() / 1000);
-  const exp = now + (8 * 60 * 60); // 8 hours
+// JWT secret kontrolü - Development için fallback
+if (!process.env.REACT_APP_JWT_SECRET && process.env.NODE_ENV === 'development') {
+  console.warn('REACT_APP_JWT_SECRET not found, using development fallback');
+}
+
+// Güvenli JWT Token işlemleri - Browser uyumlu kriptografi ile
+export const generateToken = async (payload: any): Promise<string> => {
+  if (!JWT_SECRET) {
+    throw new Error('JWT_SECRET is required for token generation');
+  }
   
-  const data = {
-    ...payload,
-    iat: now,
-    exp: exp
-  };
+  const secret = new TextEncoder().encode(JWT_SECRET);
   
-  // Simple base64 encoding for browser compatibility
-  const headerB64 = btoa(JSON.stringify(header));
-  const payloadB64 = btoa(JSON.stringify(data));
-  
-  // Simple signature (in production, use proper crypto)
-  const signature = btoa(JWT_SECRET + headerB64 + payloadB64);
-  
-  return `${headerB64}.${payloadB64}.${signature}`;
+  const jwt = await new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('8h')
+    .setIssuer('sedef-akvaryum')
+    .setAudience('admin-panel')
+    .sign(secret);
+    
+  return jwt;
 };
 
-export const verifyToken = (token: string): any => {
+export const verifyToken = async (token: string): Promise<any> => {
   try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return null;
+    if (!JWT_SECRET) {
+      throw new Error('JWT_SECRET is required for token verification');
+    }
     
-    const [headerB64, payloadB64, signature] = parts;
+    const secret = new TextEncoder().encode(JWT_SECRET);
     
-    // Verify signature (simple check for browser compatibility)
-    const expectedSignature = btoa(JWT_SECRET + headerB64 + payloadB64);
-    if (signature !== expectedSignature) return null;
-    
-    const payload = JSON.parse(atob(payloadB64));
-    
-    // Check expiration
-    const now = Math.floor(Date.now() / 1000);
-    if (payload.exp && payload.exp < now) return null;
+    const { payload } = await jwtVerify(token, secret, {
+      issuer: 'sedef-akvaryum',
+      audience: 'admin-panel'
+    });
     
     return payload;
   } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Token verification error:', error);
+    }
     return null;
   }
+};
+
+// Token'ın geçerli olup olmadığını kontrol et
+export const isTokenValid = async (token: string): Promise<boolean> => {
+  const decoded = await verifyToken(token);
+  return decoded !== null;
 };
 
 // Password hashing
@@ -58,13 +67,37 @@ export const comparePassword = async (password: string, hashedPassword: string):
   return await bcrypt.compare(password, hashedPassword);
 };
 
-// Input validation ve sanitization
+// Input validation ve sanitization - DOMPurify ile güçlendirilmiş XSS koruması
 export const sanitizeInput = (input: string): string => {
-  return input
+  if (!input || typeof input !== 'string') return '';
+  
+  // DOMPurify ile temizleme
+  const sanitized = DOMPurify.sanitize(input, {
+    ALLOWED_TAGS: [], // Hiçbir HTML tag'ine izin verme
+    ALLOWED_ATTR: [], // Hiçbir attribute'a izin verme
+    KEEP_CONTENT: true // Sadece metin içeriğini koru
+  });
+  
+  return sanitized
     .trim()
-    .replace(/[<>]/g, '') // XSS koruması
-    .replace(/javascript:/gi, '') // JavaScript injection koruması
-    .replace(/on\w+=/gi, ''); // Event handler koruması
+    // Ek güvenlik için regex temizleme
+    .replace(/javascript:/gi, '')
+    .replace(/vbscript:/gi, '')
+    .replace(/data:/gi, '')
+    .replace(/on\w+\s*=/gi, '')
+    // Maksimum uzunluk kontrolü
+    .substring(0, 1000);
+};
+
+// HTML içeriği için güvenli sanitization (sınırlı HTML tag'leri ile)
+export const sanitizeHTML = (input: string): string => {
+  if (!input || typeof input !== 'string') return '';
+  
+  return DOMPurify.sanitize(input, {
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li'],
+    ALLOWED_ATTR: [],
+    KEEP_CONTENT: true
+  });
 };
 
 export const validateEmail = (email: string): boolean => {
@@ -97,24 +130,87 @@ export const validatePassword = (password: string): { isValid: boolean; errors: 
   };
 };
 
-// Rate limiting için basit bir in-memory store
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+// Rate limiting için localStorage tabanlı persistent store
+const RATE_LIMIT_KEY = 'sedef_akvaryum_rate_limits';
+
+interface RateLimitRecord {
+  count: number;
+  resetTime: number;
+  blocked: boolean;
+}
+
+const getRateLimitStore = (): Map<string, RateLimitRecord> => {
+  try {
+    const stored = localStorage.getItem(RATE_LIMIT_KEY);
+    if (stored) {
+      const data = JSON.parse(stored);
+      return new Map(Object.entries(data));
+    }
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Rate limit store error:', error);
+    }
+  }
+  return new Map();
+};
+
+const saveRateLimitStore = (store: Map<string, RateLimitRecord>): void => {
+  try {
+    const data = Object.fromEntries(store);
+    localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data));
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Rate limit save error:', error);
+    }
+  }
+};
 
 export const checkRateLimit = (identifier: string, maxRequests: number = 5, windowMs: number = 60000): boolean => {
   const now = Date.now();
-  const record = rateLimitStore.get(identifier);
+  const store = getRateLimitStore();
+  const record = store.get(identifier);
   
+  // Eğer kullanıcı bloklanmışsa ve süre dolmamışsa
+  if (record?.blocked && now < record.resetTime) {
+    return false;
+  }
+  
+  // Eğer kayıt yoksa veya süre dolmuşsa yeni kayıt oluştur
   if (!record || now > record.resetTime) {
-    rateLimitStore.set(identifier, { count: 1, resetTime: now + windowMs });
+    store.set(identifier, { 
+      count: 1, 
+      resetTime: now + windowMs,
+      blocked: false 
+    });
+    saveRateLimitStore(store);
     return true;
   }
   
+  // Limit aşıldıysa blokla
   if (record.count >= maxRequests) {
+    record.blocked = true;
+    record.resetTime = now + (windowMs * 2); // 2x daha uzun blokla
+    store.set(identifier, record);
+    saveRateLimitStore(store);
     return false;
   }
   
   record.count++;
+  store.set(identifier, record);
+  saveRateLimitStore(store);
   return true;
+};
+
+// Rate limit durumunu temizle
+export const clearRateLimit = (identifier: string): void => {
+  const store = getRateLimitStore();
+  store.delete(identifier);
+  saveRateLimitStore(store);
+};
+
+// Tüm rate limit verilerini temizle
+export const clearAllRateLimits = (): void => {
+  localStorage.removeItem(RATE_LIMIT_KEY);
 };
 
 // CSRF token generation
@@ -122,30 +218,122 @@ export const generateCSRFToken = (): string => {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 };
 
-// Secure storage utilities
+// Admin şifre hash'i oluşturma (sadece geliştirme için)
+export const generateAdminPasswordHash = async (password: string): Promise<string> => {
+  console.log(`Generating hash for password: ${password}`);
+  const hash = await hashPassword(password);
+  console.log(`Generated hash: ${hash}`);
+  return hash;
+};
+
+// Secure storage utilities - Geliştirilmiş güvenlik
 export const secureStorage = {
   setItem: (key: string, value: any): void => {
     try {
-      const encryptedValue = btoa(JSON.stringify(value));
+      // Validate key format
+      if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
+        console.error('Invalid storage key format');
+        return;
+      }
+      
+      // Basit şifreleme (gerçek uygulamada daha güçlü şifreleme kullanın)
+      const data = JSON.stringify(value);
+      const encryptedValue = btoa(data);
       sessionStorage.setItem(key, encryptedValue);
     } catch (error) {
-      console.error('Secure storage setItem error:', error);
+      // Production'da console.error kullanmayın
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Secure storage setItem error:', error);
+      }
     }
   },
   
   getItem: (key: string): any => {
     try {
+      // Validate key format
+      if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
+        console.error('Invalid storage key format');
+        return null;
+      }
+      
       const encryptedValue = sessionStorage.getItem(key);
       if (!encryptedValue) return null;
-      return JSON.parse(atob(encryptedValue));
+      const decryptedValue = atob(encryptedValue);
+      return JSON.parse(decryptedValue);
     } catch (error) {
-      console.error('Secure storage getItem error:', error);
+      // Şifreleme hatası durumunda temizle
+      sessionStorage.removeItem(key);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Secure storage getItem error:', error);
+      }
       return null;
     }
   },
   
   removeItem: (key: string): void => {
+    if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
+      console.error('Invalid storage key format');
+      return;
+    }
     sessionStorage.removeItem(key);
+  },
+  
+  // Tüm admin verilerini temizle
+  clearAdminData: (): void => {
+    const keys = ['adminToken', 'adminUser', 'adminSession'];
+    keys.forEach(key => sessionStorage.removeItem(key));
+  }
+};
+
+// Enhanced localStorage wrapper with security checks
+export const secureLocalStorage = {
+  setItem: (key: string, value: any): void => {
+    try {
+      // Validate key format
+      if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
+        console.error('Invalid localStorage key format');
+        return;
+      }
+      
+      // Don't store sensitive data in localStorage
+      const sensitiveKeys = ['password', 'token', 'secret', 'key', 'auth'];
+      if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
+        console.error('Sensitive data not allowed in localStorage');
+        return;
+      }
+      
+      const data = JSON.stringify(value);
+      localStorage.setItem(key, data);
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error saving to localStorage:', error);
+      }
+    }
+  },
+  
+  getItem: (key: string): any => {
+    try {
+      if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
+        console.error('Invalid localStorage key format');
+        return null;
+      }
+      
+      const value = localStorage.getItem(key);
+      return value ? JSON.parse(value) : null;
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error loading from localStorage:', error);
+      }
+      return null;
+    }
+  },
+  
+  removeItem: (key: string): void => {
+    if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
+      console.error('Invalid localStorage key format');
+      return;
+    }
+    localStorage.removeItem(key);
   }
 };
 

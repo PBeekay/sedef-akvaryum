@@ -57,9 +57,26 @@ export const fetchPlaceDetails = async (
     return null;
   }
 
+  // Sanitize placeId to prevent injection
+  const sanitizedPlaceId = placeId.replace(/[^a-zA-Z0-9_-]/g, '');
+  if (sanitizedPlaceId !== placeId) {
+    console.error('Invalid place ID format');
+    return null;
+  }
+
   try {
+    // Use environment variable for API key in production
+    const safeApiKey = process.env.NODE_ENV === 'production' 
+      ? process.env.REACT_APP_GOOGLE_PLACES_API_KEY 
+      : apiKey;
+      
+    if (!safeApiKey) {
+      console.warn('Google Places API key not configured');
+      return null;
+    }
+
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=place_id,name,formatted_address,formatted_phone_number,international_phone_number,website,rating,user_ratings_total,reviews,opening_hours,geometry&key=${apiKey}`
+      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${sanitizedPlaceId}&fields=place_id,name,formatted_address,formatted_phone_number,international_phone_number,website,rating,user_ratings_total,reviews,opening_hours,geometry&key=${safeApiKey}`
     );
 
     if (!response.ok) {

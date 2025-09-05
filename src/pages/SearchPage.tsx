@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { products } from '../data/products';
 import { Product } from '../types/Product';
 import ProductCard from '../components/ProductCard';
 import SearchBar from '../components/SearchBar';
 import { GridLoader } from '../components/LoadingSpinner';
+import { useAdmin } from '../context/AdminContext';
 
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -15,6 +15,7 @@ const SearchPage: React.FC = () => {
     priceRange: 'all',
     sortBy: 'relevance'
   });
+  const { products } = useAdmin();
 
   const query = searchParams.get('q') || '';
 

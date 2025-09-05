@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { generateToken, verifyToken, secureStorage, comparePassword, checkRateLimit } from '../utils/security';
+import { generateToken, verifyToken, secureStorage, checkRateLimit } from '../utils/security';
+import { Product } from '../types/Product';
+import { products as initialProducts } from '../data/products';
 
 interface SliderData {
   id: number;
@@ -22,6 +24,11 @@ interface AdminContextType {
   addSlider: (slide: Omit<SliderData, 'id'>) => void;
   updateSlider: (id: number, slide: Partial<SliderData>) => void;
   deleteSlider: (id: number) => void;
+  // Product management
+  products: Product[];
+  addProduct: (productData: Omit<Product, 'id'>) => void;
+  updateProduct: (id: string, productData: Partial<Product>) => void;
+  deleteProduct: (id: string) => void;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
@@ -63,11 +70,22 @@ const defaultSliderData: SliderData[] = [
     id: 2,
     title: "Çalışma Saatlerimiz",
     subtitle: "Hizmetinizdeyiz",
-    description: "Her gün sabah 10:00 - akşam 20:00 arası hizmetinizdeyiz. Pazar günleri kapalıyız. Adres: Eskişehir, Telefon: 0555 123 45 67",
+    description: "Her gün sabah 10:00 - akşam 20:00 arası hizmetinizdeyiz. Pazar günleri kapalıyız. Müşteri memnuniyeti bizim önceliğimizdir.",
     image: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?q=80&w=1926&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     category: "info",
     icon: "🕐",
-    buttonText: "İletişim Bilgileri",
+    buttonText: "Çalışma Saatleri",
+    buttonLink: "/contact"
+  },
+  {
+    id: 7,
+    title: "Adresimiz",
+    subtitle: "Eskişehir Merkez",
+    description: "Eskişehir merkezde bulunan mağazamızda sizleri ağırlamaktan mutluluk duyarız. Geniş ürün yelpazesi ve uzman ekibimizle hizmetinizdeyiz.",
+    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    category: "info",
+    icon: "📍",
+    buttonText: "Adres Bilgileri",
     buttonLink: "/contact"
   },
   {
@@ -75,7 +93,7 @@ const defaultSliderData: SliderData[] = [
     title: "Kargo & Teslimat",
     subtitle: "Anlaşmalı Kargo",
     description: "Anlaşmalı kargo firmaları ile güvenli teslimat. 2000 TL üzeri alışverişlerde ücretsiz kargo! Alıcı ödemeli gönderim seçeneği de mevcut.",
-    image: "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    image: "https://www.ideasoft.com.tr/wp-content/uploads/2024/08/image-7-1024x681.png",
     category: "shipping",
     icon: "📦",
     buttonText: "Teslimat Bilgileri",
@@ -140,24 +158,41 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   const [sliderData, setSliderData] = useState<SliderData[]>(() => 
     loadFromStorage(STORAGE_KEYS.SLIDER_DATA, defaultSliderData)
   );
+  const [products, setProducts] = useState<Product[]>(() => {
+    const loadedProducts = loadFromStorage(STORAGE_KEYS.PRODUCTS, initialProducts);
+    console.log('=== AdminContext Products Initialize ===');
+    console.log('Storage key:', STORAGE_KEYS.PRODUCTS);
+    console.log('Loaded products from localStorage:', loadedProducts.length);
+    console.log('Initial products from data:', initialProducts.length);
+    console.log('Loaded products:', loadedProducts.map(p => ({ id: p.id, name: p.name })));
+    return loadedProducts;
+  });
 
   // Authentication check on mount
   useEffect(() => {
-    const token = secureStorage.getItem('adminToken');
-    if (token) {
-      const decoded = verifyToken(token);
-      if (decoded) {
-        setIsAuthenticated(true);
-      } else {
-        secureStorage.removeItem('adminToken');
+    const checkAuth = async () => {
+      const token = secureStorage.getItem('adminToken');
+      if (token) {
+        const decoded = await verifyToken(token);
+        if (decoded) {
+          setIsAuthenticated(true);
+        } else {
+          secureStorage.removeItem('adminToken');
+        }
       }
-    }
+    };
+    checkAuth();
   }, []);
 
   // Slider verilerini localStorage'a kaydet
   useEffect(() => {
     saveToStorage(STORAGE_KEYS.SLIDER_DATA, sliderData);
   }, [sliderData]);
+
+  // Products verilerini localStorage'a kaydet
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.PRODUCTS, products);
+  }, [products]);
 
   const addSlider = (slide: Omit<SliderData, 'id'>) => {
     const newSlide = {
@@ -186,13 +221,18 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
     }
 
     try {
-      // Gerçek uygulamada bu bilgiler veritabanından alınır
-      const hashedPassword = '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/HS.iK8i'; // "akvaryum2024"
+      // Güvenli admin girişi - environment variables kullanarak
+      const adminUsername = process.env.REACT_APP_ADMIN_USERNAME || 'admin';
+      const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin123';
       
-      const isValidPassword = await comparePassword(password, hashedPassword);
+      if (process.env.NODE_ENV === 'development' && (!process.env.REACT_APP_ADMIN_USERNAME || !process.env.REACT_APP_ADMIN_PASSWORD)) {
+        console.warn('Using development fallback credentials. Set REACT_APP_ADMIN_USERNAME and REACT_APP_ADMIN_PASSWORD for production.');
+      }
       
-      if (username === 'sedefadmin' && isValidPassword) {
-        const token = generateToken({ 
+      const isValidCredentials = username === adminUsername && password === adminPassword;
+      
+      if (isValidCredentials) {
+        const token = await generateToken({ 
           username, 
           role: 'admin',
           loginTime: Date.now()
@@ -223,6 +263,56 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  const addProduct = (productData: Omit<Product, 'id'>) => {
+    console.log('Adding new product:', productData);
+    const newProduct: Product = {
+      id: `product-${Date.now()}`,
+      ...productData
+    };
+    console.log('Created product with ID:', newProduct.id);
+    
+    setProducts(prev => {
+      const updated = [...prev, newProduct];
+      console.log('Updated products array, new length:', updated.length);
+      console.log('New product added to array:', newProduct);
+      
+      // Immediately save to localStorage
+      saveToStorage(STORAGE_KEYS.PRODUCTS, updated);
+      
+      return updated;
+    });
+  };
+
+  const updateProduct = (id: string, productData: Partial<Product>) => {
+    console.log('Updating product:', id, 'with data:', productData);
+    setProducts(prev => {
+      const updated = prev.map(p => 
+        p.id === id ? { ...p, ...productData } : p
+      );
+      saveToStorage(STORAGE_KEYS.PRODUCTS, updated); // Immediate save
+      return updated;
+    });
+  };
+
+  const deleteProduct = (id: string) => {
+    console.log('=== AdminContext deleteProduct called ===');
+    console.log('Product ID to delete:', id);
+    console.log('Current products before deletion:', products.length);
+    console.log('Products before deletion:', products.map(p => ({ id: p.id, name: p.name })));
+    
+    setProducts(prev => {
+      const updated = prev.filter(p => p.id !== id);
+      console.log('Updated products after deletion, new length:', updated.length);
+      console.log('Products after deletion:', updated.map(p => ({ id: p.id, name: p.name })));
+      
+      // Save to localStorage immediately
+      saveToStorage(STORAGE_KEYS.PRODUCTS, updated);
+      console.log('Saved to localStorage:', STORAGE_KEYS.PRODUCTS);
+      
+      return updated;
+    });
+  };
+
   const value: AdminContextType = {
     isAuthenticated,
     login,
@@ -231,7 +321,11 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
     setSliderData,
     addSlider,
     updateSlider,
-    deleteSlider
+    deleteSlider,
+    products,
+    addProduct,
+    updateProduct,
+    deleteProduct
   };
 
   return (

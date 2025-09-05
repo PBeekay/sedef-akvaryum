@@ -12,7 +12,6 @@ interface AdminProduct extends Product {
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('products');
-  const [adminProducts, setAdminProducts] = useState<AdminProduct[]>(products);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -23,7 +22,18 @@ const AdminPage: React.FC = () => {
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [showSliderEditor, setShowSliderEditor] = useState(false);
   const [editingSlider, setEditingSlider] = useState<any>(null);
-  const { isAuthenticated, logout, sliderData, addSlider, updateSlider, deleteSlider } = useAdmin();
+  const { 
+    isAuthenticated, 
+    logout, 
+    sliderData, 
+    addSlider, 
+    updateSlider, 
+    deleteSlider,
+    products: adminProducts,
+    addProduct,
+    updateProduct,
+    deleteProduct
+  } = useAdmin();
   const { stockItems, updateStock, setLowStockThreshold } = useStock();
 
   // Authentication check
@@ -56,6 +66,14 @@ const AdminPage: React.FC = () => {
     return matchesSearch && matchesCategory;
   });
 
+  // Debug: Log products when they change
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('AdminPage - Products updated:', adminProducts.length, 'products');
+      console.log('AdminPage - Filtered products:', filteredProducts.length, 'products');
+    }
+  }, [adminProducts, filteredProducts]);
+
   const handleAddProduct = () => {
     setShowAddForm(true);
     setEditingProduct(null);
@@ -67,45 +85,51 @@ const AdminPage: React.FC = () => {
   };
 
   const handleDeleteProduct = (productId: string) => {
-    if (window.confirm('Bu ürünü silmek istediğinizden emin misiniz?')) {
-      setAdminProducts(prev => prev.filter(p => p.id !== productId));
+    // Sanitize productId
+    const sanitizedId = productId.replace(/[^a-zA-Z0-9_-]/g, '');
+    if (sanitizedId !== productId) {
+      console.error('Invalid product ID format');
+      return;
+    }
+    
+    // Use a more secure confirmation method
+    const confirmed = window.confirm('Bu ürünü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');
+    if (confirmed) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('AdminPage - Deleting product:', sanitizedId);
+        console.log('AdminPage - Products before deletion:', adminProducts.length);
+      }
+      deleteProduct(sanitizedId);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('AdminPage - Delete function called');
+      }
+      alert('Ürün başarıyla silindi!');
     }
   };
 
   const handleSaveProduct = (productData: Partial<Product>) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('AdminPage - handleSaveProduct called with:', productData);
+    }
     if (editingProduct) {
       // Update existing product
-      setAdminProducts(prev => prev.map(p => 
-        p.id === editingProduct.id ? { ...p, ...productData, isEditing: false } : p
-      ));
+      if (process.env.NODE_ENV === 'development') {
+        console.log('AdminPage - Updating product:', editingProduct.id);
+      }
+      updateProduct(editingProduct.id, productData);
+      alert('Ürün başarıyla güncellendi!');
     } else {
       // Add new product
-      const newProduct: AdminProduct = {
-        id: `product-${Date.now()}`,
-        name: productData.name || '',
-        category: productData.category || 'fish',
-        price: productData.price || 0,
-        description: productData.description || '',
-        shortDescription: productData.shortDescription || '',
-        image: productData.image || '',
-        inStock: productData.inStock || true,
-        featured: productData.featured || false,
-        new: productData.new || false,
-        colors: productData.colors || [],
-        socialBehavior: productData.socialBehavior || '',
-        waterParameters: productData.waterParameters || {
-          temperature: '',
-          pH: '',
-          hardness: ''
-        },
-        size: productData.size || '',
-        difficulty: productData.difficulty || '',
-        breeding: productData.breeding || '',
-        diet: productData.diet || '',
-        lifespan: productData.lifespan || '',
-        tankSize: productData.tankSize || '',
-      };
-      setAdminProducts(prev => [...prev, newProduct]);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('AdminPage - Adding new product');
+      }
+      addProduct(productData as Omit<Product, 'id'>);
+      alert('Yeni ürün başarıyla eklendi!');
+      
+      // Force a re-render by updating the active tab
+      setTimeout(() => {
+        setActiveTab('products');
+      }, 100);
     }
     setShowAddForm(false);
     setEditingProduct(null);
@@ -236,12 +260,48 @@ const AdminPage: React.FC = () => {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <h2 className="text-2xl font-bold text-gray-800">Ürün Yönetimi</h2>
-                <button
-                  onClick={handleAddProduct}
-                  className="btn-primary"
-                >
-                  + Yeni Ürün Ekle
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      console.log('=== DEBUG INFO ===');
+                      console.log('Total products:', adminProducts.length);
+                      console.log('Filtered products:', filteredProducts.length);
+                      console.log('Selected category:', selectedCategory);
+                      console.log('Search term:', searchTerm);
+                      console.log('All products:', adminProducts);
+                      console.log('Filtered products:', filteredProducts);
+                      console.log('LocalStorage products:', JSON.parse(localStorage.getItem('sedef_akvaryum_products') || '[]'));
+                    }}
+                    className="px-3 py-1 bg-gray-500 text-white rounded text-sm"
+                  >
+                    Debug
+                  </button>
+                  <button
+                    onClick={() => {
+                      console.log('=== LOCALSTORAGE DEBUG ===');
+                      console.log('Current localStorage products:', localStorage.getItem('sedef_akvaryum_products'));
+                      console.log('Parsed localStorage products:', JSON.parse(localStorage.getItem('sedef_akvaryum_products') || '[]'));
+                    }}
+                    className="px-3 py-1 bg-blue-500 text-white rounded text-sm"
+                  >
+                    LocalStorage Debug
+                  </button>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('sedef_akvaryum_products');
+                      window.location.reload();
+                    }}
+                    className="px-3 py-1 bg-red-500 text-white rounded text-sm"
+                  >
+                    Cache Temizle
+                  </button>
+                  <button
+                    onClick={handleAddProduct}
+                    className="btn-primary"
+                  >
+                    + Yeni Ürün Ekle
+                  </button>
+                </div>
               </div>
 
               {/* Filters */}
@@ -891,7 +951,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
   });
 
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  // const [imagePreview, setImagePreview] = useState<string>(''); // Removed unused variable
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -919,12 +979,27 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        setImagePreview(result);
+        // setImagePreview(result); // Removed unused
         handleInputChange('image', result);
       };
       reader.readAsDataURL(file);
     }
   };
+
+  const handleAddImageUrl = (url: string) => {
+    if (url) {
+      handleInputChange('image', url);
+    }
+  };
+
+  // const handleRemoveImage = (index: number) => {
+  //   // This function is no longer needed since we removed multiple images support
+  //   console.log('Image removal not supported in single image mode');
+  // };
+
+  // const handleSetMainImage = (imageUrl: string) => {
+  //   handleInputChange('image', imageUrl);
+  // };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -975,7 +1050,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Resim
+            Resimler (Ana resim ilk sırada olmalı)
           </label>
           <div className="space-y-4">
             <input
@@ -984,20 +1059,47 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
               onChange={handleFileChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             />
-            <input
-              type="url"
-              value={formData.image}
-              onChange={(e) => handleInputChange('image', e.target.value)}
-              placeholder="Veya resim URL'si girin"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            {(imagePreview || formData.image) && (
-              <div className="mt-4">
-                <img
-                  src={imagePreview || formData.image}
-                  alt="Önizleme"
-                  className="w-full h-48 object-cover rounded-lg border"
-                />
+            <div className="flex gap-2">
+              <input
+                type="url"
+                placeholder="Yeni resim URL'si ekle"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const input = e.target as HTMLInputElement;
+                    handleAddImageUrl(input.value);
+                    input.value = '';
+                  }
+                }}
+              />
+              <button
+                type="button"
+                onClick={(e) => {
+                  const input = (e.target as HTMLButtonElement).previousElementSibling as HTMLInputElement;
+                  handleAddImageUrl(input.value);
+                  input.value = '';
+                }}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+              >
+                Ekle
+              </button>
+            </div>
+            
+            {/* Display current image */}
+            {formData.image && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium text-gray-700">Mevcut Resim:</h4>
+                <div className="mt-4">
+                  <img
+                    src={formData.image}
+                    alt="Ürün resmi"
+                    className="w-full h-32 object-cover rounded-lg border-2 border-primary-500"
+                  />
+                  <div className="mt-2 text-sm text-gray-600">
+                    Ana resim: {formData.image}
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -1401,7 +1503,7 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
   });
 
   // const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  // const [imagePreview, setImagePreview] = useState<string>(''); // Removed unused variable
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1419,7 +1521,7 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        setImagePreview(result);
+        // setImagePreview(result); // Removed unused
         handleInputChange('image', result);
       };
       reader.readAsDataURL(file);
@@ -1547,10 +1649,10 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
             placeholder="Veya resim URL'si girin"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
-          {(imagePreview || formData.image) && (
+          {formData.image && (
             <div className="mt-4">
               <img
-                src={imagePreview || formData.image}
+                src={formData.image}
                 alt="Önizleme"
                 className="w-full h-48 object-cover rounded-lg border"
               />

@@ -18,6 +18,7 @@ interface StockContextType {
   getStockStatus: (productId: string) => 'in-stock' | 'low-stock' | 'out-of-stock';
   setLowStockThreshold: (productId: string, threshold: number) => void;
   getLowStockProducts: () => Product[];
+  initializeStockForProduct: (productId: string) => void;
 }
 
 const StockContext = createContext<StockContextType | undefined>(undefined);
@@ -37,7 +38,7 @@ interface StockProviderProps {
 // LocalStorage anahtarı
 const STOCK_STORAGE_KEY = 'sedef_akvaryum_stock';
 
-// Varsayılan stok verileri
+// Varsayılan stok verileri - sadece temel ürünler için
 const getDefaultStock = (): StockItem[] => [
   // Shrimp Products
   { productId: 'shrimp-1', quantity: 50, lastUpdated: new Date().toISOString(), lowStockThreshold: 10 },
@@ -70,12 +71,16 @@ const getDefaultStock = (): StockItem[] => [
   // Additional Fish Products
   { productId: 'fish-japanese', quantity: 75, lastUpdated: new Date().toISOString(), lowStockThreshold: 15 },
   { productId: 'fish-betta', quantity: 45, lastUpdated: new Date().toISOString(), lowStockThreshold: 9 },
-  { productId: 'fish-tropical-set', quantity: 25, lastUpdated: new Date().toISOString(), lowStockThreshold: 5 },
   
   // Equipment Products
-  { productId: 'equipment-1', quantity: 15, lastUpdated: new Date().toISOString(), lowStockThreshold: 3 },
-  { productId: 'equipment-2', quantity: 8, lastUpdated: new Date().toISOString(), lowStockThreshold: 2 },
-  { productId: 'equipment-3', quantity: 12, lastUpdated: new Date().toISOString(), lowStockThreshold: 3 },
+  { productId: 'equipment-11', quantity: 15, lastUpdated: new Date().toISOString(), lowStockThreshold: 3 },
+  { productId: 'equipment-12', quantity: 8, lastUpdated: new Date().toISOString(), lowStockThreshold: 2 },
+  { productId: 'equipment-2', quantity: 12, lastUpdated: new Date().toISOString(), lowStockThreshold: 3 },
+  { productId: 'equipment-3', quantity: 20, lastUpdated: new Date().toISOString(), lowStockThreshold: 4 },
+  { productId: 'equipment-4', quantity: 25, lastUpdated: new Date().toISOString(), lowStockThreshold: 5 },
+  { productId: 'equipment-5', quantity: 10, lastUpdated: new Date().toISOString(), lowStockThreshold: 2 },
+  { productId: 'equipment-6', quantity: 8, lastUpdated: new Date().toISOString(), lowStockThreshold: 2 },
+  { productId: 'equipment-7', quantity: 15, lastUpdated: new Date().toISOString(), lowStockThreshold: 3 },
   
   // Accessories Products
   { productId: 'accessories-1', quantity: 20, lastUpdated: new Date().toISOString(), lowStockThreshold: 4 },
@@ -183,6 +188,20 @@ export const StockProvider: React.FC<StockProviderProps> = ({ children }) => {
     return [];
   };
 
+  const initializeStockForProduct = (productId: string) => {
+    setStockItems(prevItems => {
+      const existingItem = prevItems.find(item => item.productId === productId);
+      if (existingItem) return prevItems;
+      
+      return [...prevItems, { 
+        productId, 
+        quantity: 0, 
+        lastUpdated: new Date().toISOString(),
+        lowStockThreshold: 5 // Varsayılan eşik
+      }];
+    });
+  };
+
   const value: StockContextType = {
     stockItems,
     getStockQuantity,
@@ -191,7 +210,8 @@ export const StockProvider: React.FC<StockProviderProps> = ({ children }) => {
     isOutOfStock,
     getStockStatus,
     setLowStockThreshold,
-    getLowStockProducts
+    getLowStockProducts,
+    initializeStockForProduct
   };
 
   return (

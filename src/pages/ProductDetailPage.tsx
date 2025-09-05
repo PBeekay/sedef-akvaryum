@@ -1,12 +1,14 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getProductById, getProductsByCategory } from '../data/products';
 import WhatsAppButton from '../components/WhatsAppButton';
 import ProductCard from '../components/ProductCard';
+import { useAdmin } from '../context/AdminContext';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const product = getProductById(id || '');
+  const { products } = useAdmin();
+  const product = products.find(p => p.id === id);
+  // Removed selectedImageIndex since we're using single image now
 
   if (!product) {
     return (
@@ -22,8 +24,8 @@ const ProductDetailPage: React.FC = () => {
     );
   }
 
-  const relatedProducts = getProductsByCategory(product.category)
-    .filter(p => p.id !== product.id)
+  const relatedProducts = products
+    .filter(p => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 
   const whatsappMessage = `Merhaba! Sipariş vermek istiyorum: ${product.name} - ${product.price.toFixed(2)}₺. Stok durumu ve teslimat hakkında bilgi verebilir misiniz?`;
@@ -59,8 +61,9 @@ const ProductDetailPage: React.FC = () => {
 
         {/* Product Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          {/* Product Image */}
+          {/* Product Image Gallery */}
           <div className="space-y-4">
+            {/* Main Image */}
             <div className="relative">
               <img
                 src={product.image}
@@ -78,6 +81,8 @@ const ProductDetailPage: React.FC = () => {
                 </div>
               )}
             </div>
+            
+            {/* Single image display - no thumbnail gallery needed */}
           </div>
 
           {/* Product Info */}

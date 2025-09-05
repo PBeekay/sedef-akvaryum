@@ -33,9 +33,15 @@ export const sanitizeInput = (input: string): string => {
 };
 
 export const sanitizeHtml = (html: string): string => {
+  // Use DOMPurify for safe HTML sanitization instead of innerHTML
+  if (typeof window !== 'undefined' && window.DOMPurify) {
+    return window.DOMPurify.sanitize(html);
+  }
+  
+  // Fallback: simple text content extraction
   const div = document.createElement('div');
   div.textContent = html;
-  return div.innerHTML;
+  return div.textContent || '';
 };
 
 // Rate limiting utility

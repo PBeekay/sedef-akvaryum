@@ -1,4 +1,5 @@
 import React from 'react';
+import { sanitizeInput } from '../utils/security';
 
 interface WhatsAppButtonProps {
   message?: string;
@@ -16,9 +17,26 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   variant = "inline"
 }) => {
   const handleWhatsAppClick = () => {
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
+    // Sanitize inputs
+    const sanitizedMessage = sanitizeInput(message);
+    const sanitizedPhone = sanitizeInput(phoneNumber);
+    
+    // Validate phone number format (basic check)
+    const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(sanitizedPhone.replace(/\s/g, ''))) {
+      console.error('Invalid phone number format');
+      return;
+    }
+    
+    const encodedMessage = encodeURIComponent(sanitizedMessage);
+    const whatsappUrl = `https://wa.me/${sanitizedPhone.replace(/\s/g, '')}?text=${encodedMessage}`;
+    
+    // Additional security: verify URL domain
+    if (whatsappUrl.startsWith('https://wa.me/')) {
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      console.error('Invalid WhatsApp URL');
+    }
   };
 
   if (variant === 'floating') {

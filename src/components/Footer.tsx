@@ -47,16 +47,6 @@ const Footer: React.FC = () => {
                   İletişim
                 </Link>
               </li>
-              <li>
-                <a href="#about" className="text-gray-300 hover:text-white transition-colors duration-200">
-                  Hakkımızda
-                </a>
-              </li>
-              <li>
-                <a href="#services" className="text-gray-300 hover:text-white transition-colors duration-200">
-                  Hizmetler
-                </a>
-              </li>
             </ul>
           </div>
 

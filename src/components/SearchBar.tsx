@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { products } from '../data/products';
 import { Product } from '../types/Product';
 import { debounce } from '../utils/validation';
+import { useAdmin } from '../context/AdminContext';
 
 interface SearchBarProps {
   className?: string;
@@ -18,6 +18,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onSearch
 }) => {
   const [query, setQuery] = useState('');
+  const { products } = useAdmin();
   const [results, setResults] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);

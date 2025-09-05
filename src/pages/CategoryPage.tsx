@@ -1,15 +1,27 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getProductsByCategory, categories } from '../data/products';
+import { categories } from '../data/products';
 import ProductCard from '../components/ProductCard';
+import { useAdmin } from '../context/AdminContext';
 
 const CategoryPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const [sortBy, setSortBy] = useState<'name' | 'price-low' | 'price-high'>('name');
   const [filterInStock, setFilterInStock] = useState(false);
+  const { products } = useAdmin();
+
+  // Debug: Log products when they change
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('=== CategoryPage Products Update ===');
+      console.log('Category ID:', categoryId);
+      console.log('Total products from AdminContext:', products.length);
+      console.log('Products for this category:', products.filter(p => p.category === categoryId).length);
+    }
+  }, [products, categoryId]);
 
   const category = categories.find(cat => cat.id === categoryId);
-  const allProducts = getProductsByCategory(categoryId || '');
+  const allProducts = products.filter(product => product.category === categoryId);
 
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = allProducts;

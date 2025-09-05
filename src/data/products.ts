@@ -88,7 +88,29 @@ export const products: Product[] = [
     lifespan: '3-5 yıl',
     tankSize: 'Minimum 75L (20 galon)'
   },
-
+  {
+    id: 'red-finned-cigar-shark',
+    name: 'Red Finned Cigar Shark',
+    category: 'fish',
+    price: 89.99,
+    description: 'Güneydoğu Asya\'nın hızlı akan nehirlerinde yaşayan büyük bir tatlı su balığıdır. Parlak gümüşi vücudu ve kırmızı renkteki yüzgeçleriyle dikkat çeker. Bu tür doğada 80 cm\'ye kadar büyüyebilir ve geniş yüzme alanlarına ihtiyaç duyar. Zıplama eğiliminde olduklarından akvaryumun üstü kapalı olmalıdır.',
+    shortDescription: 'Büyük boyutlu, gümüşi vücutlu ve kırmızı yüzgeçli etkileyici balık.',
+    image: 'https://www.fishkeeper.co.uk/media//cache/2068x/databank/images/image//LeptoMAQ.jpg',
+    inStock: true,
+    colors: ['Gümüşi', 'Kırmızı Yüzgeçler', 'Parlak Gümüş'],
+    socialBehavior: 'Barışçıl, benzer büyüklükteki balıklarla uyumlu',
+    waterParameters: {
+      temperature: '23-28°C',
+      pH: '6.0-8.0',
+      hardness: 'Orta-Sert'
+    },
+    size: 'Doğada 80 cm\'ye kadar (akvaryumda daha küçük)',
+    difficulty: 'Zor - Büyük akvaryum gerektirir',
+    breeding: 'Zor üretim',
+    diet: 'Omnivor - Pul yem, granül yem, canlı yem, sebzeler',
+    lifespan: 'Uzun ömürlü',
+    tankSize: 'Minimum 800L (6 feet uzunluk)'
+  },
   // Shrimp Category - Neocaridinia Türleri
   {
     id: 'shrimp-1',
