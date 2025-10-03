@@ -3,21 +3,12 @@ import { Link } from 'react-router-dom';
 import { categories } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import PWAInstallButton from '../components/PWAInstallButton';
-import ReviewsSlider from '../components/ReviewsSlider';
+import GoogleReviews from '../components/GoogleReviews';
 import { useAdmin } from '../context/AdminContext';
-// import shrimpImage from '../assets/shrimp.jpeg';
 
 const HomePage: React.FC = () => {
   const { sliderData, products } = useAdmin();
   
-  // Debug: Log products when they change
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('=== HomePage Products Update ===');
-      console.log('Total products from AdminContext:', products.length);
-      console.log('Products:', products.map(p => ({ id: p.id, name: p.name })));
-    }
-  }, [products]);
   
   // Get featured and new products from admin context
   const featuredProducts = products.filter(product => product.featured);
@@ -28,10 +19,6 @@ const HomePage: React.FC = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  // Debug: Log current slide (only in development)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Current slide:', currentSlide, heroSlides[currentSlide]?.title);
-  }
 
   // Auto-slide functionality
   useEffect(() => {
@@ -56,36 +43,50 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-             {/* Hero Section with Slider */}
-       <section className="relative bg-gradient-to-br from-ocean-600 via-primary-600 to-secondary-500 text-white py-20 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero Section with Slider */}
+      <section className="relative bg-gradient-to-br from-ocean-600 via-primary-600 to-secondary-500 text-white py-24 overflow-hidden">
+        {/* Animated Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-20 left-20 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-bounce-gentle"></div>
+            <div className="absolute bottom-20 right-20 w-96 h-96 bg-yellow-300 rounded-full mix-blend-overlay filter blur-3xl animate-bounce-gentle" style={{ animationDelay: '2s' }}></div>
+          </div>
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
             <div className="animate-fade-in relative z-10">
               <div className="transition-all duration-500 ease-in-out">
-                <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                <div className="inline-block mb-4">
+                  <span className="px-4 py-2 bg-yellow-400/20 backdrop-blur-sm rounded-full text-yellow-200 text-sm font-semibold border border-yellow-300/30">
+                    ✨ Akvaryum Uzmanları
+                  </span>
+                </div>
+                <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
                   Hoş Geldiniz{' '}
-                  <span className="text-yellow-300">Sedef Akvaryum</span>
+                  <span className="block text-yellow-300 drop-shadow-lg">Sedef Akvaryum</span>
                 </h1>
-                <div className="mb-8">
-                  <h2 className="text-2xl md:text-3xl font-semibold mb-2 text-yellow-200">
+                <div className="mb-10 space-y-3">
+                  <h2 className="text-3xl md:text-4xl font-bold mb-3 text-yellow-200 drop-shadow-md">
                     {heroSlides[currentSlide].title}
                   </h2>
-                  <p className="text-lg text-gray-100 mb-4">
+                  <p className="text-xl text-white/90 mb-4 font-medium">
                     {heroSlides[currentSlide].subtitle}
                   </p>
-                  <p className="text-xl text-gray-100">
+                  <p className="text-lg text-white/80 leading-relaxed">
                     {heroSlides[currentSlide].description}
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     to={heroSlides[currentSlide].buttonLink}
-                    className="btn-primary text-center"
+                    className="group relative px-8 py-4 bg-white text-primary-600 font-bold text-lg rounded-xl hover:bg-yellow-300 hover:text-primary-700 transition-all duration-300 text-center shadow-2xl hover:shadow-yellow-300/50 hover:scale-105 transform"
                   >
-                    {heroSlides[currentSlide].buttonText}
+                    <span className="relative z-10">{heroSlides[currentSlide].buttonText}</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-200 to-yellow-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </Link>
-                  <PWAInstallButton className="btn-outline border-white text-white hover:bg-white hover:text-primary-600" />
+                  <PWAInstallButton className="px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-primary-600 font-bold text-lg rounded-xl transition-all duration-300 backdrop-blur-sm hover:scale-105 transform shadow-xl" />
                 </div>
               </div>
             </div>
@@ -107,7 +108,6 @@ const HomePage: React.FC = () => {
                            onError={(e) => {
                              const target = e.target as HTMLImageElement;
                              if (process.env.NODE_ENV === 'development') {
-                               console.error('❌ Image failed to load:', slide.title, slide.image);
                              }
                              // Fallback to gradient background
                              target.style.display = 'none';
@@ -144,7 +144,6 @@ const HomePage: React.FC = () => {
                            }}
                            onLoad={() => {
                              if (process.env.NODE_ENV === 'development') {
-                               console.log('✅ Image loaded successfully:', slide.title);
                              }
                            }}
                          />
@@ -160,33 +159,35 @@ const HomePage: React.FC = () => {
               {/* Navigation Arrows */}
               <button
                 onClick={prevSlide}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white rounded-full p-2 transition-all duration-200 backdrop-blur-sm"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
                 aria-label="Önceki slayt"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white rounded-full p-2 transition-all duration-200 backdrop-blur-sm"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
                 aria-label="Sonraki slayt"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
             </div>
           </div>
 
           {/* Slide Indicators */}
-          <div className="flex justify-center mt-8 space-x-2">
+          <div className="flex justify-center mt-10 space-x-3">
             {heroSlides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                  index === currentSlide ? 'bg-yellow-300' : 'bg-white/50 hover:bg-white/75'
+                className={`transition-all duration-300 rounded-full ${
+                  index === currentSlide 
+                    ? 'w-10 h-3 bg-yellow-300 shadow-lg shadow-yellow-300/50' 
+                    : 'w-3 h-3 bg-white/50 hover:bg-white/75 hover:scale-125'
                 }`}
                 aria-label={`Slayt ${index + 1}`}
               />
@@ -196,32 +197,48 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Categories Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Kategorilerimizi Keşfedin
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16 animate-fade-in">
+            <div className="inline-block mb-4">
+              <span className="px-4 py-2 bg-primary-100 rounded-full text-primary-600 text-sm font-semibold">
+                🏪 Ürün Kategorileri
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
+              <span className="bg-gradient-to-r from-ocean-600 via-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                Kategorilerimizi Keşfedin
+              </span>
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Sevimli balıklardan temel aksesuarlara kadar, dostlarınıza en iyi bakımı 
               sağlamak için ihtiyacınız olan her şeye sahibiz.
             </p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {categories.map((category) => (
-                             <Link
-                 key={category.id}
-                 to={`/category/${category.id}`}
-                 className="group bg-gradient-to-br from-white to-ocean-50 rounded-xl p-6 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-ocean-100"
-               >
-                <div className="flex flex-col items-center">
-                  <div className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-300">
-                    {category.icon}
+            {categories.map((category, index) => (
+              <Link
+                key={category.id}
+                to={`/category/${category.id}`}
+                className="group relative overflow-hidden"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-ocean-400 via-primary-500 to-secondary-500 rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-500"></div>
+                <div className="relative bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-2 border-2 border-transparent group-hover:border-primary-200">
+                  <div className="flex flex-col items-center">
+                    <div className="text-5xl mb-4 transform group-hover:scale-125 group-hover:rotate-12 transition-all duration-300">
+                      {category.icon}
+                    </div>
+                    <h3 className="font-bold text-gray-800 group-hover:text-primary-600 transition-colors duration-200 text-sm">
+                      {category.name}
+                    </h3>
                   </div>
-                  <h3 className="font-semibold text-gray-800 group-hover:text-primary-600 transition-colors duration-200">
-                    {category.name}
-                  </h3>
+                  
+                  {/* Decorative shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
                 </div>
               </Link>
             ))}
@@ -230,29 +247,40 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-16">
+      <section className="py-20 bg-white relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Öne Çıkan Ürünler
+          <div className="text-center mb-16">
+            <div className="inline-block mb-4">
+              <span className="px-4 py-2 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full text-orange-600 text-sm font-semibold border border-orange-200">
+                ⭐ En Popüler
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
+              <span className="bg-gradient-to-r from-ocean-600 via-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                Öne Çıkan Ürünler
+              </span>
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Müşterilerimizin en çok sevdiği popüler ve yüksek puanlı ürünlerimiz.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} product={product} showDetails={false} />
             ))}
           </div>
           
-          <div className="text-center mt-8">
+          <div className="text-center mt-12">
             <Link
               to="/category/fish"
-              className="btn-primary"
+              className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-ocean-500 to-primary-500 text-white font-bold text-lg rounded-xl hover:from-ocean-600 hover:to-primary-600 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform"
             >
-              🐠 Balıkları Keşfet
+              <span className="text-2xl">🐠</span>
+              Balıkları Keşfet
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
             </Link>
           </div>
         </div>
@@ -260,18 +288,29 @@ const HomePage: React.FC = () => {
 
       {/* New Arrivals Section */}
       {newProducts.length > 0 && (
-        <section className="py-16 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                Yeni Gelenler
+        <section className="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full opacity-5">
+            <div className="absolute top-20 right-20 w-72 h-72 bg-green-400 rounded-full filter blur-3xl"></div>
+          </div>
+          
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <div className="inline-block mb-4">
+                <span className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full text-green-600 text-sm font-semibold border border-green-200">
+                  🆕 Yeni Geldiler
+                </span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
+                <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  Yeni Gelenler
+                </span>
               </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Ailemize katılan en son üyelerimizi keşfedin.
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {newProducts.map((product) => (
                 <ProductCard key={product.id} product={product} showDetails={false} />
               ))}
@@ -339,13 +378,7 @@ const HomePage: React.FC = () => {
       </section>
 
              {/* Google Reviews Section */}
-       <section className="py-16 bg-gray-50">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <div className="max-w-4xl mx-auto">
-             <ReviewsSlider />
-           </div>
-         </div>
-       </section>
+      <GoogleReviews />
     </div>
   );
 };

@@ -42,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         (product.colors && product.colors.some((color) => color.toLowerCase().includes(loweredQuery)))
       )
       .slice(0, 8);
-  }, []);
+  }, [products]);
 
   const handleProductClick = useCallback((product: Product) => {
     navigate(`/product/${product.id}`);

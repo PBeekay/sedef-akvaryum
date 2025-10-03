@@ -24,7 +24,6 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
     // Validate phone number format (basic check)
     const phoneRegex = /^\+?[1-9]\d{1,14}$/;
     if (!phoneRegex.test(sanitizedPhone.replace(/\s/g, ''))) {
-      console.error('Invalid phone number format');
       return;
     }
     
@@ -35,7 +34,6 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
     if (whatsappUrl.startsWith('https://wa.me/')) {
       window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     } else {
-      console.error('Invalid WhatsApp URL');
     }
   };
 

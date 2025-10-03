@@ -6,9 +6,9 @@ import { SignJWT, jwtVerify } from 'jose';
 const JWT_SECRET = process.env.REACT_APP_JWT_SECRET || 'sedef-akvaryum-dev-secret-key-2024';
 const SALT_ROUNDS = 12;
 
-// JWT secret kontrolü - Development için fallback
-if (!process.env.REACT_APP_JWT_SECRET && process.env.NODE_ENV === 'development') {
-  console.warn('REACT_APP_JWT_SECRET not found, using development fallback');
+// JWT secret kontrolü - Production'da zorunlu
+if (process.env.NODE_ENV === 'production' && !process.env.REACT_APP_JWT_SECRET) {
+  throw new Error('REACT_APP_JWT_SECRET environment variable is required in production');
 }
 
 // Güvenli JWT Token işlemleri - Browser uyumlu kriptografi ile
@@ -46,7 +46,6 @@ export const verifyToken = async (token: string): Promise<any> => {
     return payload;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.error('Token verification error:', error);
     }
     return null;
   }
@@ -148,7 +147,6 @@ const getRateLimitStore = (): Map<string, RateLimitRecord> => {
     }
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.error('Rate limit store error:', error);
     }
   }
   return new Map();
@@ -160,7 +158,6 @@ const saveRateLimitStore = (store: Map<string, RateLimitRecord>): void => {
     localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data));
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.error('Rate limit save error:', error);
     }
   }
 };
@@ -220,9 +217,7 @@ export const generateCSRFToken = (): string => {
 
 // Admin şifre hash'i oluşturma (sadece geliştirme için)
 export const generateAdminPasswordHash = async (password: string): Promise<string> => {
-  console.log(`Generating hash for password: ${password}`);
   const hash = await hashPassword(password);
-  console.log(`Generated hash: ${hash}`);
   return hash;
 };
 
@@ -232,7 +227,6 @@ export const secureStorage = {
     try {
       // Validate key format
       if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
-        console.error('Invalid storage key format');
         return;
       }
       
@@ -243,7 +237,6 @@ export const secureStorage = {
     } catch (error) {
       // Production'da console.error kullanmayın
       if (process.env.NODE_ENV === 'development') {
-        console.error('Secure storage setItem error:', error);
       }
     }
   },
@@ -252,7 +245,6 @@ export const secureStorage = {
     try {
       // Validate key format
       if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
-        console.error('Invalid storage key format');
         return null;
       }
       
@@ -264,7 +256,6 @@ export const secureStorage = {
       // Şifreleme hatası durumunda temizle
       sessionStorage.removeItem(key);
       if (process.env.NODE_ENV === 'development') {
-        console.error('Secure storage getItem error:', error);
       }
       return null;
     }
@@ -272,7 +263,6 @@ export const secureStorage = {
   
   removeItem: (key: string): void => {
     if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
-      console.error('Invalid storage key format');
       return;
     }
     sessionStorage.removeItem(key);
@@ -291,14 +281,12 @@ export const secureLocalStorage = {
     try {
       // Validate key format
       if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
-        console.error('Invalid localStorage key format');
         return;
       }
       
       // Don't store sensitive data in localStorage
       const sensitiveKeys = ['password', 'token', 'secret', 'key', 'auth'];
       if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
-        console.error('Sensitive data not allowed in localStorage');
         return;
       }
       
@@ -306,7 +294,6 @@ export const secureLocalStorage = {
       localStorage.setItem(key, data);
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Error saving to localStorage:', error);
       }
     }
   },
@@ -314,7 +301,6 @@ export const secureLocalStorage = {
   getItem: (key: string): any => {
     try {
       if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
-        console.error('Invalid localStorage key format');
         return null;
       }
       
@@ -322,7 +308,6 @@ export const secureLocalStorage = {
       return value ? JSON.parse(value) : null;
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Error loading from localStorage:', error);
       }
       return null;
     }
@@ -330,7 +315,6 @@ export const secureLocalStorage = {
   
   removeItem: (key: string): void => {
     if (!/^[a-zA-Z0-9_-]+$/.test(key)) {
-      console.error('Invalid localStorage key format');
       return;
     }
     localStorage.removeItem(key);

@@ -1,7 +1,7 @@
-const CACHE_NAME = 'sedef-akvaryum-v2';
-const STATIC_CACHE = 'sedef-static-v2';
-const DYNAMIC_CACHE = 'sedef-dynamic-v2';
-const IMAGE_CACHE = 'sedef-images-v2';
+const CACHE_NAME = 'sedef-akvaryum-v3';
+const STATIC_CACHE = 'sedef-static-v3';
+const DYNAMIC_CACHE = 'sedef-dynamic-v3';
+const IMAGE_CACHE = 'sedef-images-v3';
 
 // Cache strategies
 const CACHE_STRATEGIES = {

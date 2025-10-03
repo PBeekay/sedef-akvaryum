@@ -69,8 +69,6 @@ const AdminPage: React.FC = () => {
   // Debug: Log products when they change
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('AdminPage - Products updated:', adminProducts.length, 'products');
-      console.log('AdminPage - Filtered products:', filteredProducts.length, 'products');
     }
   }, [adminProducts, filteredProducts]);
 
@@ -88,7 +86,6 @@ const AdminPage: React.FC = () => {
     // Sanitize productId
     const sanitizedId = productId.replace(/[^a-zA-Z0-9_-]/g, '');
     if (sanitizedId !== productId) {
-      console.error('Invalid product ID format');
       return;
     }
     
@@ -96,12 +93,9 @@ const AdminPage: React.FC = () => {
     const confirmed = window.confirm('Bu ürünü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');
     if (confirmed) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('AdminPage - Deleting product:', sanitizedId);
-        console.log('AdminPage - Products before deletion:', adminProducts.length);
       }
       deleteProduct(sanitizedId);
       if (process.env.NODE_ENV === 'development') {
-        console.log('AdminPage - Delete function called');
       }
       alert('Ürün başarıyla silindi!');
     }
@@ -109,19 +103,16 @@ const AdminPage: React.FC = () => {
 
   const handleSaveProduct = (productData: Partial<Product>) => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('AdminPage - handleSaveProduct called with:', productData);
     }
     if (editingProduct) {
       // Update existing product
       if (process.env.NODE_ENV === 'development') {
-        console.log('AdminPage - Updating product:', editingProduct.id);
       }
       updateProduct(editingProduct.id, productData);
       alert('Ürün başarıyla güncellendi!');
     } else {
       // Add new product
       if (process.env.NODE_ENV === 'development') {
-        console.log('AdminPage - Adding new product');
       }
       addProduct(productData as Omit<Product, 'id'>);
       alert('Yeni ürün başarıyla eklendi!');
@@ -147,7 +138,6 @@ const AdminPage: React.FC = () => {
 
   const handleSaveGuideSection = (content: string) => {
     // Burada rehber içeriğini kaydetme işlemi yapılacak
-    console.log(`Saving content for section: ${editingGuideSection}`, content);
     setShowGuideEditor(false);
     setEditingGuideSection('');
   };
@@ -164,7 +154,6 @@ const AdminPage: React.FC = () => {
 
   const handleDeleteCategory = (categoryId: string) => {
     if (window.confirm('Bu kategoriyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
-      console.log('Deleting category:', categoryId);
       // Kategori silme işlemi burada yapılacak
     }
   };
@@ -172,10 +161,8 @@ const AdminPage: React.FC = () => {
   const handleSaveCategory = (categoryData: any) => {
     if (editingCategory) {
       // Kategori güncelleme
-      console.log('Updating category:', categoryData);
     } else {
       // Yeni kategori ekleme
-      console.log('Adding new category:', categoryData);
     }
     setShowCategoryEditor(false);
     setEditingCategory(null);
@@ -261,31 +248,6 @@ const AdminPage: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <h2 className="text-2xl font-bold text-gray-800">Ürün Yönetimi</h2>
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      console.log('=== DEBUG INFO ===');
-                      console.log('Total products:', adminProducts.length);
-                      console.log('Filtered products:', filteredProducts.length);
-                      console.log('Selected category:', selectedCategory);
-                      console.log('Search term:', searchTerm);
-                      console.log('All products:', adminProducts);
-                      console.log('Filtered products:', filteredProducts);
-                      console.log('LocalStorage products:', JSON.parse(localStorage.getItem('sedef_akvaryum_products') || '[]'));
-                    }}
-                    className="px-3 py-1 bg-gray-500 text-white rounded text-sm"
-                  >
-                    Debug
-                  </button>
-                  <button
-                    onClick={() => {
-                      console.log('=== LOCALSTORAGE DEBUG ===');
-                      console.log('Current localStorage products:', localStorage.getItem('sedef_akvaryum_products'));
-                      console.log('Parsed localStorage products:', JSON.parse(localStorage.getItem('sedef_akvaryum_products') || '[]'));
-                    }}
-                    className="px-3 py-1 bg-blue-500 text-white rounded text-sm"
-                  >
-                    LocalStorage Debug
-                  </button>
                   <button
                     onClick={() => {
                       localStorage.removeItem('sedef_akvaryum_products');
@@ -994,7 +956,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
 
   // const handleRemoveImage = (index: number) => {
   //   // This function is no longer needed since we removed multiple images support
-  //   console.log('Image removal not supported in single image mode');
   // };
 
   // const handleSetMainImage = (imageUrl: string) => {

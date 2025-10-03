@@ -53,14 +53,12 @@ export const fetchPlaceDetails = async (
   apiKey?: string
 ): Promise<GooglePlaceDetails | null> => {
   if (!apiKey) {
-    console.warn('Google Places API key is required for real data');
     return null;
   }
 
   // Sanitize placeId to prevent injection
   const sanitizedPlaceId = placeId.replace(/[^a-zA-Z0-9_-]/g, '');
   if (sanitizedPlaceId !== placeId) {
-    console.error('Invalid place ID format');
     return null;
   }
 
@@ -71,7 +69,6 @@ export const fetchPlaceDetails = async (
       : apiKey;
       
     if (!safeApiKey) {
-      console.warn('Google Places API key not configured');
       return null;
     }
 
@@ -91,7 +88,6 @@ export const fetchPlaceDetails = async (
       throw new Error(`Google Places API error: ${data.status}`);
     }
   } catch (error) {
-    console.error('Error fetching place details:', error);
     return null;
   }
 };
@@ -109,7 +105,6 @@ export const fetchPlaceReviews = async (
   apiKey?: string
 ): Promise<GooglePlaceReview[]> => {
   if (!apiKey) {
-    console.warn('Google Places API key is required for real data');
     return [];
   }
 
@@ -124,7 +119,6 @@ export const fetchPlaceReviews = async (
     
     return [];
   } catch (error) {
-    console.error('Error fetching place reviews:', error);
     return [];
   }
 };

@@ -104,7 +104,6 @@ const loadStockFromStorage = (): StockItem[] => {
     const stockData = safeLocalStorage.get(STOCK_STORAGE_KEY);
     return stockData ? stockData : getDefaultStock();
   } catch (error) {
-    console.error('Error loading stock from localStorage:', error);
     return getDefaultStock();
   }
 };
@@ -113,7 +112,6 @@ const saveStockToStorage = (stock: StockItem[]): void => {
   try {
     safeLocalStorage.set(STOCK_STORAGE_KEY, stock);
   } catch (error) {
-    console.error('Error saving stock to localStorage:', error);
   }
 };
 
@@ -183,7 +181,6 @@ export const StockProvider: React.FC<StockProviderProps> = ({ children }) => {
   };
 
   const getLowStockProducts = (): Product[] => {
-    // Bu fonksiyon products.ts'den import edilmesi gerekiyor
     // Şimdilik boş array döndürüyoruz
     return [];
   };

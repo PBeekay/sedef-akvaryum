@@ -21,7 +21,6 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
     this.setState({ error, errorInfo });
   }
 
@@ -33,7 +32,6 @@ class ErrorBoundary extends Component<Props, State> {
     const { error, errorInfo } = this.state;
     if (error && errorInfo) {
       // Burada hata raporlama servisi entegrasyonu yapılabilir
-      console.log('Error reported:', { error, errorInfo });
       alert('Hata raporlandı. Teşekkürler!');
     }
   };

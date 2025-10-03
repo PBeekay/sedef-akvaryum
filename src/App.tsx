@@ -7,6 +7,8 @@ import PWAInstallButton from './components/PWAInstallButton';
 import OfflinePage from './components/OfflinePage';
 import ErrorBoundary from './components/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner';
+import BackToTop from './components/BackToTop';
+import ScrollProgressBar from './components/ScrollProgressBar';
 
 import { AdminProvider } from './context/AdminContext';
 import { StockProvider } from './context/StockContext';
@@ -62,6 +64,12 @@ function App() {
 
             {/* PWA Install Button */}
             <PWAInstallButton variant="floating" />
+
+            {/* Back To Top Button */}
+            <BackToTop />
+
+            {/* Scroll Progress Bar */}
+            <ScrollProgressBar />
 
             {/* Offline Page */}
             <OfflinePage />

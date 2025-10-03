@@ -41,7 +41,6 @@ const loadCartFromStorage = (): CartItem[] => {
     const cartData = safeLocalStorage.get(CART_STORAGE_KEY);
     return cartData ? cartData : [];
   } catch (error) {
-    console.error('Error loading cart from localStorage:', error);
     return [];
   }
 };
@@ -50,7 +49,6 @@ const saveCartToStorage = (cart: CartItem[]): void => {
   try {
     safeLocalStorage.set(CART_STORAGE_KEY, cart);
   } catch (error) {
-    console.error('Error saving cart to localStorage:', error);
   }
 };
 

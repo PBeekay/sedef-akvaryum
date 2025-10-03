@@ -133,17 +133,18 @@ const AdminLoginPage: React.FC = () => {
             Bu panel sadece yetkili kullanıcılar içindir.
           </p>
           
-          {/* Admin Bilgileri - Sadece geliştirme için */}
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 className="text-sm font-medium text-blue-800 mb-2">Admin Giriş Bilgileri:</h3>
-            <div className="text-xs text-blue-700 space-y-1">
-              <p><strong>Hesap 1:</strong> admin / sedef2024</p>
-              <p><strong>Hesap 2:</strong> sedefadmin / akvaryum2024</p>
+          {/* Admin Bilgileri - Sadece development için */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="text-sm font-medium text-blue-800 mb-2">Development Admin Bilgileri:</h3>
+              <div className="text-xs text-blue-700 space-y-1">
+                <p><strong>Default:</strong> admin / admin123</p>
+                <p className="text-xs text-blue-600 mt-2">
+                  ⚠️ Production'da environment variables kullanılır
+                </p>
+              </div>
             </div>
-            <p className="text-xs text-blue-600 mt-2">
-              ⚠️ Bu bilgiler sadece geliştirme amaçlıdır
-            </p>
-          </div>
+          )}
         </div>
       </div>
     </div>

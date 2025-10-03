@@ -140,7 +140,6 @@ const loadFromStorage = <T,>(key: string, defaultValue: T): T => {
     const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : defaultValue;
   } catch (error) {
-    console.error(`Error loading from localStorage (${key}):`, error);
     return defaultValue;
   }
 };
@@ -149,7 +148,6 @@ const saveToStorage = <T,>(key: string, value: T): void => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
-    console.error(`Error saving to localStorage (${key}):`, error);
   }
 };
 
@@ -160,11 +158,6 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   );
   const [products, setProducts] = useState<Product[]>(() => {
     const loadedProducts = loadFromStorage(STORAGE_KEYS.PRODUCTS, initialProducts);
-    console.log('=== AdminContext Products Initialize ===');
-    console.log('Storage key:', STORAGE_KEYS.PRODUCTS);
-    console.log('Loaded products from localStorage:', loadedProducts.length);
-    console.log('Initial products from data:', initialProducts.length);
-    console.log('Loaded products:', loadedProducts.map(p => ({ id: p.id, name: p.name })));
     return loadedProducts;
   });
 
@@ -221,15 +214,25 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
     }
 
     try {
-      // Güvenli admin girişi - environment variables kullanarak
-      const adminUsername = process.env.REACT_APP_ADMIN_USERNAME || 'admin';
-      const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin123';
+      // Production'da environment variables zorunlu
+      const adminUsername = process.env.REACT_APP_ADMIN_USERNAME;
+      const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD;
       
-      if (process.env.NODE_ENV === 'development' && (!process.env.REACT_APP_ADMIN_USERNAME || !process.env.REACT_APP_ADMIN_PASSWORD)) {
-        console.warn('Using development fallback credentials. Set REACT_APP_ADMIN_USERNAME and REACT_APP_ADMIN_PASSWORD for production.');
+      // Production'da environment variables kontrolü
+      if (process.env.NODE_ENV === 'production') {
+        if (!adminUsername || !adminPassword) {
+          return {
+            success: false,
+            message: 'Admin kimlik bilgileri yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.'
+          };
+        }
       }
       
-      const isValidCredentials = username === adminUsername && password === adminPassword;
+      // Development için fallback
+      const finalUsername = adminUsername || 'admin';
+      const finalPassword = adminPassword || 'admin123';
+      
+      const isValidCredentials = username === finalUsername && password === finalPassword;
       
       if (isValidCredentials) {
         const token = await generateToken({ 
@@ -250,7 +253,6 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         };
       }
     } catch (error) {
-      console.error('Login error:', error);
       return {
         success: false,
         message: 'Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.'
@@ -264,17 +266,13 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   };
 
   const addProduct = (productData: Omit<Product, 'id'>) => {
-    console.log('Adding new product:', productData);
     const newProduct: Product = {
       id: `product-${Date.now()}`,
       ...productData
     };
-    console.log('Created product with ID:', newProduct.id);
     
     setProducts(prev => {
       const updated = [...prev, newProduct];
-      console.log('Updated products array, new length:', updated.length);
-      console.log('New product added to array:', newProduct);
       
       // Immediately save to localStorage
       saveToStorage(STORAGE_KEYS.PRODUCTS, updated);
@@ -284,7 +282,6 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   };
 
   const updateProduct = (id: string, productData: Partial<Product>) => {
-    console.log('Updating product:', id, 'with data:', productData);
     setProducts(prev => {
       const updated = prev.map(p => 
         p.id === id ? { ...p, ...productData } : p
@@ -295,19 +292,12 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   };
 
   const deleteProduct = (id: string) => {
-    console.log('=== AdminContext deleteProduct called ===');
-    console.log('Product ID to delete:', id);
-    console.log('Current products before deletion:', products.length);
-    console.log('Products before deletion:', products.map(p => ({ id: p.id, name: p.name })));
     
     setProducts(prev => {
       const updated = prev.filter(p => p.id !== id);
-      console.log('Updated products after deletion, new length:', updated.length);
-      console.log('Products after deletion:', updated.map(p => ({ id: p.id, name: p.name })));
       
       // Save to localStorage immediately
       saveToStorage(STORAGE_KEYS.PRODUCTS, updated);
-      console.log('Saved to localStorage:', STORAGE_KEYS.PRODUCTS);
       
       return updated;
     });

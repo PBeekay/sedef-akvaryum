@@ -51,10 +51,8 @@ export const usePWA = (): UsePWAReturn => {
     const registerServiceWorker = async () => {
       if ('serviceWorker' in navigator) {
         try {
-          const registration = await navigator.serviceWorker.register('/sw.js');
-          console.log('SW registered: ', registration);
+          await navigator.serviceWorker.register('/sw.js');
         } catch (registrationError) {
-          console.log('SW registration failed: ', registrationError);
         }
       }
     };
@@ -84,14 +82,11 @@ export const usePWA = (): UsePWAReturn => {
         await installPrompt.prompt();
         const { outcome } = await installPrompt.userChoice;
         if (outcome === 'accepted') {
-          console.log('User accepted the install prompt');
         } else {
-          console.log('User dismissed the install prompt');
         }
         setInstallPrompt(null);
         setIsInstallable(false);
       } catch (error) {
-        console.error('Error installing app:', error);
       }
     }
   };
@@ -104,7 +99,6 @@ export const usePWA = (): UsePWAReturn => {
           await registration.update();
         }
       } catch (error) {
-        console.error('Error checking for updates:', error);
       }
     }
   };
@@ -115,7 +109,6 @@ export const usePWA = (): UsePWAReturn => {
         const permission = await Notification.requestPermission();
         return permission === 'granted';
       } catch (error) {
-        console.error('Error requesting notification permission:', error);
         return false;
       }
     }

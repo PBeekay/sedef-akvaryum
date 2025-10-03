@@ -33,7 +33,6 @@ const NotificationButton: React.FC<NotificationButtonProps> = ({
         });
       }
     } catch (error) {
-      console.error('Notification permission request failed:', error);
     } finally {
       setIsRequesting(false);
     }

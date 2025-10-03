@@ -19,7 +19,7 @@ const SearchPage: React.FC = () => {
 
   const query = searchParams.get('q') || '';
 
-  const searchProducts = (searchQuery: string): Product[] => {
+  const searchProducts = useCallback((searchQuery: string): Product[] => {
     if (!searchQuery.trim()) return [];
     
     const query = searchQuery.toLowerCase();
@@ -31,7 +31,7 @@ const SearchPage: React.FC = () => {
       (product.color && product.color.toLowerCase().includes(query)) ||
       (product.colors && product.colors.some(color => color.toLowerCase().includes(query)))
     );
-  };
+  }, [products]);
 
   const getRelevanceScore = (product: Product, query: string): number => {
     let score = 0;
@@ -115,7 +115,7 @@ const SearchPage: React.FC = () => {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [query]);
+  }, [query, searchProducts]);
 
   // Filtreleme ve sıralama
   useEffect(() => {
@@ -123,7 +123,7 @@ const SearchPage: React.FC = () => {
 
     const filteredResults = applyFilters(searchProducts(query));
     setSearchResults(filteredResults);
-  }, [query, filters, applyFilters]);
+  }, [query, filters, applyFilters, searchProducts]);
 
   const handleFilterChange = (filterType: string, value: string) => {
     setFilters(prev => ({ ...prev, [filterType]: value }));
@@ -150,118 +150,177 @@ const SearchPage: React.FC = () => {
   // };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Arama başlığı */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Arama Sonuçları
-          </h1>
-          <SearchBar 
-            className="max-w-2xl"
-            placeholder={`"${query}" için arama yapın...`}
-          />
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Arama başlığı - Enhanced */}
+        <div className="mb-12 animate-fade-in">
+          <div className="text-center mb-8">
+            <div className="inline-block mb-4">
+              <span className="px-4 py-2 bg-primary-100 rounded-full text-primary-600 text-sm font-semibold">
+                🔍 Arama
+              </span>
+            </div>
+            <h1 className="text-5xl font-extrabold mb-6">
+              <span className="bg-gradient-to-r from-ocean-600 via-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                Arama Sonuçları
+              </span>
+            </h1>
+          </div>
+          
+          <div className="max-w-3xl mx-auto">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-ocean-400 via-primary-500 to-secondary-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
+              <div className="relative">
+                <SearchBar 
+                  className="w-full"
+                  placeholder={query ? `"${query}" için arama yapın...` : "Arama yapın..."}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Sonuç sayısı */}
+        {/* Sonuç sayısı - Enhanced */}
         {query && (
-          <div className="mb-6">
-            <p className="text-gray-600">
-              "{query}" için <span className="font-semibold">{searchResults.length}</span> sonuç bulundu
-            </p>
+          <div className="mb-8 text-center animate-slide-up">
+            <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-xl shadow-md border border-primary-100">
+              <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-gray-700 font-medium">
+                "<span className="font-bold text-primary-600">{query}</span>" için <span className="font-bold text-accent-600">{searchResults.length}</span> sonuç bulundu
+              </p>
+            </div>
           </div>
         )}
 
-        {/* Filtreler ve sıralama */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700">Kategori:</label>
-              <select
-                value={filters.category}
-                onChange={(e) => handleFilterChange('category', e.target.value)}
-                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="all">Tümü</option>
-                <option value="shrimp">🦐 Karides</option>
-                <option value="fish">🐠 Balık</option>
-                <option value="plants">🌿 Bitkiler</option>
-                <option value="equipment">🔧 Ekipman</option>
-                <option value="accessories">🎣 Aksesuarlar</option>
-                <option value="food">🍖 Yem</option>
-              </select>
-            </div>
+        {/* Filtreler ve sıralama - Enhanced */}
+        <div className="relative group mb-10">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-ocean-400 via-primary-500 to-secondary-500 rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-500"></div>
+          <div className="relative bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-primary-100 p-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+              {/* Category Filter */}
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                <label className="text-base font-semibold text-gray-700">Kategori:</label>
+                <select
+                  value={filters.category}
+                  onChange={(e) => handleFilterChange('category', e.target.value)}
+                  className="px-4 py-2.5 border-2 border-gray-300 rounded-xl text-base font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white hover:border-primary-300 transition-colors cursor-pointer shadow-sm"
+                >
+                  <option value="all">🌟 Tümü</option>
+                  <option value="shrimp">🦐 Karides</option>
+                  <option value="fish">🐠 Balık</option>
+                  <option value="plants">🌿 Bitkiler</option>
+                  <option value="equipment">🔧 Ekipman</option>
+                  <option value="accessories">🎣 Aksesuarlar</option>
+                  <option value="food">🍖 Yem</option>
+                </select>
+              </div>
 
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700">Fiyat:</label>
-              <select
-                value={filters.priceRange}
-                onChange={(e) => handleFilterChange('priceRange', e.target.value)}
-                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="all">Tümü</option>
-                <option value="0-50">0₺ - 50₺</option>
-                <option value="50-100">50₺ - 100₺</option>
-                <option value="100-200">100₺ - 200₺</option>
-                <option value="200+">200₺+</option>
-              </select>
-            </div>
+              {/* Price Filter */}
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <label className="text-base font-semibold text-gray-700">Fiyat:</label>
+                <select
+                  value={filters.priceRange}
+                  onChange={(e) => handleFilterChange('priceRange', e.target.value)}
+                  className="px-4 py-2.5 border-2 border-gray-300 rounded-xl text-base font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white hover:border-primary-300 transition-colors cursor-pointer shadow-sm"
+                >
+                  <option value="all">💰 Tümü</option>
+                  <option value="0-50">0₺ - 50₺</option>
+                  <option value="50-100">50₺ - 100₺</option>
+                  <option value="100-200">100₺ - 200₺</option>
+                  <option value="200+">200₺+</option>
+                </select>
+              </div>
 
-            <div className="flex items-center space-x-2">
-              <label className="text-sm font-medium text-gray-700">Sırala:</label>
-              <select
-                value={filters.sortBy}
-                onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="relevance">İlgi Sırası</option>
-                <option value="name">İsim</option>
-                <option value="price-low">Fiyat (Düşük-Yüksek)</option>
-                <option value="price-high">Fiyat (Yüksek-Düşük)</option>
-              </select>
+              {/* Sort Filter */}
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                </svg>
+                <label className="text-base font-semibold text-gray-700">Sırala:</label>
+                <select
+                  value={filters.sortBy}
+                  onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+                  className="px-4 py-2.5 border-2 border-gray-300 rounded-xl text-base font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white hover:border-primary-300 transition-colors cursor-pointer shadow-sm"
+                >
+                  <option value="relevance">⭐ İlgi Sırası</option>
+                  <option value="name">📝 İsim</option>
+                  <option value="price-low">💰 Fiyat (Düşük-Yüksek)</option>
+                  <option value="price-high">💎 Fiyat (Yüksek-Düşük)</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Sonuçlar */}
         {isLoading ? (
-          <GridLoader count={6} />
+          <GridLoader count={8} />
         ) : searchResults.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-fade-in">
             {searchResults.map((product) => (
               <ProductCard key={product.id} product={product} showDetails={true} />
             ))}
           </div>
         ) : query ? (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Sonuç bulunamadı
+          <div className="text-center py-20 animate-fade-in">
+            <div className="inline-block mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gray-200 rounded-full blur-2xl opacity-50"></div>
+                <div className="relative text-8xl animate-bounce-gentle">🔍</div>
+              </div>
+            </div>
+            <h3 className="text-3xl font-bold text-gray-800 mb-4">
+              Sonuç Bulunamadı
             </h3>
-            <p className="text-gray-500 mb-4">
-              "{query}" için aradığınız kriterlere uygun ürün bulunamadı.
+            <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+              "<span className="font-bold text-primary-600">{query}</span>" için aradığınız kriterlere uygun ürün bulunamadı.
             </p>
-            <div className="space-y-2">
-              <p className="text-sm text-gray-600">Öneriler:</p>
-              <ul className="text-sm text-gray-500 space-y-1">
-                <li>• Farklı anahtar kelimeler deneyin</li>
-                <li>• Daha genel terimler kullanın</li>
-                <li>• Filtreleri temizleyin</li>
+            <div className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl border border-gray-200 max-w-2xl mx-auto shadow-lg">
+              <p className="text-lg font-semibold text-gray-800 mb-4 flex items-center justify-center gap-2">
+                <span className="text-2xl">💡</span>
+                Öneriler
+              </p>
+              <ul className="text-left text-base text-gray-600 space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="text-primary-600 font-bold">✓</span>
+                  <span>Farklı anahtar kelimeler deneyin</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary-600 font-bold">✓</span>
+                  <span>Daha genel terimler kullanın</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary-600 font-bold">✓</span>
+                  <span>Filtreleri temizleyin veya değiştirin</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary-600 font-bold">✓</span>
+                  <span>Yazım hatası olup olmadığını kontrol edin</span>
+                </li>
               </ul>
             </div>
           </div>
         ) : (
-          <div className="text-center py-12">
-            <svg className="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Arama yapın
+          <div className="text-center py-20 animate-fade-in">
+            <div className="inline-block mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary-200 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+                <div className="relative text-9xl animate-bounce-gentle">🔎</div>
+              </div>
+            </div>
+            <h3 className="text-4xl font-bold text-gray-800 mb-4">
+              Arama Yapın
             </h3>
-            <p className="text-gray-500">
-              Ürün bulmak için yukarıdaki arama çubuğunu kullanın.
+            <p className="text-xl text-gray-600 max-w-lg mx-auto leading-relaxed">
+              Ürün bulmak için yukarıdaki arama çubuğunu kullanın. Binlerce ürün arasından aradığınızı bulun!
             </p>
           </div>
         )}

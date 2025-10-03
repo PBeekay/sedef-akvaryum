@@ -21,7 +21,6 @@ const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
     try {
       await installApp();
     } catch (error) {
-      console.error('Installation failed:', error);
     } finally {
       setIsInstalling(false);
     }
