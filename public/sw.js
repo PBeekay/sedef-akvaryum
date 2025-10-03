@@ -61,7 +61,12 @@ self.addEventListener('fetch', (event) => {
   if (isStaticAsset(request)) {
     event.respondWith(cacheFirst(request, STATIC_CACHE));
   } else if (isImage(request)) {
-    event.respondWith(cacheFirst(request, IMAGE_CACHE));
+    // For external images, use network-first strategy without caching
+    if (isExternalImage(request)) {
+      event.respondWith(networkOnly(request));
+    } else {
+      event.respondWith(cacheFirst(request, IMAGE_CACHE));
+    }
   } else if (isAPIRequest(request)) {
     event.respondWith(networkFirst(request, DYNAMIC_CACHE));
   } else {
@@ -103,6 +108,17 @@ async function networkFirst(request, cacheName) {
   }
 }
 
+// Network Only strategy for external images
+async function networkOnly(request) {
+  try {
+    const networkResponse = await fetch(request);
+    return networkResponse;
+  } catch (error) {
+    console.log('Network only failed:', error);
+    return new Response('Network error', { status: 503 });
+  }
+}
+
 // Stale While Revalidate strategy for dynamic content
 async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName);
@@ -134,6 +150,17 @@ function isAPIRequest(request) {
   return request.url.includes('/api/') ||
          request.url.includes('googleapis.com') ||
          request.url.includes('analytics');
+}
+
+function isExternalImage(request) {
+  const url = new URL(request.url);
+  const externalDomains = [
+    'images.unsplash.com',
+    'cdn.balikturleri.com',
+    'cdn.myikas.com',
+    'www.ideasoft.com.tr'
+  ];
+  return externalDomains.some(domain => url.hostname.includes(domain));
 }
 
 
