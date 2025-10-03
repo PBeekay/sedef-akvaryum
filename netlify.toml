@@ -20,13 +20,6 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: https://images.unsplash.com https://cdn.balikturleri.com https://cdn.myikas.com https://www.ideasoft.com.tr; connect-src 'self' https:; worker-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
 
-# Cache static assets
-[[headers]]
-  for = "/static/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    Content-Type = "application/javascript"
-
 # Fix JavaScript chunks
 [[headers]]
   for = "/static/js/*"
@@ -41,6 +34,50 @@
     Content-Type = "text/css"
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Manifest and other assets
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=86400"
+
+# Image files
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Content-Type = "image/png"
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "*.ico"
+  [headers.values]
+    Content-Type = "image/x-icon"
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Content-Type = "image/jpeg"
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "*.jpeg"
+  [headers.values]
+    Content-Type = "image/jpeg"
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "*.webp"
+  [headers.values]
+    Content-Type = "image/webp"
+    Cache-Control = "public, max-age=86400"
+
+# Other static assets
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
 # Cache service worker
 [[headers]]
   for = "/sw.js"
@@ -49,19 +86,30 @@
     Content-Type = "application/javascript"
     Content-Security-Policy = "default-src 'self'; connect-src 'self' https:; img-src 'self' data: https: https://images.unsplash.com https://cdn.balikturleri.com https://cdn.myikas.com https://www.ideasoft.com.tr;"
 
+# SPA fallback - redirect all non-file requests to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 # API routes (if needed)
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
 
-# Sitemap and robots.txt
+# Static files redirects
 [[redirects]]
-  from = "/sitemap.xml"
-  to = "/sitemap.xml"
+  from = "/manifest.json"
+  to = "/manifest.json"
   status = 200
 
 [[redirects]]
   from = "/robots.txt"
   to = "/robots.txt"
+  status = 200
+
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap.xml"
   status = 200
