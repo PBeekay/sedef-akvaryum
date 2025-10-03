@@ -1,9 +1,9 @@
 [build]
-  # Run build command inside sedefak folder
-  command = "cd sedefak && npm install && npm run build"
+  # Build command
+  command = "npm run build:netlify"
   
-  # Publish the build output inside sedefak/build
-  publish = "sedefak/build"
+  # Build directory
+  publish = "build"
 
 [build.environment]
   NODE_VERSION = "18"
