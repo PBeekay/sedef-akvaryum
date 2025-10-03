@@ -61,12 +61,7 @@ self.addEventListener('fetch', (event) => {
   if (isStaticAsset(request)) {
     event.respondWith(cacheFirst(request, STATIC_CACHE));
   } else if (isImage(request)) {
-    // For external images, use network first to avoid CSP issues
-    if (isInternalRequest(request)) {
-      event.respondWith(cacheFirst(request, IMAGE_CACHE));
-    } else {
-      event.respondWith(networkFirst(request, IMAGE_CACHE));
-    }
+    event.respondWith(cacheFirst(request, IMAGE_CACHE));
   } else if (isAPIRequest(request)) {
     event.respondWith(networkFirst(request, DYNAMIC_CACHE));
   } else {
@@ -83,20 +78,11 @@ async function cacheFirst(request, cacheName) {
   
   try {
     const networkResponse = await fetch(request);
-    
-    // Only cache if the response is successful and from our domain or allowed external domains
-    if (networkResponse.ok && (isInternalRequest(request) || isAllowedExternalDomain(request))) {
-      const cache = await caches.open(cacheName);
-      cache.put(request, networkResponse.clone());
-    }
-    
+    const cache = await caches.open(cacheName);
+    cache.put(request, networkResponse.clone());
     return networkResponse;
   } catch (error) {
     console.log('Cache first failed:', error);
-    // For external images, return a fallback or let the browser handle it
-    if (isImage(request) && !isInternalRequest(request)) {
-      return new Response('', { status: 404 }); // Return empty response for external images
-    }
     return new Response('Offline content not available', { status: 503 });
   }
 }
@@ -150,20 +136,6 @@ function isAPIRequest(request) {
          request.url.includes('analytics');
 }
 
-function isInternalRequest(request) {
-  const url = new URL(request.url);
-  return url.origin === self.location.origin;
-}
-
-function isAllowedExternalDomain(request) {
-  const url = new URL(request.url);
-  const allowedDomains = [
-    'images.unsplash.com',
-    'cdn.balikturleri.com',
-    'cdn.myikas.com'
-  ];
-  return allowedDomains.some(domain => url.hostname.includes(domain));
-}
 
 // Activate event with cache cleanup
 self.addEventListener('activate', (event) => {
