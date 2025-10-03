@@ -26,7 +26,7 @@
     "build:analyze": "GENERATE_SOURCEMAP=false react-scripts build && npx webpack-bundle-analyzer build/static/js/*.js",
     "build:prod": "GENERATE_SOURCEMAP=false react-scripts build",
     "build:secure": "GENERATE_SOURCEMAP=false NODE_ENV=production react-scripts build",
-    "build:netlify": "GENERATE_SOURCEMAP=false NODE_ENV=production react-scripts build",
+    "build:netlify": "set GENERATE_SOURCEMAP=false && set NODE_ENV=production && react-scripts build",
     "build:analyze-bundle": "npm run build:prod && npx webpack-bundle-analyzer build/static/js/*.js",
     "build:lighthouse": "npm run build:prod && npm run lighthouse",
     "test": "react-scripts test",
