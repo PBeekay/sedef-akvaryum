@@ -35,7 +35,7 @@ function App() {
     <ErrorBoundary>
       <AdminProvider>
         <StockProvider>
-          <Router>
+          <Router basename="/">
           <div className="min-h-screen flex flex-col">
             <Navbar />
 

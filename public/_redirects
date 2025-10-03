@@ -2,11 +2,5 @@
 # This ensures all routes are handled by the React app
 
 # Handle all non-file requests with index.html for client-side routing
+# The catch-all rule should be at the end
 /*    /index.html   200
-
-# Optional: Redirect old URLs to new ones (if you have any)
-# /old-page    /new-page    301
-
-# Optional: Handle specific file extensions
-# *.js         /index.html   200
-# *.css        /index.html   200
