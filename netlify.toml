@@ -1,12 +1,9 @@
 [build]
   # Build command
-  command = "npm run build:secure"
+  command = "npm run build:netlify"
   
   # Build directory
   publish = "build"
-  
-  # Environment variables for build
-  environment = { NODE_ENV = "production" }
 
 [build.environment]
   # Node.js version
