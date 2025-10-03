@@ -1,15 +1,12 @@
 [build]
-  # Build command
-  command = "npm run build:netlify"
+  # Run build command inside sedefak folder
+  command = "cd sedefak && npm install && npm run build"
   
-  # Build directory
-  publish = "build"
+  # Publish the build output inside sedefak/build
+  publish = "sedefak/build"
 
 [build.environment]
-  # Node.js version
   NODE_VERSION = "18"
-  
-  # Build optimization
   GENERATE_SOURCEMAP = "false"
   NODE_ENV = "production"
 
