@@ -1,6 +1,16 @@
 # Netlify redirects file for SPA routing
 # This ensures all routes are handled by the React app
 
-# Handle all non-file requests with index.html for client-side routing
-# The catch-all rule should be at the end
+# API routes
+/api/*  /.netlify/functions/:splat  200
+
+# Specific routes that should be handled by React Router
+/category/*  /index.html   200
+/product/*   /index.html   200
+/contact     /index.html   200
+/admin       /index.html   200
+/search      /index.html   200
+/guide       /index.html   200
+
+# Catch-all for any other routes
 /*    /index.html   200
