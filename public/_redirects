@@ -1,10 +1,15 @@
-# Netlify redirects file for SPA routing
-# This ensures all routes are handled by the React app
-
 # API routes
-/api/*  /.netlify/functions/:splat  200
+/api/*    /.netlify/functions/:splat  200
 
-# Specific routes that should be handled by React Router
+# Statik dosyaları doğru serve et
+/static/*   /static/:splat   200
+/*.css      /:splat          200
+/*.js       /:splat          200
+/*.png      /:splat          200
+/*.jpg      /:splat          200
+/*.svg      /:splat          200
+
+# React Router için route'lar
 /category/*  /index.html   200
 /product/*   /index.html   200
 /contact     /index.html   200
@@ -12,5 +17,5 @@
 /search      /index.html   200
 /guide       /index.html   200
 
-# Catch-all for any other routes
-/*    /index.html   200
+# Catch-all fallback
+/*          /index.html   200
