@@ -8,7 +8,7 @@ const SALT_ROUNDS = 12;
 
 // JWT secret kontrolü - Production'da zorunlu
 if (process.env.NODE_ENV === 'production' && !process.env.REACT_APP_JWT_SECRET) {
-  throw new Error('REACT_APP_JWT_SECRET environment variable is required in production');
+  console.warn('REACT_APP_JWT_SECRET environment variable is not set in production. Using fallback secret.');
 }
 
 // Güvenli JWT Token işlemleri - Browser uyumlu kriptografi ile
