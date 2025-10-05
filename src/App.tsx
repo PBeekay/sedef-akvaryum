@@ -76,7 +76,7 @@ function App() {
 
             {/* Performance Monitor (Development Only) */}
             
-                      </div>
+          </div>
           </Router>
         </StockProvider>
       </AdminProvider>

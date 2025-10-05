@@ -9,7 +9,6 @@ import { useAdmin } from '../context/AdminContext';
 const HomePage: React.FC = () => {
   const { sliderData, products } = useAdmin();
   
-  
   // Get featured and new products from admin context
   const featuredProducts = products.filter(product => product.featured);
   const newProducts = products.filter(product => product.new);
