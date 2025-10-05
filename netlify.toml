@@ -117,14 +117,5 @@
 # Static assets - these must be served directly without redirects
 # Netlify should serve these files directly from the build directory
 
-# API routes (if needed)
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-
-# SPA fallback - redirect all non-static requests to index.html
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Redirects are handled by _redirects file
+# This ensures proper static asset serving
