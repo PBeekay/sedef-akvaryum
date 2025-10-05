@@ -9,13 +9,13 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "/logo192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any"
     },
     {
-      "src": "logo512.png",
+      "src": "/logo512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
@@ -49,21 +49,21 @@
       "short_name": "Balık",
       "description": "Balık ürünlerini görüntüle",
       "url": "/category/fish",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo192.png", "sizes": "192x192" }]
     },
     {
       "name": "Karides Kategorisi",
       "short_name": "Karides",
       "description": "Karides ürünlerini görüntüle",
       "url": "/category/shrimp",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo192.png", "sizes": "192x192" }]
     },
     {
       "name": "Rehber",
       "short_name": "Rehber",
       "description": "Akvaryum rehberini görüntüle",
       "url": "/guide",
-      "icons": [{ "src": "logo192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo192.png", "sizes": "192x192" }]
     }
   ]
 }

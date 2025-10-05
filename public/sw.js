@@ -14,8 +14,6 @@ const CACHE_STRATEGIES = {
 // URLs to cache immediately
 const STATIC_URLS = [
   '/',
-  '/static/js/main.js',
-  '/static/css/main.css',
   '/manifest.json',
   '/logo192.png',
   '/logo512.png'
@@ -60,6 +58,8 @@ self.addEventListener('fetch', (event) => {
   // Handle different types of requests
   if (isStaticAsset(request)) {
     event.respondWith(cacheFirst(request, STATIC_CACHE));
+  } else if (isChunkFile(request)) {
+    event.respondWith(networkFirst(request, STATIC_CACHE));
   } else if (isImage(request)) {
     // For external images, use network-first strategy without caching
     if (isExternalImage(request)) {
@@ -138,7 +138,8 @@ async function staleWhileRevalidate(request, cacheName) {
 function isStaticAsset(request) {
   return STATIC_URLS.some(url => request.url.includes(url)) ||
          request.url.includes('/static/') ||
-         request.url.includes('/manifest.json');
+         request.url.includes('/manifest.json') ||
+         /\.(js|css|chunk\.js)$/i.test(request.url);
 }
 
 function isImage(request) {
@@ -150,6 +151,11 @@ function isAPIRequest(request) {
   return request.url.includes('/api/') ||
          request.url.includes('googleapis.com') ||
          request.url.includes('analytics');
+}
+
+function isChunkFile(request) {
+  return /\.chunk\.js$/i.test(request.url) || 
+         /\/static\/js\/\d+\.\w+\.chunk\.js$/i.test(request.url);
 }
 
 function isExternalImage(request) {
