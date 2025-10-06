@@ -74,7 +74,6 @@ function App() {
             {/* Offline Page */}
             <OfflinePage />
 
-            {/* Performance Monitor (Development Only) */}
             
           </div>
           </Router>

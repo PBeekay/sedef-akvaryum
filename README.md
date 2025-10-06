@@ -1,5 +1,7 @@
 # Pet Paradise - Modern Pet Shop Website
 
+![CI](https://github.com/your-org-or-user/your-repo-name/actions/workflows/ci.yml/badge.svg)
+
 A modern, responsive pet shop website built with React, TypeScript, and TailwindCSS. This website allows customers to browse pets and accessories, view product details, and place orders via WhatsApp.
 
 ## 🚀 Features
@@ -208,6 +210,32 @@ npm run build:lighthouse
 ```bash
 npm run build:analyze
 ```
+
+### Deploy via GitHub + Render
+
+1. Prepare repository
+   - Ensure `render.yaml` exists at the repo root (defines Static Site with build and publish to `build/`).
+   - Keep `public/_redirects` (optional). SPA rewrites are already configured in `render.yaml`.
+   - GitHub Actions workflow located at `.github/workflows/ci.yml` will run tests and build on pushes/PRs.
+
+2. Push to GitHub
+   - Commit changes and push to the `main` branch.
+
+3. Create Render Blueprint (recommended)
+   - In Render dashboard: New → Blueprint → select this GitHub repo/branch.
+   - Render reads `render.yaml` and creates a Static Site named `sedefak-website`.
+   - Build command: `npm ci && npm run build`
+   - Publish directory: `build`
+
+4. Environment variables (if needed)
+   - Add build-time env vars in the Render service settings.
+
+5. First deploy and verify
+   - Click Deploy and wait for success.
+   - Verify deep links like `/category/...`, `/product/...`, `/search` load correctly.
+
+6. Continuous deployment
+   - Keep Auto-Deploy enabled so every push to `main` triggers a new build and publish.
 
 ## 📈 Performance Best Practices
 

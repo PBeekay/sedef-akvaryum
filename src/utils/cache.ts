@@ -1,3 +1,5 @@
+import { log } from './logger';
+
 // Cache utility for better performance
 interface CacheItem<T> {
   data: T;
@@ -8,16 +10,29 @@ interface CacheItem<T> {
 interface CacheOptions {
   ttl?: number; // Default TTL: 5 minutes
   maxSize?: number; // Maximum cache size
+  enableLogging?: boolean; // Enable cache logging
 }
 
 class CacheManager {
   private memoryCache = new Map<string, CacheItem<any>>();
   private readonly defaultTTL = 5 * 60 * 1000; // 5 minutes
   private readonly maxSize = 100;
+  private cacheStats = { hits: 0, misses: 0 };
 
   constructor(private options: CacheOptions = {}) {
     this.options.ttl = this.options.ttl || this.defaultTTL;
     this.options.maxSize = this.options.maxSize || this.maxSize;
+    this.options.enableLogging = this.options.enableLogging ?? true;
+    
+    // Load cache stats from localStorage
+    try {
+      const savedStats = localStorage.getItem('cache_stats');
+      if (savedStats) {
+        this.cacheStats = JSON.parse(savedStats);
+      }
+    } catch (error) {
+      log.error('Failed to load cache stats', { error }, 'CacheManager');
+    }
   }
 
   // Set item in cache
@@ -33,24 +48,48 @@ class CacheManager {
       const oldestKey = this.memoryCache.keys().next().value;
       if (oldestKey) {
         this.memoryCache.delete(oldestKey);
+        if (this.options.enableLogging) {
+          log.cache('delete', oldestKey, 'CacheManager');
+        }
       }
     }
 
     this.memoryCache.set(key, item);
+    
+    if (this.options.enableLogging) {
+      log.cache('set', key, 'CacheManager');
+    }
   }
 
   // Get item from cache
   get<T>(key: string): T | null {
     const item = this.memoryCache.get(key);
     
-    if (!item) return null;
+    if (!item) {
+      this.cacheStats.misses++;
+      this.saveCacheStats();
+      if (this.options.enableLogging) {
+        log.cache('miss', key, 'CacheManager');
+      }
+      return null;
+    }
 
     // Check if item is expired
     if (Date.now() - item.timestamp > item.ttl) {
       this.memoryCache.delete(key);
+      this.cacheStats.misses++;
+      this.saveCacheStats();
+      if (this.options.enableLogging) {
+        log.cache('miss', key, 'CacheManager');
+      }
       return null;
     }
 
+    this.cacheStats.hits++;
+    this.saveCacheStats();
+    if (this.options.enableLogging) {
+      log.cache('hit', key, 'CacheManager');
+    }
     return item.data;
   }
 
@@ -69,12 +108,26 @@ class CacheManager {
     this.memoryCache.clear();
   }
 
+  // Save cache stats to localStorage
+  private saveCacheStats(): void {
+    try {
+      localStorage.setItem('cache_stats', JSON.stringify(this.cacheStats));
+    } catch (error) {
+      log.error('Failed to save cache stats', { error }, 'CacheManager');
+    }
+  }
+
   // Get cache statistics
   getStats() {
     return {
       size: this.memoryCache.size,
       maxSize: this.options.maxSize,
-      keys: Array.from(this.memoryCache.keys())
+      keys: Array.from(this.memoryCache.keys()),
+      hits: this.cacheStats.hits,
+      misses: this.cacheStats.misses,
+      hitRate: this.cacheStats.hits + this.cacheStats.misses > 0 
+        ? (this.cacheStats.hits / (this.cacheStats.hits + this.cacheStats.misses)) * 100 
+        : 0
     };
   }
 
@@ -88,7 +141,14 @@ class CacheManager {
       if (now - item.timestamp > item.ttl) {
         this.memoryCache.delete(key);
         cleaned++;
+        if (this.options.enableLogging) {
+          log.cache('delete', key, 'CacheManager');
+        }
       }
+    }
+
+    if (cleaned > 0 && this.options.enableLogging) {
+      log.info(`Cache cleanup: removed ${cleaned} expired items`, { cleaned }, 'CacheManager');
     }
 
     return cleaned;
@@ -106,10 +166,12 @@ export function cacheable<T extends (...args: any[]) => any>(
   options: { 
     ttl?: number;
     keyGenerator?: (...args: Parameters<T>) => string;
+    enableLogging?: boolean;
   } = {}
 ): T {
   const cache = memoryCache; // Only memory cache is available
   const ttl = options.ttl;
+  const enableLogging = options.enableLogging ?? true;
   const keyGenerator = options.keyGenerator || ((...args: Parameters<T>) => 
     `${fn.name}_${JSON.stringify(args)}`
   );
@@ -119,7 +181,14 @@ export function cacheable<T extends (...args: any[]) => any>(
     const cached = cache.get(key);
     
     if (cached !== null) {
+      if (enableLogging) {
+        log.debug(`Cache hit for function ${fn.name}`, { key, function: fn.name }, 'CacheDecorator');
+      }
       return cached as ReturnType<T>;
+    }
+
+    if (enableLogging) {
+      log.debug(`Cache miss for function ${fn.name}`, { key, function: fn.name }, 'CacheDecorator');
     }
 
     const result = fn(...args);
@@ -128,18 +197,27 @@ export function cacheable<T extends (...args: any[]) => any>(
     if (result instanceof Promise) {
       return result.then(resolvedResult => {
         cache.set(key, resolvedResult, ttl);
+        if (enableLogging) {
+          log.debug(`Cached result for function ${fn.name}`, { key, function: fn.name }, 'CacheDecorator');
+        }
         return resolvedResult;
       }) as ReturnType<T>;
     }
 
     cache.set(key, result, ttl);
+    if (enableLogging) {
+      log.debug(`Cached result for function ${fn.name}`, { key, function: fn.name }, 'CacheDecorator');
+    }
     return result;
   }) as T;
 }
 
 // Auto cleanup expired items every 5 minutes
 setInterval(() => {
-  memoryCache.cleanup();
+  const cleaned = memoryCache.cleanup();
+  if (cleaned > 0) {
+    log.info(`Automatic cache cleanup completed`, { cleaned }, 'CacheManager');
+  }
 }, 5 * 60 * 1000);
 
 export default CacheManager;
