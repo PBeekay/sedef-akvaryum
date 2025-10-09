@@ -1,14 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import WhatsAppButton from '../components/WhatsAppButton';
 import ProductCard from '../components/ProductCard';
 import { useAdmin } from '../context/AdminContext';
+import { ProductDetailSkeleton } from '../components/SkeletonLoader';
+import ImageGallery from '../components/ImageGallery';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { products } = useAdmin();
+  const [isLoading, setIsLoading] = useState(true);
   const product = products.find(p => p.id === id);
-  // Removed selectedImageIndex since we're using single image now
+
+  // Simulate loading
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => setIsLoading(false), 600);
+    return () => clearTimeout(timer);
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen py-8 bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 h-10 bg-gray-200 rounded animate-pulse w-64" />
+          <ProductDetailSkeleton />
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -29,6 +49,11 @@ const ProductDetailPage: React.FC = () => {
     .slice(0, 4);
 
   const whatsappMessage = `Merhaba! Sipariş vermek istiyorum: ${product.name} - ${product.price.toFixed(2)}₺. Stok durumu ve teslimat hakkında bilgi verebilir misiniz?`;
+  
+  // Prepare images array (use images if available, fallback to single image)
+  const productImages = product.images && product.images.length > 0 
+    ? product.images 
+    : [product.image];
 
   return (
     <div className="min-h-screen py-8 bg-gradient-to-b from-gray-50 to-white">
@@ -70,45 +95,26 @@ const ProductDetailPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16 animate-slide-up">
           {/* Product Image Gallery */}
           <div className="space-y-4">
-            {/* Main Image - Enhanced */}
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-ocean-400 via-primary-500 to-secondary-500 rounded-3xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-              <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-96 object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
-                {/* Badges */}
-                <div className="absolute top-4 left-4 flex gap-2 z-10">
-                  {product.new && (
-                    <span className="bg-gradient-to-r from-green-400 to-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg animate-pulse flex items-center gap-1">
-                      <span>✨</span> Yeni
-                    </span>
-                  )}
-                  {product.featured && (
-                    <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-1">
-                      <span>⭐</span> Öne Çıkan
-                    </span>
-                  )}
-                </div>
-                
-                {!product.inStock && (
-                  <div className="absolute inset-0 bg-black/70 backdrop-blur-sm rounded-2xl flex items-center justify-center z-20">
-                    <div className="text-center">
-                      <span className="text-white text-2xl font-bold block mb-2">Stokta Yok</span>
-                      <span className="text-gray-300 text-sm">Yakında Stokta</span>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Zoom Hint */}
-                <div className="absolute bottom-4 right-4 bg-white/20 backdrop-blur-md text-white text-xs px-3 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  🔍 Yakınlaştır
-                </div>
-              </div>
+            {/* Image Gallery Component */}
+            <ImageGallery images={productImages} productName={product.name} />
+            
+            {/* Badges Below Gallery */}
+            <div className="flex gap-2">
+              {product.new && (
+                <span className="bg-green-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
+                  <span>✨</span> Yeni
+                </span>
+              )}
+              {product.featured && (
+                <span className="bg-yellow-400 text-yellow-900 text-sm font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
+                  <span>⭐</span> Öne Çıkan
+                </span>
+              )}
+              {!product.inStock && (
+                <span className="bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-sm">
+                  Stokta Yok
+                </span>
+              )}
             </div>
             
             {/* Product Info Cards */}
@@ -134,7 +140,7 @@ const ProductDetailPage: React.FC = () => {
             <div className="relative">
               <div className="absolute -inset-4 bg-gradient-to-r from-ocean-100 via-primary-100 to-secondary-100 rounded-2xl blur-xl opacity-30"></div>
               <div className="relative bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-primary-100">
-                <h1 className="text-4xl font-extrabold mb-4">
+              <h1 className="text-2xl md:text-3xl font-extrabold mb-4">
                   <span className="bg-gradient-to-r from-ocean-600 via-primary-600 to-secondary-600 bg-clip-text text-transparent">
                     {product.name}
                   </span>
@@ -178,223 +184,203 @@ const ProductDetailPage: React.FC = () => {
             </div>
 
             {/* Description */}
-            <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border-l-4 border-primary-500 shadow-md">
-              <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Açıklama
+                Ürün Açıklaması
               </h3>
-              <p className="text-gray-700 leading-relaxed text-base">{product.description}</p>
+              <p className="text-gray-700 leading-relaxed text-sm">{product.description}</p>
             </div>
 
-                         {/* Karides Özellikleri */}
-                         {product.category === 'shrimp' && (
-                           <div className="space-y-6">
-                             <h3 className="text-lg font-semibold text-gray-800">Karides Özellikleri</h3>
-                             
-                             {/* Renkler */}
-                             {product.colors && (
-                               <div className="bg-gradient-to-br from-secondary-50 to-accent-50 p-4 rounded-lg border border-secondary-200">
-                                 <h4 className="font-medium text-secondary-800 mb-2">Renkler</h4>
-                                 <div className="flex flex-wrap gap-2">
-                                   {product.colors.map((color, index) => (
-                                     <span key={index} className="bg-white text-secondary-700 px-3 py-1 rounded-full text-sm border border-secondary-200">
-                                       {color}
-                                     </span>
-                                   ))}
-                                 </div>
+            {/* Quick Specs - Prominent */}
+            {(product.size || product.difficulty || product.tankSize) && (
+              <div className="bg-primary-50 border-2 border-primary-200 rounded-xl p-5">
+                <h3 className="text-base font-bold text-primary-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Hızlı Bilgiler
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {product.size && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg">
+                      <span className="text-xl">📏</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Boyut</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.size}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.difficulty && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg">
+                      <span className="text-xl">⭐</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Bakım</p>
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${
+                          product.difficulty === 'Çok Kolay' || product.difficulty === 'Kolay' ? 'bg-green-100 text-green-700' :
+                          product.difficulty === 'Orta' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {product.difficulty}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {product.tankSize && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg col-span-2">
+                      <span className="text-xl">🏠</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Tank Boyutu</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.tankSize}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+                         {/* Su Parametreleri - Prominent for all water creatures */}
+                         {product.waterParameters && (
+                           <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-6 rounded-xl shadow-lg text-white">
+                             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                               </svg>
+                               Su Parametreleri
+                             </h3>
+                             <div className="grid grid-cols-3 gap-4">
+                               <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 text-center">
+                                 <div className="text-2xl mb-2">🌡️</div>
+                                 <p className="text-xs text-white/80 mb-1">Sıcaklık</p>
+                                 <p className="font-bold text-lg">{product.waterParameters.temperature}</p>
                                </div>
-                             )}
-                             
-                             {/* Su Parametreleri */}
-                             {product.waterParameters && (
-                               <div className="bg-gradient-to-br from-ocean-50 to-primary-50 p-4 rounded-lg border border-ocean-200">
-                                 <h4 className="font-medium text-ocean-800 mb-3">Su Parametreleri</h4>
-                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                   <div className="text-center">
-                                     <p className="text-sm text-ocean-600">Sıcaklık</p>
-                                     <p className="font-medium text-ocean-800">{product.waterParameters.temperature}</p>
-                                   </div>
-                                   <div className="text-center">
-                                     <p className="text-sm text-ocean-600">pH</p>
-                                     <p className="font-medium text-ocean-800">{product.waterParameters.pH}</p>
-                                   </div>
-                                   <div className="text-center">
-                                     <p className="text-sm text-ocean-600">Sertlik</p>
-                                     <p className="font-medium text-ocean-800">{product.waterParameters.hardness}</p>
-                                   </div>
-                                 </div>
+                               <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 text-center">
+                                 <div className="text-2xl mb-2">⚗️</div>
+                                 <p className="text-xs text-white/80 mb-1">pH Seviyesi</p>
+                                 <p className="font-bold text-lg">{product.waterParameters.pH}</p>
                                </div>
-                             )}
-                             
-                             {/* Diğer Özellikler */}
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                               {product.size && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Boyut</p>
-                                   <p className="font-medium text-gray-800">{product.size}</p>
-                                 </div>
-                               )}
-                               {product.difficulty && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Bakım Zorluğu</p>
-                                   <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                                     product.difficulty === 'Kolay' ? 'bg-green-100 text-green-700' :
-                                     product.difficulty === 'Orta' ? 'bg-yellow-100 text-yellow-700' :
-                                     'bg-red-100 text-red-700'
-                                   }`}>
-                                     {product.difficulty}
-                                   </span>
-                                 </div>
-                               )}
-                               {product.socialBehavior && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Sosyal Davranış</p>
-                                   <p className="font-medium text-gray-800">{product.socialBehavior}</p>
-                                 </div>
-                               )}
-                               {product.breeding && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Üretim</p>
-                                   <p className="font-medium text-gray-800">{product.breeding}</p>
-                                 </div>
-                               )}
-                               {product.diet && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Beslenme</p>
-                                   <p className="font-medium text-gray-800">{product.diet}</p>
-                                 </div>
-                               )}
-                               {product.lifespan && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Yaşam Süresi</p>
-                                   <p className="font-medium text-gray-800">{product.lifespan}</p>
-                                 </div>
-                               )}
-                               {product.tankSize && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Minimum Tank Boyutu</p>
-                                   <p className="font-medium text-gray-800">{product.tankSize}</p>
-                                 </div>
-                               )}
+                               <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 text-center">
+                                 <div className="text-2xl mb-2">💧</div>
+                                 <p className="text-xs text-white/80 mb-1">Sertlik</p>
+                                 <p className="font-bold text-lg">{product.waterParameters.hardness}</p>
+                               </div>
                              </div>
                            </div>
                          )}
 
-                         {/* Balık Özellikleri */}
-                         {product.category === 'fish' && (
-                           <div className="space-y-6">
-                             <h3 className="text-lg font-semibold text-gray-800">Balık Özellikleri</h3>
-                             
-                             {/* Renk */}
-                             {product.color && (
-                               <div className="bg-gradient-to-br from-primary-50 to-ocean-50 p-4 rounded-lg border border-primary-200">
-                                 <h4 className="font-medium text-primary-800 mb-2">Renk</h4>
-                                 <span className="bg-white text-primary-700 px-3 py-1 rounded-full text-sm border border-primary-200">
-                                   {product.color}
+                         {/* Renkler - Karides için */}
+                         {product.colors && product.colors.length > 0 && (
+                           <div className="bg-white p-5 rounded-xl border border-gray-200">
+                             <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                               <span className="text-xl">🎨</span>
+                               Renk Çeşitleri
+                             </h4>
+                             <div className="flex flex-wrap gap-2">
+                               {product.colors.map((color, index) => (
+                                 <span key={index} className="bg-gradient-to-r from-primary-50 to-secondary-50 text-primary-700 px-4 py-2 rounded-full text-sm font-medium border border-primary-200">
+                                   {color}
                                  </span>
-                               </div>
-                             )}
-                             
-                             {/* Su Parametreleri */}
-                             {product.waterParameters && (
-                               <div className="bg-gradient-to-br from-ocean-50 to-primary-50 p-4 rounded-lg border border-ocean-200">
-                                 <h4 className="font-medium text-ocean-800 mb-3">Su Parametreleri</h4>
-                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                   <div className="text-center">
-                                     <p className="text-sm text-ocean-600">Sıcaklık</p>
-                                     <p className="font-medium text-ocean-800">{product.waterParameters.temperature}</p>
-                                   </div>
-                                   <div className="text-center">
-                                     <p className="text-sm text-ocean-600">pH</p>
-                                     <p className="font-medium text-ocean-800">{product.waterParameters.pH}</p>
-                                   </div>
-                                   <div className="text-center">
-                                     <p className="text-sm text-ocean-600">Sertlik</p>
-                                     <p className="font-medium text-ocean-800">{product.waterParameters.hardness}</p>
-                                   </div>
-                                 </div>
-                               </div>
-                             )}
-                             
-                             {/* Diğer Özellikler */}
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                               {product.size && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Boyut</p>
-                                   <p className="font-medium text-gray-800">{product.size}</p>
-                                 </div>
-                               )}
-                               {product.difficulty && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Bakım Zorluğu</p>
-                                   <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                                     product.difficulty === 'Çok Kolay' || product.difficulty === 'Kolay' ? 'bg-green-100 text-green-700' :
-                                     product.difficulty === 'Orta' ? 'bg-yellow-100 text-yellow-700' :
-                                     'bg-red-100 text-red-700'
-                                   }`}>
-                                     {product.difficulty}
-                                   </span>
-                                 </div>
-                               )}
+                               ))}
+                             </div>
+                           </div>
+                         )}
+
+                         {/* Bakım ve Davranış Bilgileri */}
+                         {(product.socialBehavior || product.diet || product.breeding || product.lifespan) && (
+                           <div className="bg-white p-5 rounded-xl border border-gray-200">
+                             <h3 className="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+                               <span className="text-xl">🐠</span>
+                               Bakım Bilgileri
+                             </h3>
+                             <div className="space-y-3">
                                {product.socialBehavior && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Sosyal Davranış</p>
-                                   <p className="font-medium text-gray-800">{product.socialBehavior}</p>
-                                 </div>
-                               )}
-                               {product.breeding && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Üretim</p>
-                                   <p className="font-medium text-gray-800">{product.breeding}</p>
+                                 <div className="flex items-start gap-3 bg-gray-50 p-4 rounded-lg">
+                                   <span className="text-2xl">👥</span>
+                                   <div>
+                                     <p className="text-xs text-gray-600 mb-1">Sosyal Davranış</p>
+                                     <p className="font-medium text-gray-900 text-sm">{product.socialBehavior}</p>
+                                   </div>
                                  </div>
                                )}
                                {product.diet && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Beslenme</p>
-                                   <p className="font-medium text-gray-800">{product.diet}</p>
+                                 <div className="flex items-start gap-3 bg-gray-50 p-4 rounded-lg">
+                                   <span className="text-2xl">🍽️</span>
+                                   <div>
+                                     <p className="text-xs text-gray-600 mb-1">Beslenme</p>
+                                     <p className="font-medium text-gray-900 text-sm">{product.diet}</p>
+                                   </div>
+                                 </div>
+                               )}
+                               {product.breeding && (
+                                 <div className="flex items-start gap-3 bg-gray-50 p-4 rounded-lg">
+                                   <span className="text-2xl">🥚</span>
+                                   <div>
+                                     <p className="text-xs text-gray-600 mb-1">Üretim</p>
+                                     <p className="font-medium text-gray-900 text-sm">{product.breeding}</p>
+                                   </div>
                                  </div>
                                )}
                                {product.lifespan && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Yaşam Süresi</p>
-                                   <p className="font-medium text-gray-800">{product.lifespan}</p>
-                                 </div>
-                               )}
-                               {product.tankSize && (
-                                 <div className="bg-gray-50 p-4 rounded-lg">
-                                   <p className="text-sm text-gray-600">Minimum Tank Boyutu</p>
-                                   <p className="font-medium text-gray-800">{product.tankSize}</p>
+                                 <div className="flex items-start gap-3 bg-gray-50 p-4 rounded-lg">
+                                   <span className="text-2xl">⏳</span>
+                                   <div>
+                                     <p className="text-xs text-gray-600 mb-1">Yaşam Süresi</p>
+                                     <p className="font-medium text-gray-900 text-sm">{product.lifespan}</p>
+                                   </div>
                                  </div>
                                )}
                              </div>
                            </div>
                          )}
 
-                         <div className="space-y-4">
-               <h3 className="text-lg font-semibold text-gray-800">Ürün Detayları</h3>
-               <div className="grid grid-cols-2 gap-4">
-                 <div className="bg-gray-50 p-4 rounded-lg">
-                   <p className="text-sm text-gray-600">Kategori</p>
-                   <p className="font-medium text-gray-800 capitalize">{product.category}</p>
-                 </div>
-                                   <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600">Fiyat</p>
-                    <p className="font-medium text-gray-800">{product.price.toFixed(2)}₺</p>
-                  </div>
-                 <div className="bg-gray-50 p-4 rounded-lg">
-                   <p className="text-sm text-gray-600">Stok Durumu</p>
-                   <p className="font-medium text-gray-800">
-                     {product.inStock ? 'Mevcut' : 'Stokta Yok'}
-                   </p>
-                 </div>
-                 <div className="bg-gray-50 p-4 rounded-lg">
-                   <p className="text-sm text-gray-600">Ürün Kodu</p>
-                   <p className="font-medium text-gray-800">{product.id}</p>
-                 </div>
-               </div>
-             </div>
+                         {/* Bakım İpuçları */}
+                         {(product.category === 'shrimp' || product.category === 'fish') && (
+                           <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border-2 border-green-200">
+                             <h3 className="text-base font-bold text-green-900 mb-4 flex items-center gap-2">
+                               <span className="text-xl">💡</span>
+                               Bakım İpuçları
+                             </h3>
+                             <ul className="space-y-2">
+                               <li className="flex items-start gap-2 text-sm text-gray-700">
+                                 <span className="text-green-600 font-bold mt-0.5">✓</span>
+                                 <span>Düzenli su değişimi yapın (haftada %20-30)</span>
+                               </li>
+                               <li className="flex items-start gap-2 text-sm text-gray-700">
+                                 <span className="text-green-600 font-bold mt-0.5">✓</span>
+                                 <span>Su parametrelerini düzenli kontrol edin</span>
+                               </li>
+                               <li className="flex items-start gap-2 text-sm text-gray-700">
+                                 <span className="text-green-600 font-bold mt-0.5">✓</span>
+                                 <span>Yeterli saklanma yeri sağlayın</span>
+                               </li>
+                               <li className="flex items-start gap-2 text-sm text-gray-700">
+                                 <span className="text-green-600 font-bold mt-0.5">✓</span>
+                                 <span>Kaliteli yem ve dengeli beslenme</span>
+                               </li>
+                               {product.tankSize && (
+                                 <li className="flex items-start gap-2 text-sm text-gray-700">
+                                   <span className="text-green-600 font-bold mt-0.5">✓</span>
+                                   <span>Minimum tank boyutu: {product.tankSize}</span>
+                                 </li>
+                               )}
+                             </ul>
+                           </div>
+                         )}
+
+                         {/* Renk - Balıklar için */}
+                         {product.color && product.category === 'fish' && (
+                           <div className="bg-white p-5 rounded-xl border border-gray-200">
+                             <h4 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                               <span className="text-xl">🎨</span>
+                               Renk
+                             </h4>
+                             <span className="bg-gradient-to-r from-primary-50 to-secondary-50 text-primary-700 px-4 py-2 rounded-full text-sm font-medium border border-primary-200">
+                               {product.color}
+                             </span>
+                           </div>
+                         )}
 
             {/* WhatsApp Order Button - Enhanced */}
             <div className="pt-6">

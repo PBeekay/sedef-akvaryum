@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { categories } from '../data/products';
 import ProductCard from '../components/ProductCard';
-import PWAInstallButton from '../components/PWAInstallButton';
 import GoogleReviews from '../components/GoogleReviews';
 import { useAdmin } from '../context/AdminContext';
+import { ProductGridSkeleton, SliderSkeleton } from '../components/SkeletonLoader';
+import LogoLoop from '../components/LogoLoop';
 
 const HomePage: React.FC = () => {
   const { sliderData, products } = useAdmin();
+  const [isLoading, setIsLoading] = useState(true);
   
   // Get featured and new products from admin context
   const featuredProducts = products.filter(product => product.featured);
@@ -17,6 +19,12 @@ const HomePage: React.FC = () => {
   const heroSlides = sliderData;
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  
+  // Simulate initial loading
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
   
 
   // Auto-slide functionality
@@ -43,7 +51,7 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section with Slider */}
-      <section className="relative bg-gradient-to-br from-ocean-600 via-primary-600 to-secondary-500 text-white py-24 overflow-hidden">
+      <section className="relative bg-gradient-to-br from-ocean-600 via-primary-600 to-secondary-500 text-white py-20 overflow-hidden">
         {/* Animated Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full">
@@ -62,37 +70,27 @@ const HomePage: React.FC = () => {
                     ✨ Akvaryum Uzmanları
                   </span>
                 </div>
-                <h1 className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
+                <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
                   Hoş Geldiniz{' '}
                   <span className="block text-yellow-300 drop-shadow-lg">Sedef Akvaryum</span>
                 </h1>
-                <div className="mb-10 space-y-3">
-                  <h2 className="text-3xl md:text-4xl font-bold mb-3 text-yellow-200 drop-shadow-md">
+                <div className="mb-8 space-y-3">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-3 text-yellow-200 drop-shadow-md">
                     {heroSlides[currentSlide].title}
                   </h2>
-                  <p className="text-xl text-white/90 mb-4 font-medium">
+                  <p className="text-lg text-white/90 mb-3 font-medium">
                     {heroSlides[currentSlide].subtitle}
                   </p>
-                  <p className="text-lg text-white/80 leading-relaxed">
+                  <p className="text-base text-white/80 leading-relaxed">
                     {heroSlides[currentSlide].description}
                   </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link
-                    to={heroSlides[currentSlide].buttonLink}
-                    className="group relative px-8 py-4 bg-white text-primary-600 font-bold text-lg rounded-xl hover:bg-yellow-300 hover:text-primary-700 transition-all duration-300 text-center shadow-2xl hover:shadow-yellow-300/50 hover:scale-105 transform"
-                  >
-                    <span className="relative z-10">{heroSlides[currentSlide].buttonText}</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-200 to-yellow-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </Link>
-                  <PWAInstallButton className="px-8 py-4 border-2 border-white text-white hover:bg-white hover:text-primary-600 font-bold text-lg rounded-xl transition-all duration-300 backdrop-blur-sm hover:scale-105 transform shadow-xl" />
                 </div>
               </div>
             </div>
 
                                       {/* Image Slider */}
               <div className="animate-slide-up relative w-full">
-               <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-96">
+               <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80">
                 {heroSlides.map((slide, index) => (
                   <div
                     key={slide.id}
@@ -103,7 +101,9 @@ const HomePage: React.FC = () => {
                                                                                           <img
                            src={slide.image}
                            alt={slide.title}
-                           className="w-full h-96 object-cover"
+                           className="w-full h-80 object-cover"
+                           loading="lazy"
+                           decoding="async"
                            onError={(e) => {
                              const target = e.target as HTMLImageElement;
                              if (process.env.NODE_ENV === 'development') {
@@ -117,7 +117,7 @@ const HomePage: React.FC = () => {
                                
                                // Create elements safely without innerHTML
                                const slideDiv = document.createElement('div');
-                               slideDiv.className = 'w-full h-96 flex items-center justify-center text-white text-4xl font-bold';
+                               slideDiv.className = 'w-full h-80 flex items-center justify-center text-white text-4xl font-bold';
                                
                                const backgroundStyle = slide.id === 1 ? 'linear-gradient(135deg, #1a237e, #3949ab)' :
                                                       slide.id === 2 ? 'linear-gradient(135deg, #4a148c, #8e24aa)' :
@@ -195,8 +195,11 @@ const HomePage: React.FC = () => {
         </div>
       </section>
 
+      {/* Logo Loop - Trust Indicators */}
+      <LogoLoop />
+
       {/* Categories Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <section className="py-12 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -246,7 +249,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-20 bg-white relative">
+      <section className="py-12 bg-white relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-block mb-4">
@@ -264,11 +267,15 @@ const HomePage: React.FC = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} showDetails={false} />
-            ))}
-          </div>
+          {isLoading ? (
+            <ProductGridSkeleton count={8} />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} showDetails={false} />
+              ))}
+            </div>
+          )}
           
           <div className="text-center mt-12">
             <Link
@@ -287,7 +294,7 @@ const HomePage: React.FC = () => {
 
       {/* New Arrivals Section */}
       {newProducts.length > 0 && (
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        <section className="py-12 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full opacity-5">
             <div className="absolute top-20 right-20 w-72 h-72 bg-green-400 rounded-full filter blur-3xl"></div>
           </div>
@@ -318,63 +325,7 @@ const HomePage: React.FC = () => {
         </section>
       )}
 
-      {/* About Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">
-                Neden Sedef Akvaryum?
-              </h2>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Kalite Garantisi</h3>
-                    <p className="text-gray-600">Tüm balıklarımız ve ürünlerimiz en yüksek kalite standartlarını karşılar.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Uzman Desteği</h3>
-                    <p className="text-gray-600">Akvaryum uzmanlarımızdan oluşan ekibimiz en iyi seçimleri yapmanıza yardımcı olur.</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-800">Kolay Sipariş</h3>
-                    <p className="text-gray-600">Hızlı ve kolay alışveriş deneyimi için WhatsApp üzerinden sipariş verin.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="relative">
-              <img
-                src="https://images.unsplash.com/photo-1587764379873-97837921fd44?w=600&h=400&fit=crop"
-                alt="Pet care"
-                className="rounded-2xl shadow-lg"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
              {/* Google Reviews Section */}
       <GoogleReviews />

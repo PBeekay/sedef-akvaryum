@@ -120,6 +120,11 @@ export const products: Product[] = [
     description: 'Kırmızı Sakura Karidesi, bilimsel adıyla Neocaridina davidi, canlı kırmızı renklenmesiyle herhangi bir tatlı su akvaryumuna canlı bir renk patlaması getirir. Tayvan\'dan köken alan bu yaygın olarak sevilen tür, hem estetik çekicilik hem de yosun ve kalıntı besleme alışkanlıkları sayesinde su ortamını temiz tutmaya yardımcı olan pratik faydalar için mükemmel bir eklemedir. Bakım kolaylığı ve dayanıklılığı ile ünlü olan Kırmızı Sakura Karidesi, akvaristlik dünyasına giren yeni başlayanlar için ideal seçim olarak durur ve minimal zahmetle ödüllendirici bir deneyim sunar.',
     shortDescription: 'Canlı kırmızı renklenmesiyle tatlı su akvaryumlarına canlı renk patlaması getiren Kırmızı Sakura karidesi.',
     image: 'https://cdn.myikas.com/images/d70af965-261f-4405-a1d9-1f58e6784a19/9365ebfb-b0a9-48b4-9a70-f8da6a90dcf0/image_1080.jpg',
+    images: [
+      'https://cdn.myikas.com/images/d70af965-261f-4405-a1d9-1f58e6784a19/9365ebfb-b0a9-48b4-9a70-f8da6a90dcf0/image_1080.jpg',
+      'https://cdn.shopify.com/s/files/1/0667/6237/5466/files/neocaridina-red-sakura-shrimp_480x480.jpg',
+      'https://tropicflow.com/cdn/shop/files/IMG-1266.jpg?v=1733645067&width=713',
+    ],
     inStock: true,
     featured: true,
     colors: ['Canlı Kırmızı', 'Parlak Kırmızı', 'Vibrant Kırmızı'],

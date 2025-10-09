@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Product } from '../types/Product';
 import ProductCard from '../components/ProductCard';
 import SearchBar from '../components/SearchBar';
-import { GridLoader } from '../components/LoadingSpinner';
+import { ProductGridSkeleton } from '../components/SkeletonLoader';
 import { useAdmin } from '../context/AdminContext';
 
 const SearchPage: React.FC = () => {
@@ -12,8 +12,7 @@ const SearchPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
     category: 'all',
-    priceRange: 'all',
-    sortBy: 'relevance'
+    priceRange: 'all'
   });
   const { products } = useAdmin();
 
@@ -74,26 +73,7 @@ const SearchPage: React.FC = () => {
       });
     }
 
-    // Sıralama
-    switch (filters.sortBy) {
-      case 'price-low':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-high':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'name':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      default:
-        // Relevance - arama terimine göre sıralama
-        filtered.sort((a, b) => {
-          const queryLower = query.toLowerCase();
-          const aScore = getRelevanceScore(a, queryLower);
-          const bScore = getRelevanceScore(b, queryLower);
-          return bScore - aScore;
-        });
-    }
+    // Sıralama kaldırıldı
 
     return filtered;
   }, [filters, query]);
@@ -239,30 +219,14 @@ const SearchPage: React.FC = () => {
                 </select>
               </div>
 
-              {/* Sort Filter */}
-              <div className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                </svg>
-                <label className="text-base font-semibold text-gray-700">Sırala:</label>
-                <select
-                  value={filters.sortBy}
-                  onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                  className="px-4 py-2.5 border-2 border-gray-300 rounded-xl text-base font-medium focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white hover:border-primary-300 transition-colors cursor-pointer shadow-sm"
-                >
-                  <option value="relevance">⭐ İlgi Sırası</option>
-                  <option value="name">📝 İsim</option>
-                  <option value="price-low">💰 Fiyat (Düşük-Yüksek)</option>
-                  <option value="price-high">💎 Fiyat (Yüksek-Düşük)</option>
-                </select>
-              </div>
+              
             </div>
           </div>
         </div>
 
         {/* Sonuçlar */}
         {isLoading ? (
-          <GridLoader count={8} />
+          <ProductGridSkeleton count={8} />
         ) : searchResults.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-fade-in">
             {searchResults.map((product) => (

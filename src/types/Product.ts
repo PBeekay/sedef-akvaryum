@@ -6,6 +6,7 @@ export interface Product {
   description: string;
   shortDescription: string;
   image: string;
+  images?: string[]; // Multiple images for gallery
   inStock: boolean;
   featured?: boolean;
   new?: boolean;

@@ -20,14 +20,14 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start:3001": "PORT=3001 react-scripts start",
-    "start:4000": "PORT=4000 react-scripts start",
-    "start:8080": "PORT=8080 react-scripts start",
+    "start:3001": "cross-env PORT=3001 react-scripts start",
+    "start:4000": "cross-env PORT=4000 react-scripts start",
+    "start:8080": "cross-env PORT=8080 react-scripts start",
     "build": "react-scripts build",
-    "build:analyze": "GENERATE_SOURCEMAP=false react-scripts build && npx webpack-bundle-analyzer build/static/js/*.js",
-    "build:prod": "GENERATE_SOURCEMAP=false react-scripts build",
-    "build:secure": "GENERATE_SOURCEMAP=false NODE_ENV=production react-scripts build",
-    "build:netlify": "set GENERATE_SOURCEMAP=false && set NODE_ENV=production && react-scripts build",
+    "build:analyze": "cross-env GENERATE_SOURCEMAP=false react-scripts build && npx webpack-bundle-analyzer build/static/js/*.js",
+    "build:prod": "cross-env GENERATE_SOURCEMAP=false react-scripts build",
+    "build:secure": "cross-env GENERATE_SOURCEMAP=false NODE_ENV=production react-scripts build",
+    
     "build:analyze-bundle": "npm run build:prod && npx webpack-bundle-analyzer build/static/js/*.js",
     "build:lighthouse": "npm run build:prod && npm run lighthouse",
     "test": "react-scripts test",
@@ -41,13 +41,13 @@
     "analyze:webpack": "npx webpack-bundle-analyzer build/static/js/*.js",
     "analyze:size": "npx size-limit",
     "preview:build": "npx serve -s build",
-    "preview:netlify": "npx serve -s build -l 3000",
-    "clean": "rm -rf build node_modules/.cache",
+    
+    "clean": "rimraf build node_modules/.cache",
     "cache:clear": "npm run clean && npm start",
     "security:audit": "npm audit --audit-level=moderate",
     "security:fix": "npm audit fix",
-    "export:data": "npx ts-node scripts/export-data.ts",
-    "deploy:netlify": "npm run build:netlify && npx netlify deploy --prod --dir=build"
+    "export:data": "npx ts-node scripts/export-data.ts"
+
   },
   "eslintConfig": {
     "extends": [
@@ -80,7 +80,9 @@
     "size-limit": "^10.0.0",
     "tailwindcss": "^3.3.0",
     "ts-node": "^10.9.2",
-    "webpack-bundle-analyzer": "^4.9.1"
+    "webpack-bundle-analyzer": "^4.9.1",
+    "cross-env": "^7.0.3",
+    "rimraf": "^5.0.5"
   },
   "size-limit": [
     {

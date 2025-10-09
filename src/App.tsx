@@ -1,14 +1,12 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
-import PWAInstallButton from './components/PWAInstallButton';
-import OfflinePage from './components/OfflinePage';
 import ErrorBoundary from './components/ErrorBoundary';
-import LoadingSpinner from './components/LoadingSpinner';
 import BackToTop from './components/BackToTop';
 import ScrollProgressBar from './components/ScrollProgressBar';
+import { ProductGridSkeleton } from './components/SkeletonLoader';
 
 import { AdminProvider } from './context/AdminContext';
 import { StockProvider } from './context/StockContext';
@@ -23,10 +21,13 @@ const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
-// Loading component for Suspense fallback
+// Loading component for Suspense fallback - Skeleton instead of spinner
 const PageLoader: React.FC = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <LoadingSpinner size="lg" />
+  <div className="min-h-screen py-12 bg-gradient-to-b from-gray-50 to-white">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="mb-8 h-12 bg-gray-200 rounded animate-pulse w-64" />
+      <ProductGridSkeleton count={8} />
+    </div>
   </div>
 );
 
@@ -36,13 +37,23 @@ function App() {
       <AdminProvider>
         <StockProvider>
           <Router basename="/">
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-white text-primary-700 px-3 py-2 rounded-md shadow">
+            İçeriğe geç
+          </a>
           <div className="min-h-screen flex flex-col">
             <Navbar />
 
-            <main className="flex-grow">
+            <main id="main-content" role="main" className="flex-grow pb-20 md:pb-0" tabIndex={-1}>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   <Route path="/" element={<HomePage />} />
+                  {/* Turkish slug aliases → canonical category routes */}
+                  <Route path="/balik" element={<Navigate to="/category/fish" replace />} />
+                  <Route path="/karides" element={<Navigate to="/category/shrimp" replace />} />
+                  <Route path="/bitkiler" element={<Navigate to="/category/plants" replace />} />
+                  <Route path="/ekipman" element={<Navigate to="/category/equipment" replace />} />
+                  <Route path="/aksesuarlar" element={<Navigate to="/category/accessories" replace />} />
+                  <Route path="/yem" element={<Navigate to="/category/food" replace />} />
                   <Route path="/product/:id" element={<ProductDetailPage />} />
                   <Route path="/category/:categoryId" element={<CategoryPage />} />
                   <Route path="/contact" element={<ContactPage />} />
@@ -61,18 +72,11 @@ function App() {
               message="Merhaba! Akvaryum mağazanızın hizmetleri hakkında sorum var."
               variant="floating"
             />
-
-            {/* PWA Install Button */}
-            <PWAInstallButton variant="floating" />
-
             {/* Back To Top Button */}
             <BackToTop />
 
             {/* Scroll Progress Bar */}
             <ScrollProgressBar />
-
-            {/* Offline Page */}
-            <OfflinePage />
 
             
           </div>

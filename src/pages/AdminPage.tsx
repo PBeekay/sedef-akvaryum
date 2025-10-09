@@ -11,13 +11,11 @@ interface AdminProduct extends Product {
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
-  const [showGuideEditor, setShowGuideEditor] = useState(false);
-  const [editingGuideSection, setEditingGuideSection] = useState<string>('');
   const [showCategoryEditor, setShowCategoryEditor] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [showSliderEditor, setShowSliderEditor] = useState(false);
@@ -50,11 +48,11 @@ const AdminPage: React.FC = () => {
   };
 
   const tabs = [
+    { id: 'dashboard', name: 'Dashboard', icon: '🏠' },
     { id: 'products', name: 'Ürün Yönetimi', icon: '📦' },
     { id: 'stock', name: 'Stok Yönetimi', icon: '📊' },
     { id: 'categories', name: 'Kategori Yönetimi', icon: '🏷️' },
     { id: 'slider', name: 'Slider Yönetimi', icon: '🖼️' },
-    { id: 'guide', name: 'Rehber İçerikleri', icon: '📚' },
     { id: 'analytics', name: 'Analitik', icon: '📈' },
   ];
 
@@ -131,21 +129,6 @@ const AdminPage: React.FC = () => {
     setEditingProduct(null);
   };
 
-  const handleEditGuideSection = (section: string) => {
-    setEditingGuideSection(section);
-    setShowGuideEditor(true);
-  };
-
-  const handleSaveGuideSection = (content: string) => {
-    // Burada rehber içeriğini kaydetme işlemi yapılacak
-    setShowGuideEditor(false);
-    setEditingGuideSection('');
-  };
-
-  const handleCancelGuideEdit = () => {
-    setShowGuideEditor(false);
-    setEditingGuideSection('');
-  };
 
   const handleEditCategory = (category: any) => {
     setEditingCategory(category);
@@ -647,77 +630,148 @@ const AdminPage: React.FC = () => {
              </div>
            )}
 
-          {activeTab === 'guide' && (
+          {activeTab === 'dashboard' && (
             <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800">Rehber İçerikleri</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
+                <div className="text-sm text-gray-500">
+                  Hoş geldiniz! İşte mağazanızın genel durumu.
+                </div>
+              </div>
               
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div className="bg-blue-50 p-6 rounded-lg">
-                   <h3 className="font-semibold text-blue-800 mb-4">Neocaridina Bakımı</h3>
-                   <p className="text-blue-700 mb-4">Karides bakımı hakkında detaylı bilgiler</p>
-                   <button 
-                     onClick={() => handleEditGuideSection('neocaridina')}
-                     className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                   >
-                     İçeriği Düzenle
-                   </button>
-                 </div>
-                 
-                 <div className="bg-green-50 p-6 rounded-lg">
-                   <h3 className="font-semibold text-green-800 mb-4">Tank Kurulumu</h3>
-                   <p className="text-green-700 mb-4">Akvaryum kurulum rehberi</p>
-                   <button 
-                     onClick={() => handleEditGuideSection('tank-setup')}
-                     className="text-green-600 hover:text-green-800 text-sm font-medium"
-                   >
-                     İçeriği Düzenle
-                   </button>
-                 </div>
-                 
-                 <div className="bg-purple-50 p-6 rounded-lg">
-                   <h3 className="font-semibold text-purple-800 mb-4">Su Parametreleri</h3>
-                   <p className="text-purple-700 mb-4">Su kalitesi ve parametreler</p>
-                   <button 
-                     onClick={() => handleEditGuideSection('water-params')}
-                     className="text-purple-600 hover:text-purple-800 text-sm font-medium"
-                   >
-                     İçeriği Düzenle
-                   </button>
-                 </div>
-                 
-                 <div className="bg-yellow-50 p-6 rounded-lg">
-                   <h3 className="font-semibold text-yellow-800 mb-4">Üretim Rehberi</h3>
-                   <p className="text-yellow-700 mb-4">Karides üretimi hakkında bilgiler</p>
-                   <button 
-                     onClick={() => handleEditGuideSection('breeding')}
-                     className="text-yellow-600 hover:text-yellow-800 text-sm font-medium"
-                   >
-                     İçeriği Düzenle
-                   </button>
-                 </div>
+              {/* Quick Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl text-white shadow-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-3xl">📦</div>
+                    <div className="text-sm opacity-80">Toplam</div>
+                  </div>
+                  <div className="text-3xl font-bold mb-1">{adminProducts.length}</div>
+                  <div className="text-sm opacity-90">Ürün</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl text-white shadow-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-3xl">✓</div>
+                    <div className="text-sm opacity-80">Stokta</div>
+                  </div>
+                  <div className="text-3xl font-bold mb-1">{adminProducts.filter(p => p.inStock).length}</div>
+                  <div className="text-sm opacity-90">Ürün</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 rounded-xl text-white shadow-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-3xl">⭐</div>
+                    <div className="text-sm opacity-80">Öne Çıkan</div>
+                  </div>
+                  <div className="text-3xl font-bold mb-1">{adminProducts.filter(p => p.featured).length}</div>
+                  <div className="text-sm opacity-90">Ürün</div>
+                </div>
+                
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-xl text-white shadow-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-3xl">🆕</div>
+                    <div className="text-sm opacity-80">Yeni</div>
+                  </div>
+                  <div className="text-3xl font-bold mb-1">{adminProducts.filter(p => p.new).length}</div>
+                  <div className="text-sm opacity-90">Ürün</div>
+                </div>
+              </div>
 
-                 <div className="bg-orange-50 p-6 rounded-lg">
-                   <h3 className="font-semibold text-orange-800 mb-4">Beslenme</h3>
-                   <p className="text-orange-700 mb-4">Karides beslenme rehberi</p>
-                   <button 
-                     onClick={() => handleEditGuideSection('feeding')}
-                     className="text-orange-600 hover:text-orange-800 text-sm font-medium"
-                   >
-                     İçeriği Düzenle
-                   </button>
-                 </div>
+              {/* Quick Actions */}
+              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                <h3 className="text-lg font-bold text-gray-800 mb-4">Hızlı İşlemler</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <button
+                    onClick={() => { setActiveTab('products'); setShowAddForm(true); }}
+                    className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+                  >
+                    <div className="text-2xl">➕</div>
+                    <div className="text-left">
+                      <div className="font-semibold text-blue-900">Yeni Ürün Ekle</div>
+                      <div className="text-xs text-blue-700">Mağazaya ürün ekleyin</div>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('slider')}
+                    className="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200"
+                  >
+                    <div className="text-2xl">🖼️</div>
+                    <div className="text-left">
+                      <div className="font-semibold text-purple-900">Slider Düzenle</div>
+                      <div className="text-xs text-purple-700">Anasayfa slider'ını yönetin</div>
+                    </div>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('stock')}
+                    className="flex items-center gap-3 p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200"
+                  >
+                    <div className="text-2xl">📊</div>
+                    <div className="text-left">
+                      <div className="font-semibold text-green-900">Stok Yönetimi</div>
+                      <div className="text-xs text-green-700">Stok durumunu güncelleyin</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
 
-                 <div className="bg-pink-50 p-6 rounded-lg">
-                   <h3 className="font-semibold text-pink-800 mb-4">Tank Arkadaşları</h3>
-                   <p className="text-pink-700 mb-4">Uyumlu balık türleri</p>
-                   <button 
-                     onClick={() => handleEditGuideSection('tank-mates')}
-                     className="text-pink-600 hover:text-pink-800 text-sm font-medium"
-                   >
-                     İçeriği Düzenle
-                   </button>
-                 </div>
-               </div>
+              {/* Category Overview */}
+              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                <h3 className="text-lg font-bold text-gray-800 mb-4">Kategori Dağılımı</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                  {categories.map(cat => {
+                    const categoryProducts = adminProducts.filter(p => p.category === cat.id);
+                    return (
+                      <div key={cat.id} className="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg text-center border border-gray-200">
+                        <div className="text-3xl mb-2">{cat.icon}</div>
+                        <div className="text-sm font-semibold text-gray-700 mb-1">{cat.name}</div>
+                        <div className="text-2xl font-bold text-primary-600">{categoryProducts.length}</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {categoryProducts.filter(p => p.inStock).length} stokta
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Recent Products */}
+              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-gray-800">Son Eklenen Ürünler</h3>
+                  <button
+                    onClick={() => setActiveTab('products')}
+                    className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                  >
+                    Tümünü Gör →
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {adminProducts.slice(0, 6).map(product => (
+                    <div key={product.id} className="flex gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-primary-300 transition-colors">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-sm text-gray-900 truncate">{product.name}</div>
+                        <div className="text-xs text-gray-500 mb-1">{categories.find(c => c.id === product.category)?.name}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-bold text-primary-600">₺{product.price}</span>
+                          {product.inStock ? (
+                            <span className="text-xs text-green-600">✓ Stokta</span>
+                          ) : (
+                            <span className="text-xs text-red-600">Stokta Yok</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
@@ -823,22 +877,6 @@ const AdminPage: React.FC = () => {
           </div>
         )}
 
-                 {/* Guide Editor Modal */}
-         {showGuideEditor && (
-           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-             <div className="bg-white rounded-xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-               <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                 Rehber İçeriği Düzenle: {editingGuideSection}
-               </h3>
-               
-               <GuideEditor
-                 section={editingGuideSection}
-                 onSave={handleSaveGuideSection}
-                 onCancel={handleCancelGuideEdit}
-               />
-             </div>
-           </div>
-         )}
 
          {/* Category Editor Modal */}
          {showCategoryEditor && (
@@ -894,6 +932,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
     description: product?.description || '',
     shortDescription: product?.shortDescription || '',
     image: product?.image || '',
+    images: product?.images || [],
     inStock: product?.inStock || true,
     featured: product?.featured || false,
     new: product?.new || false,
@@ -912,8 +951,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
     tankSize: product?.tankSize || '',
   });
 
-  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  // const [imagePreview, setImagePreview] = useState<string>(''); // Removed unused variable
+  const [newImageUrl, setNewImageUrl] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -937,30 +975,44 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
-        // setImagePreview(result); // Removed unused
         handleInputChange('image', result);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleAddImageUrl = (url: string) => {
-    if (url) {
-      handleInputChange('image', url);
+  const handleAddImageUrl = () => {
+    if (newImageUrl.trim()) {
+      const currentImages = formData.images || [];
+      // Add to images array
+      handleInputChange('images', [...currentImages, newImageUrl.trim()]);
+      // If this is the first image, also set it as the main image
+      if (!formData.image) {
+        handleInputChange('image', newImageUrl.trim());
+      }
+      setNewImageUrl('');
     }
   };
 
-  // const handleRemoveImage = (index: number) => {
-  //   // This function is no longer needed since we removed multiple images support
-  // };
+  const handleRemoveImage = (index: number) => {
+    const currentImages = formData.images || [];
+    const newImages = currentImages.filter((_, i) => i !== index);
+    handleInputChange('images', newImages);
+    
+    // If we removed the main image, set the first remaining image as main
+    if (currentImages[index] === formData.image && newImages.length > 0) {
+      handleInputChange('image', newImages[0]);
+    } else if (newImages.length === 0) {
+      handleInputChange('image', '');
+    }
+  };
 
-  // const handleSetMainImage = (imageUrl: string) => {
-  //   handleInputChange('image', imageUrl);
-  // };
+  const handleSetMainImage = (imageUrl: string) => {
+    handleInputChange('image', imageUrl);
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -1009,58 +1061,95 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
           />
         </div>
 
-        <div>
+        <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Resimler (Ana resim ilk sırada olmalı)
+            Ürün Görselleri
           </label>
           <div className="space-y-4">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
+            {/* Add Image URL */}
             <div className="flex gap-2">
               <input
                 type="url"
-                placeholder="Yeni resim URL'si ekle"
+                placeholder="Resim URL'si ekle"
+                value={newImageUrl}
+                onChange={(e) => setNewImageUrl(e.target.value)}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
-                    const input = e.target as HTMLInputElement;
-                    handleAddImageUrl(input.value);
-                    input.value = '';
+                    handleAddImageUrl();
                   }
                 }}
               />
               <button
                 type="button"
-                onClick={(e) => {
-                  const input = (e.target as HTMLButtonElement).previousElementSibling as HTMLInputElement;
-                  handleAddImageUrl(input.value);
-                  input.value = '';
-                }}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                onClick={handleAddImageUrl}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
               >
-                Ekle
+                ➕ Ekle
               </button>
             </div>
             
-            {/* Display current image */}
-            {formData.image && (
+            {/* Image Gallery */}
+            {formData.images && formData.images.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-gray-700">Mevcut Resim:</h4>
-                <div className="mt-4">
-                  <img
-                    src={formData.image}
-                    alt="Ürün resmi"
-                    className="w-full h-32 object-cover rounded-lg border-2 border-primary-500"
-                  />
-                  <div className="mt-2 text-sm text-gray-600">
-                    Ana resim: {formData.image}
-                  </div>
+                <h4 className="text-sm font-medium text-gray-700">Mevcut Görseller:</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {formData.images.map((imageUrl, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={imageUrl}
+                        alt={`Ürün görseli ${index + 1}`}
+                        className={`w-full h-32 object-cover rounded-lg border-2 transition-all ${
+                          formData.image === imageUrl 
+                            ? 'border-green-500 ring-2 ring-green-300' 
+                            : 'border-gray-300'
+                        }`}
+                      />
+                      
+                      {/* Main Image Badge */}
+                      {formData.image === imageUrl && (
+                        <div className="absolute top-1 left-1 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                          ⭐ Ana
+                        </div>
+                      )}
+                      
+                      {/* Action Buttons */}
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all rounded-lg flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+                        {formData.image !== imageUrl && (
+                          <button
+                            type="button"
+                            onClick={() => handleSetMainImage(imageUrl)}
+                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-xs"
+                            title="Ana görsel yap"
+                          >
+                            ⭐ Ana Yap
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(index)}
+                          className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs"
+                          title="Sil"
+                        >
+                          🗑️ Sil
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  💡 İpucu: Ana görsel ürün kartlarında gösterilir. Diğer görseller ürün detay sayfasında galeri olarak görünür.
+                </p>
+              </div>
+            )}
+            
+            {/* No Images State */}
+            {(!formData.images || formData.images.length === 0) && (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div className="text-4xl mb-2">🖼️</div>
+                <p className="text-gray-500 text-sm">Henüz görsel eklenmedi</p>
+                <p className="text-gray-400 text-xs mt-1">Yukarıdaki alandan görsel URL'si ekleyin</p>
               </div>
             )}
           </div>
