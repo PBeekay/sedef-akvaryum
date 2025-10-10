@@ -217,10 +217,12 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       // Production'da environment variables zorunlu
       const adminUsername = process.env.REACT_APP_ADMIN_USERNAME;
       const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD;
+      const moderatorUsername = process.env.REACT_APP_MODERATOR_USERNAME;
+      const moderatorPassword = process.env.REACT_APP_MODERATOR_PASSWORD;
       
       // Production'da environment variables kontrolü
       if (process.env.NODE_ENV === 'production') {
-        if (!adminUsername || !adminPassword) {
+        if (!adminUsername || !adminPassword || !moderatorUsername || !moderatorPassword) {
           return {
             success: false,
             message: 'Admin kimlik bilgileri yapılandırılmamış. Lütfen sistem yöneticisi ile iletişime geçin.'
@@ -229,15 +231,20 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       }
       
       // Development için fallback
-      const finalUsername = adminUsername || 'admin';
-      const finalPassword = adminPassword || 'admin123';
+      const finalAdminUsername = adminUsername || 'sedef';
+      const finalAdminPassword = adminPassword || 'Adm.Sdf.25!';
+      const finalModeratorUsername = moderatorUsername || 'moderator';
+      const finalModeratorPassword = moderatorPassword || 'The.LasT.26';
       
-      const isValidCredentials = username === finalUsername && password === finalPassword;
+      // Admin veya Moderator kontrolü (her ikisi de aynı yetkiye sahip)
+      const isAdminValid = username === finalAdminUsername && password === finalAdminPassword;
+      const isModeratorValid = username === finalModeratorUsername && password === finalModeratorPassword;
       
-      if (isValidCredentials) {
+      if (isAdminValid || isModeratorValid) {
+        const userRole = isAdminValid ? 'admin' : 'moderator';
         const token = await generateToken({ 
           username, 
-          role: 'admin',
+          role: userRole,
           loginTime: Date.now()
         });
         secureStorage.setItem('adminToken', token);

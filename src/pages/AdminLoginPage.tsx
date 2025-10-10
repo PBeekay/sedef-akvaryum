@@ -136,10 +136,18 @@ const AdminLoginPage: React.FC = () => {
           {/* Admin Bilgileri - Sadece development için */}
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="text-sm font-medium text-blue-800 mb-2">Development Admin Bilgileri:</h3>
-              <div className="text-xs text-blue-700 space-y-1">
-                <p><strong>Default:</strong> admin / admin123</p>
+              <h3 className="text-sm font-medium text-blue-800 mb-2">Development Giriş Bilgileri:</h3>
+              <div className="text-xs text-blue-700 space-y-2">
+                <div>
+                  <p><strong>Admin:</strong> admin / admin123</p>
+                </div>
+                <div>
+                  <p><strong>Moderator:</strong> moderator / moderator123</p>
+                </div>
                 <p className="text-xs text-blue-600 mt-2">
+                  ⚠️ Her iki kullanıcı da aynı yetkiye sahiptir
+                </p>
+                <p className="text-xs text-blue-600">
                   ⚠️ Production'da environment variables kullanılır
                 </p>
               </div>
