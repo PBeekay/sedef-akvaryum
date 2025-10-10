@@ -2,7 +2,7 @@
   "name": "pet-shop-website",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "/",
   "dependencies": {
     "@types/dompurify": "^3.0.5",
     "@types/node": "^16.18.0",
