@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface ImageGalleryProps {
   images: string[];
@@ -11,13 +11,13 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName }) => {
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
-  const handlePrevImage = () => {
+  const handlePrevImage = useCallback(() => {
     setSelectedImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
+  }, [images.length]);
 
-  const handleNextImage = () => {
+  const handleNextImage = useCallback(() => {
     setSelectedImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
+  }, [images.length]);
 
   // Keyboard navigation
   useEffect(() => {
