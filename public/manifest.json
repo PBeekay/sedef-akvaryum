@@ -1,0 +1,22 @@
+{
+  "short_name": "Sedef Akvaryum",
+  "name": "Sedef Akvaryum - Karides, Balık ve Akvaryum Malzemeleri",
+  "icons": [
+    {
+      "src": "shrimp.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "shrimp.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#2563eb",
+  "background_color": "#ffffff",
+  "description": "Türkiye'nin en kaliteli karides, balık ve akvaryum malzemeleri"
+}
+

@@ -10,7 +10,7 @@ export interface Product {
   inStock: boolean;
   featured?: boolean;
   new?: boolean;
-  // Karides özellikleri için ek alanlar
+  // Balık ve Karides özellikleri için ek alanlar
   colors?: string[];
   species?: string;
   color?: string;
@@ -26,4 +26,9 @@ export interface Product {
   diet?: string;
   lifespan?: string;
   tankSize?: string;
+  // Bitki özellikleri için ek alanlar
+  lightRequirement?: string;
+  co2Requirement?: string;
+  growthRate?: string;
+  placement?: string;
 }
