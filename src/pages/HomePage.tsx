@@ -4,7 +4,7 @@ import { categories } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import GoogleReviews from '../components/GoogleReviews';
 import { useAdmin } from '../context/AdminContext';
-import { ProductGridSkeleton, SliderSkeleton } from '../components/SkeletonLoader';
+import { ProductGridSkeleton } from '../components/SkeletonLoader';
 import LogoLoop from '../components/LogoLoop';
 
 const HomePage: React.FC = () => {

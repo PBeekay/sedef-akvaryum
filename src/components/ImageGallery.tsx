@@ -8,9 +8,16 @@ interface ImageGalleryProps {
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName }) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const [isZoomed, setIsZoomed] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
+
+  const handlePrevImage = () => {
+    setSelectedImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = () => {
+    setSelectedImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
 
   // Keyboard navigation
   useEffect(() => {
@@ -28,7 +35,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName }) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isLightboxOpen, selectedImage]);
+  }, [isLightboxOpen, selectedImage, handlePrevImage, handleNextImage]);
 
   // Prevent body scroll when lightbox is open
   useEffect(() => {
@@ -41,14 +48,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, productName }) => {
       document.body.style.overflow = 'unset';
     };
   }, [isLightboxOpen]);
-
-  const handlePrevImage = () => {
-    setSelectedImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
-
-  const handleNextImage = () => {
-    setSelectedImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
 
   // Touch handlers for mobile swipe
   const handleTouchStart = (e: React.TouchEvent) => {

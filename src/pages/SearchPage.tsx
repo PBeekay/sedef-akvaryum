@@ -32,18 +32,19 @@ const SearchPage: React.FC = () => {
     );
   }, [products]);
 
-  const getRelevanceScore = (product: Product, query: string): number => {
-    let score = 0;
-    
-    if (product.name.toLowerCase().includes(query)) score += 10;
-    if (product.description.toLowerCase().includes(query)) score += 5;
-    if (product.category.toLowerCase().includes(query)) score += 3;
-    if (product.species && product.species.toLowerCase().includes(query)) score += 7;
-    if (product.color && product.color.toLowerCase().includes(query)) score += 4;
-    if (product.colors && product.colors.some(color => color.toLowerCase().includes(query))) score += 6;
-    
-    return score;
-  };
+  // Relevance scoring function - kept for potential future use
+  // const getRelevanceScore = (product: Product, query: string): number => {
+  //   let score = 0;
+  //   
+  //   if (product.name.toLowerCase().includes(query)) score += 10;
+  //   if (product.description.toLowerCase().includes(query)) score += 5;
+  //   if (product.category.toLowerCase().includes(query)) score += 3;
+  //   if (product.species && product.species.toLowerCase().includes(query)) score += 7;
+  //   if (product.color && product.color.toLowerCase().includes(query)) score += 4;
+  //   if (product.colors && product.colors.some(color => color.toLowerCase().includes(query))) score += 6;
+  //   
+  //   return score;
+  // };
 
   const applyFilters = useCallback((products: Product[]): Product[] => {
     let filtered = [...products];
@@ -76,7 +77,7 @@ const SearchPage: React.FC = () => {
     // Sıralama kaldırıldı
 
     return filtered;
-  }, [filters, query]);
+  }, [filters]);
 
   // Arama işlemi
   useEffect(() => {

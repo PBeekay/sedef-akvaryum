@@ -972,17 +972,18 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
     }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        handleInputChange('image', result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // File upload handler - kept for potential future use
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = (e) => {
+  //       const result = e.target?.result as string;
+  //       handleInputChange('image', result);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
   const handleAddImageUrl = () => {
     if (newImageUrl.trim()) {
@@ -1392,63 +1393,63 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
   );
 };
 
-// Guide Editor Component
-interface GuideEditorProps {
-  section: string;
-  onSave: (content: string) => void;
-  onCancel: () => void;
-}
+// Guide Editor Component - Kept for potential future use
+// interface GuideEditorProps {
+//   section: string;
+//   onSave: (content: string) => void;
+//   onCancel: () => void;
+// }
 
-const GuideEditor: React.FC<GuideEditorProps> = ({ section, onSave, onCancel }) => {
-  const [content, setContent] = useState('');
+// const GuideEditor: React.FC<GuideEditorProps> = ({ section, onSave, onCancel }) => {
+//   const [content, setContent] = useState('');
 
-  const sectionTitles: { [key: string]: string } = {
-    'neocaridina': 'Neocaridina Bakımı',
-    'tank-setup': 'Tank Kurulumu',
-    'water-params': 'Su Parametreleri',
-    'breeding': 'Üretim Rehberi',
-    'feeding': 'Beslenme',
-    'tank-mates': 'Tank Arkadaşları'
-  };
+//   const sectionTitles: { [key: string]: string } = {
+//     'neocaridina': 'Neocaridina Bakımı',
+//     'tank-setup': 'Tank Kurulumu',
+//     'water-params': 'Su Parametreleri',
+//     'breeding': 'Üretim Rehberi',
+//     'feeding': 'Beslenme',
+//     'tank-mates': 'Tank Arkadaşları'
+//   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(content);
-  };
+//   const handleSubmit = (e: React.FormEvent) => {
+//     e.preventDefault();
+//     onSave(content);
+//   };
 
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {sectionTitles[section]} İçeriği
-        </label>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={20}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-          placeholder={`${sectionTitles[section]} içeriğini buraya yazın...`}
-        />
-      </div>
+//   return (
+//     <form onSubmit={handleSubmit} className="space-y-6">
+//       <div>
+//         <label className="block text-sm font-medium text-gray-700 mb-2">
+//           {sectionTitles[section]} İçeriği
+//         </label>
+//         <textarea
+//           value={content}
+//           onChange={(e) => setContent(e.target.value)}
+//           rows={20}
+//           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+//           placeholder={`${sectionTitles[section]} içeriğini buraya yazın...`}
+//         />
+//       </div>
 
-      <div className="flex gap-4 pt-6">
-        <button
-          type="submit"
-          className="btn-primary"
-        >
-          Kaydet
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="btn-outline"
-        >
-          İptal
-        </button>
-      </div>
-    </form>
-  );
-};
+//       <div className="flex gap-4 pt-6">
+//         <button
+//           type="submit"
+//           className="btn-primary"
+//         >
+//           Kaydet
+//         </button>
+//         <button
+//           type="button"
+//           onClick={onCancel}
+//           className="btn-outline"
+//         >
+//           İptal
+//         </button>
+//       </div>
+//     </form>
+//   );
+// };
 
 // Category Editor Component
 interface CategoryEditorProps {
