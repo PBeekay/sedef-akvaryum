@@ -1,119 +1,146 @@
-// Google Analytics utility functions
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-    dataLayer: any[];
-  }
-}
+import ReactGA from 'react-ga4';
 
-// Initialize Google Analytics
-export const initGA = (measurementId: string) => {
-  if (typeof window !== 'undefined' && !window.gtag) {
-    // Load Google Analytics script
-    const script = document.createElement('script');
-    script.async = true;
-    script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-    document.head.appendChild(script);
+// Event tracking helper functions
 
-    // Initialize gtag
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function() {
-      window.dataLayer.push(arguments);
-    };
-    window.gtag('js', new Date());
-    window.gtag('config', measurementId, {
-      page_title: document.title,
-      page_location: window.location.href,
-    });
-  }
-};
-
-// Track page views
-export const trackPageView = (url: string, title?: string) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('config', 'G-XXXXXXXXXX', {
-      page_path: url,
-      page_title: title || document.title,
-    });
-  }
-};
-
-// Track events
+/**
+ * Track custom events
+ */
 export const trackEvent = (
-  action: string,
   category: string,
+  action: string,
   label?: string,
   value?: number
 ) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', action, {
-      event_category: category,
-      event_label: label,
-      value: value,
-    });
-  }
+  ReactGA.event({
+    category,
+    action,
+    label,
+    value,
+  });
 };
 
-// Track ecommerce events
-export const trackPurchase = (transactionId: string, value: number, currency: string = 'TRY') => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'purchase', {
-      transaction_id: transactionId,
-      value: value,
-      currency: currency,
-    });
-  }
-};
-
-// Track add to cart
-export const trackAddToCart = (productId: string, productName: string, price: number) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'add_to_cart', {
-      items: [{
+/**
+ * Track product view
+ */
+export const trackProductView = (productId: string, productName: string, price: number) => {
+  ReactGA.event('view_item', {
+    currency: 'TRY',
+    value: price,
+    items: [
+      {
         item_id: productId,
         item_name: productName,
         price: price,
-        currency: 'TRY',
-      }],
-    });
-  }
+      },
+    ],
+  });
 };
 
-// Track search
-export const trackSearch = (searchTerm: string) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'search', {
-      search_term: searchTerm,
-    });
-  }
+/**
+ * Track category view
+ */
+export const trackCategoryView = (categoryId: string, categoryName: string) => {
+  ReactGA.event('view_item_list', {
+    item_list_id: categoryId,
+    item_list_name: categoryName,
+  });
 };
 
-// Track contact form submission
-export const trackContactForm = () => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'form_submit', {
-      form_name: 'contact_form',
-    });
-  }
+/**
+ * Track search
+ */
+export const trackSearch = (searchTerm: string, resultsCount: number) => {
+  ReactGA.event('search', {
+    search_term: searchTerm,
+    results_count: resultsCount,
+  });
 };
 
-// Track WhatsApp clicks
-export const trackWhatsAppClick = (productId?: string) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'click', {
-      event_category: 'engagement',
-      event_label: 'whatsapp_click',
-      item_id: productId,
-    });
-  }
+/**
+ * Track WhatsApp click
+ */
+export const trackWhatsAppClick = (source: string) => {
+  ReactGA.event('contact', {
+    method: 'whatsapp',
+    source: source,
+  });
 };
 
-// Track PWA install
-export const trackPWAInstall = () => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'pwa_install', {
-      event_category: 'engagement',
-      event_label: 'pwa_install',
-    });
-  }
+/**
+ * Track phone click
+ */
+export const trackPhoneClick = () => {
+  ReactGA.event('contact', {
+    method: 'phone',
+  });
+};
+
+/**
+ * Track add to cart (for future use)
+ */
+export const trackAddToCart = (productId: string, productName: string, price: number) => {
+  ReactGA.event('add_to_cart', {
+    currency: 'TRY',
+    value: price,
+    items: [
+      {
+        item_id: productId,
+        item_name: productName,
+        price: price,
+      },
+    ],
+  });
+};
+
+/**
+ * Track outbound link clicks
+ */
+export const trackOutboundLink = (url: string, label?: string) => {
+  ReactGA.event('click', {
+    event_category: 'outbound',
+    event_label: label || url,
+    transport_type: 'beacon',
+  });
+};
+
+/**
+ * Track scroll depth
+ */
+export const trackScrollDepth = (percentage: number) => {
+  ReactGA.event('scroll', {
+    event_category: 'engagement',
+    event_label: `${percentage}%`,
+    value: percentage,
+  });
+};
+
+/**
+ * Track time on page
+ */
+export const trackTimeOnPage = (seconds: number, pagePath: string) => {
+  ReactGA.event('timing_complete', {
+    name: 'time_on_page',
+    value: seconds * 1000, // milliseconds
+    event_category: 'engagement',
+    event_label: pagePath,
+  });
+};
+
+/**
+ * Track exceptions/errors
+ */
+export const trackException = (description: string, fatal: boolean = false) => {
+  ReactGA.event('exception', {
+    description,
+    fatal,
+  });
+};
+
+/**
+ * Set user properties
+ */
+export const setUserProperty = (property: string, value: string) => {
+  ReactGA.gtag('set', 'user_properties', {
+    [property]: value,
+  });
 };

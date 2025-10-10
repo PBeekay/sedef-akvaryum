@@ -2,10 +2,12 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import BottomNav from './components/BottomNav';
 import WhatsAppButton from './components/WhatsAppButton';
 import ErrorBoundary from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
 import ScrollProgressBar from './components/ScrollProgressBar';
+import RouteChangeTracker from './components/RouteChangeTracker';
 import { ProductGridSkeleton } from './components/SkeletonLoader';
 
 import { AdminProvider } from './context/AdminContext';
@@ -37,6 +39,9 @@ function App() {
       <AdminProvider>
         <StockProvider>
           <Router basename="/">
+          {/* Google Analytics Route Tracking */}
+          <RouteChangeTracker />
+          
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-white text-primary-700 px-3 py-2 rounded-md shadow">
             İçeriğe geç
           </a>
@@ -78,7 +83,8 @@ function App() {
             {/* Scroll Progress Bar */}
             <ScrollProgressBar />
 
-            
+            {/* Bottom Navigation (Mobile Only) */}
+            <BottomNav />
           </div>
           </Router>
         </StockProvider>

@@ -6,6 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#2563eb" />
     
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-73Q74LPY26"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-73Q74LPY26', {
+        page_path: window.location.pathname,
+        send_page_view: false // React-GA4 will handle page views
+      });
+    </script>
+    
     <!-- Security headers are set at the hosting/proxy layer -->
     
     <!-- Primary Meta Tags -->

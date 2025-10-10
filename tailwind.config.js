@@ -75,6 +75,9 @@ module.exports = {
         'slide-up': 'slideUp 0.3s ease-out',
         'bounce-gentle': 'bounceGentle 2s infinite',
       },
+      scale: {
+        '98': '0.98',
+      },
       keyframes: {
         fadeIn: {
           '0%': { opacity: '0' },

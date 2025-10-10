@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { categories } from '../data/products';
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
 
   const isActive = (path: string) => {
@@ -14,10 +15,40 @@ const Navbar: React.FC = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // Scroll detection for sticky header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
   return (
-    <nav className="bg-white/80 backdrop-blur-lg shadow-lg sticky top-0 z-50 border-b border-ocean-100/50">
+    <nav className={`bg-white/80 backdrop-blur-lg shadow-lg sticky top-0 z-50 border-b border-ocean-100/50 transition-all duration-300 ${
+      isScrolled ? 'py-1' : 'py-2'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-18 py-2">
+        <div className={`flex justify-between items-center transition-all duration-300 ${
+          isScrolled ? 'h-14' : 'h-18'
+        }`}>
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="text-3xl transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">🦐</div>
@@ -87,10 +118,12 @@ const Navbar: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden animate-slide-up">
-            <div className="px-2 pt-2 pb-4 space-y-2 bg-gradient-to-b from-ocean-50/50 to-white/50 backdrop-blur-sm border-t-2 border-ocean-200">
+        {/* Mobile Navigation - Full Screen Overlay */}
+        <div className={`md:hidden fixed inset-0 top-[72px] bg-white z-40 transition-all duration-300 transform ${
+          isMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+        }`}>
+          <div className="h-full overflow-y-auto">
+            <div className="px-4 pt-4 pb-20 space-y-2 bg-gradient-to-b from-ocean-50/30 to-white">
               {categories.map((category) => (
                 <Link
                   key={category.id}
@@ -123,7 +156,7 @@ const Navbar: React.FC = () => {
               </Link>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );
