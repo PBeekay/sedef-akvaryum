@@ -23,9 +23,9 @@ const SearchPage: React.FC = () => {
     
     const query = searchQuery.toLowerCase();
     return products.filter(product => 
-      product.name.toLowerCase().includes(query) ||
-      product.description.toLowerCase().includes(query) ||
-      product.category.toLowerCase().includes(query) ||
+      product.name?.toLowerCase().includes(query) ||
+      product.description?.toLowerCase().includes(query) ||
+      product.category?.toLowerCase().includes(query) ||
       (product.species && product.species.toLowerCase().includes(query)) ||
       (product.color && product.color.toLowerCase().includes(query)) ||
       (product.colors && product.colors.some(color => color.toLowerCase().includes(query)))

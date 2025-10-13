@@ -1,0 +1,53 @@
+# ============================================
+# RENDER.COM ENVIRONMENT VARIABLES
+# ============================================
+# Bu dosyayı Render.com Dashboard'da
+# Environment Variables bölümüne kopyalayın
+# ============================================
+
+# ADMIN AUTHENTICATION
+# ⚠️ ÖNEMLİ: Production için güçlü şifreler kullanın!
+REACT_APP_ADMIN_USERNAME=sedef
+REACT_APP_ADMIN_PASSWORD=Adm.Sdf.25!
+
+# JWT SECRET
+# ⚠️ ÇOK ÖNEMLİ: Aşağıdaki komutu çalıştırıp oluşan değeri buraya yapıştırın:
+# PowerShell: -join ((65..90) + (97..122) + (48..57) | Get-Random -Count 64 | % {[char]$_})
+# Node.js: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+REACT_APP_JWT_SECRET=your_jwt_secret_key_here_CHANGE_THIS
+
+# GOOGLE ANALYTICS
+REACT_APP_GA_MEASUREMENT_ID=G-73Q74LPY26
+
+# BUILD CONFIGURATION
+GENERATE_SOURCEMAP=false
+NODE_ENV=production
+
+# SECURITY SETTINGS
+REACT_APP_ENABLE_SECURITY_HEADERS=true
+REACT_APP_RATE_LIMIT_ENABLED=true
+
+# ============================================
+# NASIL EKLENİR?
+# ============================================
+# 1. Render.com Dashboard'a gidin
+# 2. Service'inizi seçin
+# 3. "Environment" sekmesine tıklayın
+# 4. "Add Environment Variable" butonuna tıklayın
+# 5. Her satırı tek tek ekleyin:
+#    - Key: REACT_APP_ADMIN_USERNAME
+#    - Value: sedef
+# 6. "Save Changes" tıklayın
+# 7. Service otomatik redeploy olacak
+# ============================================
+
+# ============================================
+# GÜVENLİK NOTLARI
+# ============================================
+# ✅ Bu değişkenler Render.com'da şifrelenmiş olarak saklanır
+# ✅ Git'e commit ETMEYİN bu dosyayı
+# ✅ Production için mutlaka güçlü şifreler kullanın
+# ⚠️ JWT_SECRET'i mutlaka değiştirin!
+# ⚠️ Admin şifresini production için değiştirin!
+# ============================================
+

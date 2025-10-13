@@ -58,8 +58,9 @@ const AdminPage: React.FC = () => {
 
   // Filter products based on search and category
   const filteredProducts = adminProducts.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         false;
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -949,6 +950,19 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
     diet: product?.diet || '',
     lifespan: product?.lifespan || '',
     tankSize: product?.tankSize || '',
+    // Yeni eklenen alanlar
+    quickInfo: product?.quickInfo || {
+      size: '',
+      temperament: '',
+      careLevel: ''
+    },
+    careInfo: product?.careInfo || {
+      diet: '',
+      family: '',
+      origin: '',
+      aquariumSize: '',
+      lifespan: ''
+    },
   });
 
   const [newImageUrl, setNewImageUrl] = useState('');
@@ -968,6 +982,26 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
       waterParameters: {
         ...prev.waterParameters,
         [param]: value
+      }
+    }));
+  };
+
+  const handleQuickInfoChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      quickInfo: {
+        ...prev.quickInfo,
+        [field]: value
+      }
+    }));
+  };
+
+  const handleCareInfoChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      careInfo: {
+        ...prev.careInfo,
+        [field]: value
       }
     }));
   };
@@ -1182,6 +1216,174 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
           required
         />
       </div>
+
+      {/* Fish-specific fields */}
+      {formData.category === 'fish' && (
+        <div className="space-y-6 border-t pt-6">
+          <h4 className="font-semibold text-gray-800">Balık Özellikleri</h4>
+          
+          {/* Quick Info Section */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h5 className="font-medium text-gray-800 mb-3">Hızlı Bilgiler</h5>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Boyut
+                </label>
+                <input
+                  type="text"
+                  value={formData.quickInfo.size}
+                  onChange={(e) => handleQuickInfoChange('size', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="4 cm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mizaç
+                </label>
+                <input
+                  type="text"
+                  value={formData.quickInfo.temperament}
+                  onChange={(e) => handleQuickInfoChange('temperament', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Peaceful"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Bakım Seviyesi
+                </label>
+                <input
+                  type="text"
+                  value={formData.quickInfo.careLevel}
+                  onChange={(e) => handleQuickInfoChange('careLevel', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Easy"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Care Info Section */}
+          <div className="bg-green-50 p-4 rounded-lg">
+            <h5 className="font-medium text-gray-800 mb-3">Bakım Bilgileri</h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Beslenme
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.diet}
+                  onChange={(e) => handleCareInfoChange('diet', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Omnivore"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Aile
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.family}
+                  onChange={(e) => handleCareInfoChange('family', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Characidae"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Menşei
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.origin}
+                  onChange={(e) => handleCareInfoChange('origin', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Güney Amerika"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Akvaryum Boyutu
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.aquariumSize}
+                  onChange={(e) => handleCareInfoChange('aquariumSize', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="40 Litre"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Yaşam Süresi
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.lifespan}
+                  onChange={(e) => handleCareInfoChange('lifespan', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="3-5 yıl"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Water Parameters Section */}
+          <div className="bg-purple-50 p-4 rounded-lg">
+            <h5 className="font-medium text-gray-800 mb-3">Su Değerleri</h5>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sıcaklık
+                </label>
+                <input
+                  type="text"
+                  value={formData.waterParameters.temperature}
+                  onChange={(e) => handleWaterParamChange('temperature', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="22-26°C"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  pH
+                </label>
+                <input
+                  type="text"
+                  value={formData.waterParameters.pH}
+                  onChange={(e) => handleWaterParamChange('pH', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="6.0-7.0"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sertlik
+                </label>
+                <input
+                  type="text"
+                  value={formData.waterParameters.hardness}
+                  onChange={(e) => handleWaterParamChange('hardness', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="2-10 dGH"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Shrimp-specific fields */}
       {formData.category === 'shrimp' && (

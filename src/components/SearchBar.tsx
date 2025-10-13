@@ -34,9 +34,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const loweredQuery = searchQuery.toLowerCase();
     return products
       .filter((product) =>
-        product.name.toLowerCase().includes(loweredQuery) ||
-        product.description.toLowerCase().includes(loweredQuery) ||
-        product.category.toLowerCase().includes(loweredQuery) ||
+        product.name?.toLowerCase().includes(loweredQuery) ||
+        product.description?.toLowerCase().includes(loweredQuery) ||
+        product.category?.toLowerCase().includes(loweredQuery) ||
         (product.species && product.species.toLowerCase().includes(loweredQuery)) ||
         (product.color && product.color.toLowerCase().includes(loweredQuery)) ||
         (product.colors && product.colors.some((color) => color.toLowerCase().includes(loweredQuery)))

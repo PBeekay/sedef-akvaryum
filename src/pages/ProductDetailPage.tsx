@@ -194,8 +194,108 @@ const ProductDetailPage: React.FC = () => {
               <p className="text-gray-700 leading-relaxed text-sm">{product.description}</p>
             </div>
 
-            {/* Quick Specs - Prominent */}
-            {(product.size || product.difficulty || product.tankSize) && (
+            {/* Quick Info - For Fish (New Firebase Structure) */}
+            {product.quickInfo && (
+              <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-200 rounded-xl p-5">
+                <h3 className="text-base font-bold text-blue-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Hızlı Bilgiler
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  {product.quickInfo.size && (
+                    <div className="flex flex-col items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">📏</span>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-600">Boyut</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.quickInfo.size}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.quickInfo.temperament && (
+                    <div className="flex flex-col items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">😊</span>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-600">Mizaç</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.quickInfo.temperament}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.quickInfo.careLevel && (
+                    <div className="flex flex-col items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">⭐</span>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-600">Bakım</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.quickInfo.careLevel}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Care Info - For Fish (New Firebase Structure) */}
+            {product.careInfo && (
+              <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200 rounded-xl p-5">
+                <h3 className="text-base font-bold text-green-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Bakım Bilgileri
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {product.careInfo.diet && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">🍽️</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Beslenme</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.diet}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.careInfo.family && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">🐟</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Aile</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.family}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.careInfo.origin && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">🌍</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Menşei</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.origin}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.careInfo.aquariumSize && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">🏠</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Akvaryum</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.aquariumSize}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.careInfo.lifespan && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">⏳</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Yaşam Süresi</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.lifespan}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Quick Specs - For Shrimp (Old Structure - Backward Compatibility) */}
+            {!product.quickInfo && (product.size || product.difficulty || product.tankSize) && (
               <div className="bg-primary-50 border-2 border-primary-200 rounded-xl p-5">
                 <h3 className="text-base font-bold text-primary-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
