@@ -1033,12 +1033,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
       
       // Process each file
       Array.from(files).forEach((file, index) => {
-        // Check file size (5MB limit)
-        if (file.size > 5 * 1024 * 1024) {
-          alert(`Dosya çok büyük: ${file.name}. Maksimum 5MB olmalı.`);
-          return;
-        }
-        
         // Check file type
         if (!file.type.startsWith('image/')) {
           alert(`Geçersiz dosya türü: ${file.name}. Sadece resim dosyaları kabul edilir.`);
@@ -1190,7 +1184,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
                   Dosya Seç veya Sürükle
                 </div>
                 <div className="text-xs text-gray-500">
-                  JPG, PNG, GIF (Maksimum 5MB)
+                  JPG, PNG, GIF
                 </div>
               </label>
             </div>
