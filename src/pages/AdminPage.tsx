@@ -963,6 +963,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
       aquariumSize: '',
       lifespan: ''
     },
+    // Bitki özellikleri için ek alanlar
+    lightRequirement: product?.lightRequirement || '',
+    co2Requirement: product?.co2Requirement || '',
+    growthRate: product?.growthRate || '',
+    placement: product?.placement || '',
+    species: product?.species || '',
   });
 
   const [newImageUrl, setNewImageUrl] = useState('');
@@ -1018,6 +1024,47 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
   //     reader.readAsDataURL(file);
   //   }
   // };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const currentImages = formData.images || [];
+      const newImages: string[] = [];
+      
+      // Process each file
+      Array.from(files).forEach((file, index) => {
+        // Check file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          alert(`Dosya çok büyük: ${file.name}. Maksimum 5MB olmalı.`);
+          return;
+        }
+        
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+          alert(`Geçersiz dosya türü: ${file.name}. Sadece resim dosyaları kabul edilir.`);
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const result = event.target?.result as string;
+          newImages.push(result);
+          
+          // If this is the last file, update the images array
+          if (index === files.length - 1) {
+            const updatedImages = [...currentImages, ...newImages];
+            handleInputChange('images', updatedImages);
+            
+            // If this is the first image, also set it as the main image
+            if (!formData.image && newImages.length > 0) {
+              handleInputChange('image', newImages[0]);
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
 
   const handleAddImageUrl = () => {
     if (newImageUrl.trim()) {
@@ -1101,6 +1148,63 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
             Ürün Görselleri
           </label>
           <div className="space-y-4">
+            {/* File Upload */}
+            <div 
+              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors"
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.add('border-primary-400', 'bg-primary-50');
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('border-primary-400', 'bg-primary-50');
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove('border-primary-400', 'bg-primary-50');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                  // Create a fake event object for handleFileUpload
+                  const fakeEvent = {
+                    target: { files }
+                  } as React.ChangeEvent<HTMLInputElement>;
+                  handleFileUpload(fakeEvent);
+                }
+              }}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="image-upload"
+                multiple
+              />
+              <label
+                htmlFor="image-upload"
+                className="cursor-pointer flex flex-col items-center gap-2"
+              >
+                <div className="text-4xl">📁</div>
+                <div className="text-sm font-medium text-gray-700">
+                  Dosya Seç veya Sürükle
+                </div>
+                <div className="text-xs text-gray-500">
+                  JPG, PNG, GIF (Maksimum 5MB)
+                </div>
+              </label>
+            </div>
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">veya</span>
+              </div>
+            </div>
+
             {/* Add Image URL */}
             <div className="flex gap-2">
               <input
@@ -1390,157 +1494,330 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
         <div className="space-y-6 border-t pt-6">
           <h4 className="font-semibold text-gray-800">Karides Özellikleri</h4>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Renkler (virgülle ayırın)
-              </label>
-              <input
-                type="text"
-                value={formData.colors.join(', ')}
-                onChange={(e) => handleInputChange('colors', e.target.value.split(',').map(c => c.trim()))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Kırmızı, Mavi, Sarı"
-              />
-            </div>
+          {/* Quick Info Section */}
+          <div className="bg-orange-50 p-4 rounded-lg">
+            <h5 className="font-medium text-gray-800 mb-3">Hızlı Bilgiler</h5>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Boyut
+                </label>
+                <input
+                  type="text"
+                  value={formData.quickInfo.size}
+                  onChange={(e) => handleQuickInfoChange('size', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="2-3 cm"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Boyut
-              </label>
-              <input
-                type="text"
-                value={formData.size}
-                onChange={(e) => handleInputChange('size', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="2-3 cm"
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mizaç
+                </label>
+                <input
+                  type="text"
+                  value={formData.quickInfo.temperament}
+                  onChange={(e) => handleQuickInfoChange('temperament', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Barışçıl"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Zorluk
-              </label>
-              <select
-                value={formData.difficulty}
-                onChange={(e) => handleInputChange('difficulty', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              >
-                <option value="">Seçiniz</option>
-                <option value="Kolay">Kolay</option>
-                <option value="Orta">Orta</option>
-                <option value="Zor">Zor</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Sosyal Davranış
-              </label>
-              <input
-                type="text"
-                value={formData.socialBehavior}
-                onChange={(e) => handleInputChange('socialBehavior', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Barışçıl, grup halinde yaşar"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Bakım Seviyesi
+                </label>
+                <select
+                  value={formData.quickInfo.careLevel}
+                  onChange={(e) => handleQuickInfoChange('careLevel', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="Çok Kolay">Çok Kolay</option>
+                  <option value="Kolay">Kolay</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Zor">Zor</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Sıcaklık
-              </label>
-              <input
-                type="text"
-                value={formData.waterParameters.temperature}
-                onChange={(e) => handleWaterParamChange('temperature', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="18-28°C"
-              />
-            </div>
+          {/* Care Info Section */}
+          <div className="bg-purple-50 p-4 rounded-lg">
+            <h5 className="font-medium text-gray-800 mb-3">Bakım Bilgileri</h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Beslenme
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.diet}
+                  onChange={(e) => handleCareInfoChange('diet', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Omnivor, yosun, biyofilm"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                pH
-              </label>
-              <input
-                type="text"
-                value={formData.waterParameters.pH}
-                onChange={(e) => handleWaterParamChange('pH', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="7.0-7.6"
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Aile
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.family}
+                  onChange={(e) => handleCareInfoChange('family', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Atyidae"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Sertlik
-              </label>
-              <input
-                type="text"
-                value={formData.waterParameters.hardness}
-                onChange={(e) => handleWaterParamChange('hardness', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="9-11 dGH"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Menşei
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.origin}
+                  onChange={(e) => handleCareInfoChange('origin', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Güneydoğu Asya"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Akvaryum Boyutu
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.aquariumSize}
+                  onChange={(e) => handleCareInfoChange('aquariumSize', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Minimum 20L"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Yaşam Süresi
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.lifespan}
+                  onChange={(e) => handleCareInfoChange('lifespan', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="1-2 yıl"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Üretim
-              </label>
-              <input
-                type="text"
-                value={formData.breeding}
-                onChange={(e) => handleInputChange('breeding', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Kolay üretim"
-              />
-            </div>
+          {/* Water Parameters Section */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h5 className="font-medium text-gray-800 mb-3">Su Değerleri</h5>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sıcaklık
+                </label>
+                <input
+                  type="text"
+                  value={formData.waterParameters.temperature}
+                  onChange={(e) => handleWaterParamChange('temperature', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="18-28°C"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Beslenme
-              </label>
-              <input
-                type="text"
-                value={formData.diet}
-                onChange={(e) => handleInputChange('diet', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Omnivor"
-              />
-            </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  pH
+                </label>
+                <input
+                  type="text"
+                  value={formData.waterParameters.pH}
+                  onChange={(e) => handleWaterParamChange('pH', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="7.0-7.6"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Yaşam Süresi
-              </label>
-              <input
-                type="text"
-                value={formData.lifespan}
-                onChange={(e) => handleInputChange('lifespan', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="1-2 yıl"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Minimum Tank Boyutu
-              </label>
-              <input
-                type="text"
-                value={formData.tankSize}
-                onChange={(e) => handleInputChange('tankSize', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Minimum 20L"
-              />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sertlik
+                </label>
+                <input
+                  type="text"
+                  value={formData.waterParameters.hardness}
+                  onChange={(e) => handleWaterParamChange('hardness', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="9-11 dGH"
+                />
+              </div>
             </div>
           </div>
+
+          {/* Colors Section */}
+          <div className="bg-pink-50 p-4 rounded-lg">
+            <h5 className="font-medium text-gray-800 mb-3">Renk Çeşitleri</h5>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Renkler (virgülle ayırın)
+                </label>
+                <input
+                  type="text"
+                  value={formData.colors.join(', ')}
+                  onChange={(e) => handleInputChange('colors', e.target.value.split(',').map(c => c.trim()))}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Kırmızı, Mavi, Sarı"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Plant-specific fields */}
+      {formData.category === 'plants' && (
+        <div className="space-y-6 border-t pt-6">
+          <h4 className="font-semibold text-gray-800">Bitki Özellikleri</h4>
+          
+          {/* Quick Info Section */}
+          <div className="bg-emerald-50 p-4 rounded-lg">
+            <h5 className="font-medium text-gray-800 mb-3">Hızlı Bilgiler</h5>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Boyut
+                </label>
+                <input
+                  type="text"
+                  value={formData.quickInfo.size}
+                  onChange={(e) => handleQuickInfoChange('size', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="5-10 cm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tip
+                </label>
+                <input
+                  type="text"
+                  value={formData.quickInfo.temperament}
+                  onChange={(e) => handleQuickInfoChange('temperament', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Yosun, Rhizome"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Bakım Seviyesi
+                </label>
+                <select
+                  value={formData.quickInfo.careLevel}
+                  onChange={(e) => handleQuickInfoChange('careLevel', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="Çok Kolay">Çok Kolay</option>
+                  <option value="Kolay">Kolay</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Zor">Zor</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Care Info Section */}
+          <div className="bg-green-50 p-4 rounded-lg">
+            <h5 className="font-medium text-gray-800 mb-3">Bakım Bilgileri</h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Menşei
+                </label>
+                <input
+                  type="text"
+                  value={formData.careInfo.origin}
+                  onChange={(e) => handleCareInfoChange('origin', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Güneydoğu Asya"
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Plant Care Section */}
+          <div className="bg-green-50 p-4 rounded-lg">
+            <h5 className="font-medium text-gray-800 mb-3">Bakım Bilgileri</h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Işık İhtiyacı
+                </label>
+                <select
+                  value={formData.lightRequirement}
+                  onChange={(e) => handleInputChange('lightRequirement', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="Düşük">Düşük</option>
+                  <option value="Düşük-Orta">Düşük-Orta</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Orta-Yüksek">Orta-Yüksek</option>
+                  <option value="Yüksek">Yüksek</option>
+                  <option value="Çok Yüksek">Çok Yüksek</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  CO2 İhtiyacı
+                </label>
+                <select
+                  value={formData.co2Requirement}
+                  onChange={(e) => handleInputChange('co2Requirement', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="Gerekli değil">Gerekli değil</option>
+                  <option value="Opsiyonel">Opsiyonel</option>
+                  <option value="Düşük">Düşük</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Yüksek">Yüksek</option>
+                  <option value="Çok Yüksek">Çok Yüksek</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Büyüme Hızı
+                </label>
+                <select
+                  value={formData.growthRate}
+                  onChange={(e) => handleInputChange('growthRate', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="Çok Yavaş">Çok Yavaş</option>
+                  <option value="Yavaş">Yavaş</option>
+                  <option value="Yavaş-Orta">Yavaş-Orta</option>
+                  <option value="Orta">Orta</option>
+                  <option value="Orta-Hızlı">Orta-Hızlı</option>
+                  <option value="Hızlı">Hızlı</option>
+                  <option value="Çok Hızlı">Çok Hızlı</option>
+                </select>
+              </div>
+
+            </div>
+          </div>
+
         </div>
       )}
 

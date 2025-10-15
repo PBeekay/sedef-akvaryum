@@ -6,6 +6,7 @@ import { db } from '../firebase'; // Projenize eklediğiniz firebase.js dosyası
 
 import { generateToken, verifyToken, secureStorage, checkRateLimit } from '../utils/security';
 import { Product } from '../types/Product';
+import PageLoader from '../components/PageLoader';
 // initialProducts'a artık ihtiyacımız yok, bu satırı silebilirsiniz.
 // import { products as initialProducts } from '../data/products';
 
@@ -60,8 +61,6 @@ const STORAGE_KEYS = {
 
 // Varsayılan slider verileri (sizdekiyle aynı)
 const defaultSliderData: SliderData[] = [
-    // ... Sizin default slider verileriniz buraya gelecek ...
-    // Örnek:
     {
       id: 1,
       title: "Güzel Balıklar",
@@ -73,7 +72,28 @@ const defaultSliderData: SliderData[] = [
       buttonText: "Balıkları Keşfet",
       buttonLink: "/category/fish"
     },
-    // ... Diğer slider elemanları
+    {
+      id: 2,
+      title: "Karides Dünyası",
+      subtitle: "Renkli ve Zarif",
+      description: "Akvaryumunuzu renklendirecek güzel karidesler. Bakımı kolay ve üretimi mümkün.",
+      image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      category: "shrimp",
+      icon: "🦐",
+      buttonText: "Karidesleri Keşfet",
+      buttonLink: "/category/shrimp"
+    },
+    {
+      id: 3,
+      title: "Doğal Bitkiler",
+      subtitle: "Sağlıklı ve Güzel",
+      description: "Akvaryumunuzu doğal bir ortama dönüştürecek su bitkileri. CO2 ve ışık ihtiyaçlarına göre seçim yapın.",
+      image: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      category: "plants",
+      icon: "🌿",
+      buttonText: "Bitkileri Keşfet",
+      buttonLink: "/category/plants"
+    }
 ];
 
 // LocalStorage yardımcı fonksiyonları (Slider için hala kullanılıyor)
@@ -245,7 +265,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 
   return (
     <AdminContext.Provider value={value}>
-      {loadingProducts ? <div>Ürünler Yükleniyor...</div> : children}
+      {loadingProducts ? <PageLoader /> : children}
     </AdminContext.Provider>
   );
 };

@@ -401,31 +401,64 @@ export const products: Product[] = [
     name: 'Anubias Bitkisi',
     category: 'plants',
     price: 9.99,
-    description: 'Dayanıklı Anubias bitkisi, düşük ışık koşullarında bile gelişir. Akvaryumunuzda doğal bir görünüm sağlar.',
+    description: 'Dayanıklı Anubias bitkisi, düşük ışık koşullarında bile gelişir. Akvaryumunuzda doğal bir görünüm sağlar. Rhizome bitkisi olarak odun veya taşlara bağlanarak kullanılır.',
     shortDescription: 'Dayanıklı Anubias bitkisi, düşük ışıkta bile gelişir.',
     image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop',
     inStock: true,
     featured: true,
+    species: 'Anubias barteri',
+    difficulty: 'Çok Kolay',
+    lightRequirement: 'Düşük',
+    co2Requirement: 'Gerekli değil',
+    growthRate: 'Yavaş',
+    placement: 'Ön-Orta Plan, odun/taş üzerine',
+    waterParameters: {
+      temperature: '22-28°C',
+      pH: '6.0-7.5',
+      hardness: 'Yumuşak-Sert'
+    }
   },
   {
     id: 'plants-2',
     name: 'Java Moss',
     category: 'plants',
     price: 7.99,
-    description: 'Hızlı büyüyen Java Moss, akvaryumunuzda yoğun yeşil örtü oluşturur. Balıklar için mükemmel saklanma yeri.',
+    description: 'Hızlı büyüyen Java Moss, akvaryumunuzda yoğun yeşil örtü oluşturur. Balıklar için mükemmel saklanma yeri. Çok dayanıklı ve kolay bakım.',
     shortDescription: 'Hızlı büyüyen Java Moss, yoğun yeşil örtü oluşturur.',
     image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop',
     inStock: true,
+    species: 'Taxiphyllum barbieri',
+    difficulty: 'Çok Kolay',
+    lightRequirement: 'Düşük-Orta',
+    co2Requirement: 'Gerekli değil',
+    growthRate: 'Orta',
+    placement: 'Odun/Taş Üzerine, yüzen',
+    waterParameters: {
+      temperature: '15-30°C',
+      pH: '5.0-8.0',
+      hardness: 'Yumuşak-Sert'
+    }
   },
   {
     id: 'plants-3',
     name: 'Amazon Kılıcı',
     category: 'plants',
     price: 11.99,
-    description: 'Büyük yapraklı Amazon Kılıcı, akvaryumunuzda etkileyici bir görünüm sağlar. Orta ışık koşullarında gelişir.',
+    description: 'Büyük yapraklı Amazon Kılıcı, akvaryumunuzda etkileyici bir görünüm sağlar. Orta ışık koşullarında gelişir. Arka plan bitkisi olarak mükemmel.',
     shortDescription: 'Büyük yapraklı Amazon Kılıcı, etkileyici görünüm sağlar.',
     image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop',
     inStock: true,
+    species: 'Echinodorus amazonicus',
+    difficulty: 'Kolay',
+    lightRequirement: 'Orta',
+    co2Requirement: 'Opsiyonel',
+    growthRate: 'Orta',
+    placement: 'Arka Plan',
+    waterParameters: {
+      temperature: '20-28°C',
+      pH: '6.0-7.5',
+      hardness: 'Yumuşak-Orta'
+    }
   },
 
   // Equipment Category

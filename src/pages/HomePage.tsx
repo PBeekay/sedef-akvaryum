@@ -68,6 +68,22 @@ const HomePage: React.FC = () => {
       />
       {/* Hero Section with Slider */}
       <section className="relative bg-gradient-to-br from-ocean-600 via-primary-600 to-secondary-500 text-white py-20 overflow-hidden">
+        {/* Background Video */}
+        <div className="absolute inset-0 z-0">
+          <video
+            className="w-full h-full object-cover"
+            src="/videos/133871-758336534_small.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            onLoadStart={() => console.log('Video loading started')}
+            onCanPlay={() => console.log('Video can play')}
+            onError={(e) => console.error('Video error:', e)}
+          />
+          {/* Dark overlay for readability */}
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
         {/* Animated Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full">
@@ -79,7 +95,7 @@ const HomePage: React.FC = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
-            <div className="animate-fade-in relative z-10">
+            <div className="animate-fade-in relative z-20">
               <div className="transition-all duration-500 ease-in-out">
                 <div className="inline-block mb-4">
                   <span className="px-4 py-2 bg-yellow-400/20 backdrop-blur-sm rounded-full text-yellow-200 text-sm font-semibold border border-yellow-300/30">
@@ -105,7 +121,7 @@ const HomePage: React.FC = () => {
             </div>
 
                                       {/* Image Slider */}
-              <div className="animate-slide-up relative w-full">
+              <div className="animate-slide-up relative w-full z-20">
                <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80">
                 {heroSlides.map((slide, index) => (
                   <div

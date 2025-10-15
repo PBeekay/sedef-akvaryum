@@ -11,6 +11,22 @@ const ProductDetailPage: React.FC = () => {
   const { products } = useAdmin();
   const [isLoading, setIsLoading] = useState(true);
   const product = products.find(p => p.id === id);
+  
+  // Debug: Bitki ürünleri için console log
+  if (product && product.category === 'plants') {
+    console.log('Plant product data:', {
+      id: product.id,
+      name: product.name,
+      lightRequirement: product.lightRequirement,
+      co2Requirement: product.co2Requirement,
+      growthRate: product.growthRate,
+      careInfo: product.careInfo,
+      quickInfo: product.quickInfo,
+      hasLightReq: !!product.lightRequirement,
+      hasCo2Req: !!product.co2Requirement,
+      hasGrowthRate: !!product.growthRate
+    });
+  }
 
   // Simulate loading
   useEffect(() => {
@@ -53,7 +69,7 @@ const ProductDetailPage: React.FC = () => {
   // Prepare images array (use images if available, fallback to single image)
   const productImages = product.images && product.images.length > 0 
     ? product.images 
-    : [product.image];
+    : product.image ? [product.image] : [];
 
   return (
     <div className="min-h-screen py-8 bg-gradient-to-b from-gray-50 to-white">
@@ -132,6 +148,59 @@ const ProductDetailPage: React.FC = () => {
                 <div className="text-xs font-semibold text-purple-700">Uzman Desteği</div>
               </div>
             </div>
+
+            {/* WhatsApp Buttons */}
+            <div className="space-y-4">
+              {/* WhatsApp Order Button */}
+              {product.inStock ? (
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl blur opacity-40 group-hover:opacity-60 transition duration-500"></div>
+                  <WhatsAppButton
+                    message={whatsappMessage}
+                    className="relative py-3 px-6 text-base w-full font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="text-xl">💬</span>
+                      WhatsApp ile Sipariş Ver
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
+                    </span>
+                  </WhatsAppButton>
+                </div>
+              ) : (
+                <div className="bg-gradient-to-br from-red-50 to-rose-50 p-4 rounded-xl border-2 border-red-200">
+                  <p className="text-red-700 font-semibold mb-3 text-center text-sm">⚠️ Bu ürün şu anda stokta bulunmuyor.</p>
+                  <WhatsAppButton
+                    message="Merhaba! Bu ürünün ne zaman stokta olacağını öğrenmek istiyorum."
+                    className="w-full text-sm py-2 font-bold"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <span>🔔</span>
+                      Stok Durumu Sorgula
+                    </span>
+                  </WhatsAppButton>
+                </div>
+              )}
+
+              {/* WhatsApp Expert Chat Button */}
+              <div className="bg-gradient-to-br from-primary-50 to-ocean-50 p-4 rounded-xl border border-primary-200">
+                <h4 className="font-bold text-sm text-primary-800 mb-2 flex items-center gap-2">
+                  <span className="text-lg">💡</span>
+                  Yardıma mı ihtiyacınız var?
+                </h4>
+                <p className="text-primary-700 mb-3 text-xs leading-relaxed">
+                  Bu ürün hakkında sorularınız mı var? Akvaryum uzmanlarımız size yardımcı olmak için burada!
+                </p>
+                <WhatsAppButton
+                  message="Merhaba! Ürünlerinizden biri hakkında sorum var. Yardımcı olabilir misiniz?"
+                  variant="inline"
+                  className="text-sm font-semibold hover:underline"
+                >
+                  👨‍💼 Uzmanla Sohbet Et →
+                </WhatsAppButton>
+              </div>
+            </div>
           </div>
 
           {/* Product Info */}
@@ -195,7 +264,7 @@ const ProductDetailPage: React.FC = () => {
             </div>
 
             {/* Quick Info - For Fish (New Firebase Structure) */}
-            {product.quickInfo && (
+            {product.quickInfo && product.category === 'fish' && (
               <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-2 border-blue-200 rounded-xl p-5">
                 <h3 className="text-base font-bold text-blue-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,7 +305,7 @@ const ProductDetailPage: React.FC = () => {
             )}
 
             {/* Care Info - For Fish (New Firebase Structure) */}
-            {product.careInfo && (
+            {product.careInfo && product.category === 'fish' && (
               <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200 rounded-xl p-5">
                 <h3 className="text-base font-bold text-green-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,8 +363,269 @@ const ProductDetailPage: React.FC = () => {
               </div>
             )}
 
-            {/* Quick Specs - For Shrimp (Old Structure - Backward Compatibility) */}
-            {!product.quickInfo && (product.size || product.difficulty || product.tankSize) && (
+            {/* Quick Info - For Shrimp (New Firebase Structure) */}
+            {product.quickInfo && product.category === 'shrimp' && (
+              <div className="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 border-2 border-orange-200 rounded-xl p-5">
+                <h3 className="text-base font-bold text-orange-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Hızlı Bilgiler
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  {product.quickInfo.size && (
+                    <div className="flex flex-col items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">📏</span>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-600">Boyut</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.quickInfo.size}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.quickInfo.temperament && (
+                    <div className="flex flex-col items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">😊</span>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-600">Mizaç</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.quickInfo.temperament}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.quickInfo.careLevel && (
+                    <div className="flex flex-col items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">⭐</span>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-600">Bakım</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.quickInfo.careLevel}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Care Info - For Shrimp (New Firebase Structure) */}
+            {product.careInfo && product.category === 'shrimp' && (
+              <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 border-2 border-purple-200 rounded-xl p-5">
+                <h3 className="text-base font-bold text-purple-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Bakım Bilgileri
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {product.careInfo.diet && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">🍽️</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Beslenme</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.diet}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.careInfo.family && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">🦐</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Aile</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.family}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.careInfo.origin && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">🌍</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Menşei</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.origin}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.careInfo.aquariumSize && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">🏠</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Akvaryum</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.aquariumSize}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.careInfo.lifespan && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">⏳</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Yaşam Süresi</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.lifespan}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Plant Quick Info - For Plants (New Firebase Structure) */}
+            {product.quickInfo && product.category === 'plants' && (
+              <div className="bg-gradient-to-br from-emerald-50 via-green-50 to-lime-50 border-2 border-emerald-200 rounded-xl p-5">
+                <h3 className="text-base font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.79-3 4s1.343 4 3 4 3-1.79 3-4-1.343-4-3-4z" />
+                  </svg>
+                  Hızlı Bilgiler
+                </h3>
+                <div className="grid grid-cols-3 gap-3">
+                  {product.quickInfo.size && (
+                    <div className="flex flex-col items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">📏</span>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-600">Boyut</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.quickInfo.size}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.quickInfo.temperament && (
+                    <div className="flex flex-col items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">🌿</span>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-600">Tip</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.quickInfo.temperament}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.quickInfo.careLevel && (
+                    <div className="flex flex-col items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">⭐</span>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-600">Bakım</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.quickInfo.careLevel}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Plant Care Info - For Plants (New Firebase Structure) */}
+            {product.careInfo && product.category === 'plants' && (
+              <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200 rounded-xl p-5">
+                <h3 className="text-base font-bold text-green-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Bakım Bilgileri
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {product.careInfo.origin && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-xl">🌍</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Menşei</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.careInfo.origin}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Plant Quick Info - For Plants (Old Structure - Backward Compatibility) */}
+            {!product.quickInfo && product.category === 'plants' && (product.difficulty || product.species) && (
+              <div className="bg-gradient-to-br from-emerald-50 via-green-50 to-lime-50 border-2 border-emerald-200 rounded-xl p-5">
+                <h3 className="text-base font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 1.79-3 4s1.343 4 3 4 3-1.79 3-4-1.343-4-3-4z" />
+                  </svg>
+                  Hızlı Bilgiler
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {product.difficulty && (
+                    <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">⭐</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Zorluk</p>
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${
+                          product.difficulty === 'Çok Kolay' || product.difficulty === 'Kolay' ? 'bg-green-100 text-green-700' :
+                          product.difficulty === 'Orta' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {product.difficulty}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {product.species && (
+                    <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">🧬</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Tür</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.species}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Plant Care Info - For Plants (Old Structure - Backward Compatibility) */}
+            {product.category === 'plants' && (product.lightRequirement || product.co2Requirement || product.growthRate) && (
+              <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-green-200 rounded-xl p-5">
+                <h3 className="text-base font-bold text-green-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Bakım Bilgileri
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {product.lightRequirement && (
+                    <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">💡</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Işık İhtiyacı</p>
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${
+                          product.lightRequirement === 'Düşük' || product.lightRequirement === 'Düşük-Orta' ? 'bg-green-100 text-green-700' :
+                          product.lightRequirement === 'Orta' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {product.lightRequirement}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {product.co2Requirement && (
+                    <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">🫧</span>
+                      <div>
+                        <p className="text-xs text-gray-600">CO2 İhtiyacı</p>
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${
+                          product.co2Requirement === 'Gerekli değil' || product.co2Requirement === 'Opsiyonel' ? 'bg-green-100 text-green-700' :
+                          product.co2Requirement === 'Düşük' || product.co2Requirement === 'Orta' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {product.co2Requirement}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {product.growthRate && (
+                    <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm">
+                      <span className="text-2xl">🌱</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Büyüme Hızı</p>
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${
+                          product.growthRate === 'Çok Yavaş' || product.growthRate === 'Yavaş' ? 'bg-green-100 text-green-700' :
+                          product.growthRate === 'Orta' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {product.growthRate}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Quick Specs - For Fish (Old Structure - Backward Compatibility) */}
+            {!product.quickInfo && product.category === 'fish' && (product.size || product.difficulty || product.tankSize) && (
               <div className="bg-primary-50 border-2 border-primary-200 rounded-xl p-5">
                 <h3 className="text-base font-bold text-primary-900 mb-4 flex items-center gap-2">
                   <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -341,8 +671,55 @@ const ProductDetailPage: React.FC = () => {
               </div>
             )}
 
-                         {/* Su Parametreleri - Prominent for all water creatures */}
-                         {product.waterParameters && (
+            {/* Quick Specs - For Shrimp (Old Structure - Backward Compatibility) */}
+            {!product.quickInfo && product.category === 'shrimp' && (product.size || product.difficulty || product.tankSize) && (
+              <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-5">
+                <h3 className="text-base font-bold text-orange-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Hızlı Bilgiler
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {product.size && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg">
+                      <span className="text-xl">📏</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Boyut</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.size}</p>
+                      </div>
+                    </div>
+                  )}
+                  {product.difficulty && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg">
+                      <span className="text-xl">⭐</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Bakım</p>
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${
+                          product.difficulty === 'Çok Kolay' || product.difficulty === 'Kolay' ? 'bg-green-100 text-green-700' :
+                          product.difficulty === 'Orta' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {product.difficulty}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  {product.tankSize && (
+                    <div className="flex items-center gap-2 bg-white p-3 rounded-lg col-span-2">
+                      <span className="text-xl">🏠</span>
+                      <div>
+                        <p className="text-xs text-gray-600">Tank Boyutu</p>
+                        <p className="font-semibold text-gray-900 text-sm">{product.tankSize}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+                         {/* Su Parametreleri - Only for fish and shrimp */}
+                         {product.waterParameters && (product.category === 'fish' || product.category === 'shrimp') && (
                            <div className="bg-gradient-to-br from-blue-500 to-cyan-500 p-6 rounded-xl shadow-lg text-white">
                              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -482,60 +859,6 @@ const ProductDetailPage: React.FC = () => {
                            </div>
                          )}
 
-            {/* WhatsApp Order Button - Enhanced */}
-            <div className="pt-6">
-              {product.inStock ? (
-                <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl blur opacity-40 group-hover:opacity-60 transition duration-500"></div>
-                  <WhatsAppButton
-                    message={whatsappMessage}
-                    className="relative py-4 px-8 text-lg w-full font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
-                  >
-                    <span className="flex items-center justify-center gap-3">
-                      <span className="text-2xl">💬</span>
-                      WhatsApp ile Sipariş Ver
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-                    </span>
-                  </WhatsAppButton>
-                </div>
-              ) : (
-                <div className="bg-gradient-to-br from-red-50 to-rose-50 p-6 rounded-xl border-2 border-red-200">
-                  <p className="text-red-700 font-semibold mb-4 text-center">⚠️ Bu ürün şu anda stokta bulunmuyor.</p>
-                  <WhatsAppButton
-                    message="Merhaba! Bu ürünün ne zaman stokta olacağını öğrenmek istiyorum."
-                    className="w-full text-lg py-4 font-bold"
-                  >
-                    <span className="flex items-center justify-center gap-2">
-                      <span>🔔</span>
-                      Stok Durumu Sorgula
-                    </span>
-                  </WhatsAppButton>
-                </div>
-              )}
-            </div>
-
-            {/* Additional Info */}
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary-200 to-ocean-200 rounded-2xl blur opacity-20 group-hover:opacity-30 transition duration-500"></div>
-              <div className="relative bg-gradient-to-br from-primary-50 to-ocean-50 p-6 rounded-xl border border-primary-200 shadow-md">
-                <h4 className="font-bold text-xl text-primary-800 mb-2 flex items-center gap-2">
-                  <span className="text-2xl">💡</span>
-                  Yardıma mı ihtiyacınız var?
-                </h4>
-                <p className="text-primary-700 mb-4 leading-relaxed">
-                  Bu ürün hakkında sorularınız mı var? Akvaryum uzmanlarımız size yardımcı olmak için burada!
-                </p>
-                <WhatsAppButton
-                  message="Merhaba! Ürünlerinizden biri hakkında sorum var. Yardımcı olabilir misiniz?"
-                  variant="inline"
-                  className="text-base font-semibold hover:underline"
-                >
-                  👨‍💼 Uzmanla Sohbet Et →
-                </WhatsAppButton>
-              </div>
-            </div>
           </div>
         </div>
 

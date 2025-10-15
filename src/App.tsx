@@ -9,6 +9,7 @@ import BackToTop from './components/BackToTop';
 import ScrollProgressBar from './components/ScrollProgressBar';
 import RouteChangeTracker from './components/RouteChangeTracker';
 import { ProductGridSkeleton } from './components/SkeletonLoader';
+import PageLoader from './components/PageLoader';
 
 import { AdminProvider } from './context/AdminContext';
 import { StockProvider } from './context/StockContext';
@@ -23,15 +24,8 @@ const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
-// Loading component for Suspense fallback - Skeleton instead of spinner
-const PageLoader: React.FC = () => (
-  <div className="min-h-screen py-12 bg-gradient-to-b from-gray-50 to-white">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="mb-8 h-12 bg-gray-200 rounded animate-pulse w-64" />
-      <ProductGridSkeleton count={8} />
-    </div>
-  </div>
-);
+// Loading component for Suspense fallback - Use our custom PageLoader
+const SuspenseLoader: React.FC = () => <PageLoader />;
 
 function App() {
   return (
@@ -49,7 +43,7 @@ function App() {
             <Navbar />
 
             <main id="main-content" role="main" className="flex-grow pb-20 md:pb-0" tabIndex={-1}>
-              <Suspense fallback={<PageLoader />}>
+              <Suspense fallback={<SuspenseLoader />}>
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   {/* Turkish slug aliases → canonical category routes */}
