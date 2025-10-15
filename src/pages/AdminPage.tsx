@@ -1027,37 +1027,34 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files && files.length > 0) {
-      const currentImages = formData.images || [];
-      const newImages: string[] = [];
-      
-      // Process each file
-      Array.from(files).forEach((file, index) => {
-        // Check file type
+    if (!files || files.length === 0) return;
+
+    const currentImages = formData.images || [];
+
+    const readFileAsDataUrl = (file: File): Promise<string> => {
+      return new Promise((resolve, reject) => {
         if (!file.type.startsWith('image/')) {
-          alert(`Geçersiz dosya türü: ${file.name}. Sadece resim dosyaları kabul edilir.`);
+          reject(new Error(`Geçersiz dosya türü: ${file.name}`));
           return;
         }
-        
         const reader = new FileReader();
-        reader.onload = (event) => {
-          const result = event.target?.result as string;
-          newImages.push(result);
-          
-          // If this is the last file, update the images array
-          if (index === files.length - 1) {
-            const updatedImages = [...currentImages, ...newImages];
-            handleInputChange('images', updatedImages);
-            
-            // If this is the first image, also set it as the main image
-            if (!formData.image && newImages.length > 0) {
-              handleInputChange('image', newImages[0]);
-            }
-          }
-        };
+        reader.onload = (event) => resolve((event.target?.result as string) || '');
+        reader.onerror = () => reject(new Error(`Dosya okunamadı: ${file.name}`));
         reader.readAsDataURL(file);
       });
-    }
+    };
+
+    Promise.all(Array.from(files).map(readFileAsDataUrl))
+      .then((loadedImages) => {
+        const updatedImages = [...currentImages, ...loadedImages.filter(Boolean)];
+        handleInputChange('images', updatedImages);
+        if (!formData.image && updatedImages.length > 0) {
+          handleInputChange('image', updatedImages[0]);
+        }
+      })
+      .catch((err) => {
+        alert(err.message || 'Görseller yüklenirken bir hata oluştu');
+      });
   };
 
   const handleAddImageUrl = () => {
