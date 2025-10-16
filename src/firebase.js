@@ -6,12 +6,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDx8gblokEpOu9tdBkqIRf8LK7WsJxX4ek",
-  authDomain: "sedef-akvaryum.firebaseapp.com",
-  projectId: "sedef-akvaryum",
-  storageBucket: "sedef-akvaryum.firebasestorage.app",
-  messagingSenderId: "641783453291",
-  appId: "1:641783453291:web:7c92e856ee9739a0e2432e"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
