@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { categories, products } from '../data/products';
 import { Product } from '../types/Product';
 import { useAdmin } from '../context/AdminContext';
+import { useAuth } from '../context/AuthContext';
 import { useStock } from '../context/StockContext';
 
 interface AdminProduct extends Product {
@@ -22,7 +23,6 @@ const AdminPage: React.FC = () => {
   const [editingSlider, setEditingSlider] = useState<any>(null);
   const { 
     isAuthenticated, 
-    logout, 
     sliderData, 
     addSlider, 
     updateSlider, 
@@ -32,6 +32,8 @@ const AdminPage: React.FC = () => {
     updateProduct,
     deleteProduct
   } = useAdmin();
+  
+  const { logout } = useAuth();
   const { stockItems, updateStock, setLowStockThreshold } = useStock();
 
   // Authentication check

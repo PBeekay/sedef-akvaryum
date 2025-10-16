@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdmin } from '../context/AdminContext';
+import { useAuth } from '../context/AuthContext';
 import { sanitizeInput } from '../utils/security';
 
 const AdminLoginPage: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAdmin();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,26 +17,47 @@ const AdminLoginPage: React.FC = () => {
     setError('');
 
     // Input sanitization
-    const sanitizedUsername = sanitizeInput(username);
+    const sanitizedEmail = sanitizeInput(email);
     const sanitizedPassword = sanitizeInput(password);
 
     // Basic validation
-    if (!sanitizedUsername || !sanitizedPassword) {
-      setError('Kullanıcı adı ve şifre gereklidir!');
+    if (!sanitizedEmail || !sanitizedPassword) {
+      setError('Email ve şifre gereklidir!');
+      setIsLoading(false);
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(sanitizedEmail)) {
+      setError('Geçerli bir email adresi girin!');
       setIsLoading(false);
       return;
     }
 
     try {
-      const result = await login(sanitizedUsername, sanitizedPassword);
+      await login(sanitizedEmail, sanitizedPassword);
+      navigate('/admin');
+    } catch (error: any) {
+      console.error('Login error:', error);
       
-      if (result.success) {
-        navigate('/admin');
-      } else {
-        setError(result.message);
+      // Firebase Auth error handling
+      switch (error.code) {
+        case 'auth/user-not-found':
+          setError('Bu email adresi ile kayıtlı kullanıcı bulunamadı.');
+          break;
+        case 'auth/wrong-password':
+          setError('Şifre hatalı.');
+          break;
+        case 'auth/invalid-email':
+          setError('Geçersiz email adresi.');
+          break;
+        case 'auth/too-many-requests':
+          setError('Çok fazla başarısız giriş denemesi. Lütfen daha sonra tekrar deneyin.');
+          break;
+        default:
+          setError('Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.');
       }
-    } catch (error) {
-      setError('Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.');
     }
 
     setIsLoading(false);
@@ -61,18 +82,18 @@ const AdminLoginPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-lg p-8">
             <div className="space-y-6">
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-                  Kullanıcı Adı
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  Email Adresi
                 </label>
                 <input
-                  id="username"
-                  name="username"
-                  type="text"
+                  id="email"
+                  name="email"
+                  type="email"
                   required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
-                  placeholder="Kullanıcı adınızı girin"
+                  placeholder="Email adresinizi girin"
                 />
               </div>
 
@@ -136,19 +157,19 @@ const AdminLoginPage: React.FC = () => {
           {/* Admin Bilgileri - Sadece development için */}
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="text-sm font-medium text-blue-800 mb-2">Development Giriş Bilgileri:</h3>
+              <h3 className="text-sm font-medium text-blue-800 mb-2">Firebase Auth Giriş Bilgileri:</h3>
               <div className="text-xs text-blue-700 space-y-2">
                 <div>
-                  <p><strong>Admin:</strong> admin / admin123</p>
+                  <p><strong>Admin:</strong> admin@sedefakvaryum.com</p>
                 </div>
                 <div>
-                  <p><strong>Moderator:</strong> moderator / moderator123</p>
+                  <p><strong>Moderator:</strong> moderator@sedefakvaryum.com</p>
                 </div>
                 <p className="text-xs text-blue-600 mt-2">
-                  ⚠️ Her iki kullanıcı da aynı yetkiye sahiptir
+                  ⚠️ Bu kullanıcıları Firebase Console'da oluşturun
                 </p>
                 <p className="text-xs text-blue-600">
-                  ⚠️ Production'da environment variables kullanılır
+                  ⚠️ Authentication → Users → Add User
                 </p>
               </div>
             </div>

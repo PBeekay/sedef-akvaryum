@@ -10,6 +10,7 @@ import ScrollProgressBar from './components/ScrollProgressBar';
 import RouteChangeTracker from './components/RouteChangeTracker';
 import PageLoader from './components/PageLoader';
 
+import { AuthProvider } from './context/AuthContext';
 import { AdminProvider } from './context/AdminContext';
 import { StockProvider } from './context/StockContext';
 
@@ -89,13 +90,15 @@ const AppContent: React.FC = () => {
 function App() {
   return (
     <ErrorBoundary>
-      <AdminProvider>
-        <StockProvider>
-          <Router basename="/">
-            <AppContent />
-          </Router>
-        </StockProvider>
-      </AdminProvider>
+      <AuthProvider>
+        <AdminProvider>
+          <StockProvider>
+            <Router basename="/">
+              <AppContent />
+            </Router>
+          </StockProvider>
+        </AdminProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

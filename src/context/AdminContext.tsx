@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase'; // Projenize eklediğiniz firebase.js dosyası
 
-import { generateToken, verifyToken, secureStorage, checkRateLimit } from '../utils/security';
+import { useAuth } from './AuthContext';
 import { Product } from '../types/Product';
 import PageLoader from '../components/PageLoader';
 // initialProducts'a artık ihtiyacımız yok, bu satırı silebilirsiniz.
@@ -24,11 +24,11 @@ interface SliderData {
   buttonLink: string;
 }
 
-// AdminContextType interface'i (sizdekiyle aynı, sadece fonksiyonlar async olacak)
+// AdminContextType interface'i - Firebase Auth ile güncellendi
 interface AdminContextType {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<{ success: boolean; message: string }>;
-  logout: () => void;
+  isAdmin: boolean;
+  isModerator: boolean;
   sliderData: SliderData[];
   setSliderData: (data: SliderData[]) => void;
   addSlider: (slide: Omit<SliderData, 'id'>) => void;
@@ -115,7 +115,8 @@ const saveToStorage = <T,>(key: string, value: T): void => {
 
 
 export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { currentUser, isAdmin, isModerator } = useAuth();
+  
   // Slider yönetimi LocalStorage'dan devam ediyor
   const [sliderData, setSliderData] = useState<SliderData[]>(() =>
     loadFromStorage(STORAGE_KEYS.SLIDER_DATA, defaultSliderData)
@@ -125,21 +126,8 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true); // Ürünler için yüklenme durumu
 
-  // Authentication check on mount (sizdekiyle aynı)
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = secureStorage.getItem('adminToken');
-      if (token) {
-        const decoded = await verifyToken(token);
-        if (decoded) {
-          setIsAuthenticated(true);
-        } else {
-          secureStorage.removeItem('adminToken');
-        }
-      }
-    };
-    checkAuth();
-  }, []);
+  // Firebase Auth ile authentication durumu
+  const isAuthenticated = !!currentUser && (isAdmin || isModerator);
 
   // *** YENİ: ÜRÜNLERİ FIREBASE'DEN ÇEKME ***
   useEffect(() => {
@@ -153,21 +141,25 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
                 ...doc.data()
             })) as Product[];
             
-            // DEBUG: Firebase'den gelen verileri konsola yazdır
-            console.log('🔥 Firebase\'den çekilen ürünler:', productList);
-            console.log('📊 Toplam ürün sayısı:', productList.length);
-            
-            // İlk ürünü detaylı göster
-            if (productList.length > 0) {
-                console.log('🔍 İlk ürün detayı:', productList[0]);
-                console.log('📋 quickInfo:', productList[0].quickInfo);
-                console.log('📋 careInfo:', productList[0].careInfo);
-                console.log('📋 waterParameters:', productList[0].waterParameters);
+            // DEBUG: Firebase'den gelen verileri konsola yazdır (sadece development)
+            if (process.env.NODE_ENV === 'development') {
+                console.log('🔥 Firebase\'den çekilen ürünler:', productList);
+                console.log('📊 Toplam ürün sayısı:', productList.length);
+                
+                // İlk ürünü detaylı göster
+                if (productList.length > 0) {
+                    console.log('🔍 İlk ürün detayı:', productList[0]);
+                    console.log('📋 quickInfo:', productList[0].quickInfo);
+                    console.log('📋 careInfo:', productList[0].careInfo);
+                    console.log('📋 waterParameters:', productList[0].waterParameters);
+                }
             }
             
             setProducts(productList);
         } catch (error) {
-            console.error("❌ Firebase'den ürünler çekilirken hata oluştu: ", error);
+            if (process.env.NODE_ENV === 'development') {
+                console.error("❌ Firebase'den ürünler çekilirken hata oluştu: ", error);
+            }
         } finally {
             setLoadingProducts(false);
         }
@@ -194,27 +186,8 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
     setSliderData(prev => prev.filter(s => s.id !== id));
   };
 
-  // Login ve Logout fonksiyonları (sizdekiyle aynı, hiç dokunulmadı)
-  const login = async (username: string, password: string): Promise<{ success: boolean; message: string }> => {
-    // ... sizin mevcut login kodunuz ...
-    if (!checkRateLimit('admin-login', 3, 300000)) {
-        return { success: false, message: 'Çok fazla başarısız giriş denemesi. Lütfen 5 dakika bekleyin.' };
-    }
-    const adminUsername = process.env.REACT_APP_ADMIN_USERNAME || 'sedef';
-    const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'Adm.Sdf.25!';
-    if (username === adminUsername && password === adminPassword) {
-        const token = await generateToken({ username, role: 'admin' });
-        secureStorage.setItem('adminToken', token);
-        setIsAuthenticated(true);
-        return { success: true, message: 'Giriş başarılı!' };
-    }
-    return { success: false, message: 'Kullanıcı adı veya şifre hatalı!' };
-  };
-
-  const logout = () => {
-    secureStorage.removeItem('adminToken');
-    setIsAuthenticated(false);
-  };
+  // Login ve Logout fonksiyonları Firebase Auth'a taşındı
+  // Artık AuthContext'te yönetiliyor
 
   // *** GÜNCELLENMİŞ: Ürün Yönetim Fonksiyonları (Firebase Entegrasyonu) ***
   const addProduct = async (productData: Omit<Product, 'id'>) => {
@@ -223,7 +196,9 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       const newProduct = { id: docRef.id, ...productData } as Product;
       setProducts(prev => [...prev, newProduct]);
     } catch (error) {
-      console.error("Firebase'e ürün eklenirken hata oluştu: ", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Firebase'e ürün eklenirken hata oluştu: ", error);
+      }
     }
   };
 
@@ -235,7 +210,9 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         p.id === id ? { ...p, ...productData } : p
       ));
     } catch (error) {
-      console.error("Firebase'de ürün güncellenirken hata oluştu: ", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Firebase'de ürün güncellenirken hata oluştu: ", error);
+      }
     }
   };
 
@@ -244,14 +221,16 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       await deleteDoc(doc(db, "products", id));
       setProducts(prev => prev.filter(p => p.id !== id));
     } catch (error) {
-      console.error("Firebase'den ürün silinirken hata oluştu: ", error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error("Firebase'den ürün silinirken hata oluştu: ", error);
+      }
     }
   };
 
   const value: AdminContextType = {
     isAuthenticated,
-    login,
-    logout,
+    isAdmin,
+    isModerator,
     sliderData,
     setSliderData,
     addSlider,

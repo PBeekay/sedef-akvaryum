@@ -3,12 +3,17 @@ import DOMPurify from 'dompurify';
 import { SignJWT, jwtVerify } from 'jose';
 
 // Environment variables - .env dosyasından alınmalı
-const JWT_SECRET = process.env.REACT_APP_JWT_SECRET || 'sedef-akvaryum-dev-secret-key-2024';
+const JWT_SECRET = process.env.REACT_APP_JWT_SECRET || (process.env.NODE_ENV === 'development' ? 'dev-fallback-secret-key-2024' : undefined);
 const SALT_ROUNDS = 12;
 
 // JWT secret kontrolü - Production'da zorunlu
-if (process.env.NODE_ENV === 'production' && !process.env.REACT_APP_JWT_SECRET) {
-  console.warn('REACT_APP_JWT_SECRET environment variable is not set in production. Using fallback secret.');
+if (process.env.NODE_ENV === 'production' && !JWT_SECRET) {
+  throw new Error('REACT_APP_JWT_SECRET environment variable is required in production. Please set it in your environment variables.');
+}
+
+// Development için fallback
+if (process.env.NODE_ENV === 'development' && !process.env.REACT_APP_JWT_SECRET) {
+  console.warn('REACT_APP_JWT_SECRET not set in development. Using fallback secret.');
 }
 
 // Güvenli JWT Token işlemleri - Browser uyumlu kriptografi ile
