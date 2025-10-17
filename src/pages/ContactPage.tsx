@@ -60,7 +60,7 @@ const ContactPage: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-center bg-white/60 rounded-lg p-2 px-3">
                     <span className="font-semibold">Pazar:</span>
-                    <span className="text-blue-600 font-bold">11:00 - 17:00</span>
+                    <span className="text-blue-600 font-bold">12:00 - 18:00</span>
                   </div>
                 </div>
               </div>
@@ -78,7 +78,7 @@ const ContactPage: React.FC = () => {
                   <h3 className="text-xl font-bold text-gray-900">Telefon</h3>
                 </div>
                 <a href="tel:+905555555555" className="ml-2 text-lg font-semibold text-green-700 hover:text-green-600 transition-colors block bg-white/60 rounded-lg p-3 hover:bg-white/80">
-                  📞 +90 555 555 55 55
+                  📞 +90 531 507 30 06
                 </a>
               </div>
             </div>
