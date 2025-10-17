@@ -196,7 +196,7 @@ const SearchPage: React.FC = () => {
                   <option value="fish">🐠 Balık</option>
                   <option value="plants">🌿 Bitkiler</option>
                   <option value="equipment">🔧 Ekipman</option>
-                  <option value="accessories">🎣 Aksesuarlar</option>
+                  <option value="accessories">🩹 Sağlık & Bakım</option>
                   <option value="food">🍖 Yem</option>
                 </select>
               </div>

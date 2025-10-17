@@ -2121,7 +2121,7 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
             <option value="fish">Balık</option>
             <option value="shrimp">Karides</option>
             <option value="food">Yem</option>
-            <option value="accessories">Aksesuar</option>
+            <option value="accessories">Sağlık & Bakım</option>
           </select>
         </div>
       </div>

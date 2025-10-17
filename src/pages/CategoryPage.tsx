@@ -68,8 +68,8 @@ const CategoryPage: React.FC = () => {
         tips: ['Tank boyutuna uygun filtre seçin', 'Yedek ekipman bulundurun', 'Düzenli bakım yapın']
       },
       accessories: {
-        short: 'Akvaryum bakımını kolaylaştıran aksesuarlar. Dekorasyondan temizlik araçlarına kadar her şey.',
-        tips: ['Kaliteli malzeme seçin', 'Güvenli dekorasyon kullanın', 'Düzenli temizlik yapın']
+        short: 'Balık ve karideslerinizin sağlığı için gerekli bakım ürünleri. Su testleri, ilaçlar ve sağlık malzemeleri.',
+        tips: ['Düzenli su testleri yapın', 'Hastalık belirtilerini takip edin', 'Veteriner tavsiyesi alın']
       },
       food: {
         short: 'Balık ve karidesleriniz için yüksek kaliteli yemler. Dengeli beslenme için özel formüller.',

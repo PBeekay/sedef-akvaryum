@@ -6,7 +6,7 @@ export const categories = [
   { id: 'shrimp', name: 'Karides', icon: '🦐' },
   { id: 'plants', name: 'Bitkiler', icon: '🌿' },
   { id: 'equipment', name: 'Ekipman', icon: '🔧' },
-  { id: 'accessories', name: 'Aksesuarlar', icon: '🎣' },
+  { id: 'accessories', name: 'Sağlık & Bakım', icon: '🩹' },
   { id: 'food', name: 'Yem', icon: '🍖' },
 ];
 

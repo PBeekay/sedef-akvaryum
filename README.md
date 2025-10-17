@@ -23,7 +23,7 @@ Sedef Akvaryum için özel olarak geliştirilmiş, Firebase tabanlı, güvenli v
 - **Accessibility (A11y)** - Erişilebilirlik standartlarına uygun
 
 ### 🛍️ E-Ticaret Özellikleri
-- **Kategori Bazlı Ürün Listeleme** - Balık, Karides, Bitki, Ekipman, Aksesuar
+- **Kategori Bazlı Ürün Listeleme** - Balık, Karides, Bitki, Ekipman, Sağlık & Bakım
 - **Detaylı Ürün Sayfaları** - Bakım bilgileri, su parametreleri, hızlı bilgiler
 - **Gelişmiş Arama** - Ürün arama ve filtreleme sistemi
 - **WhatsApp Entegrasyonu** - Kolay sipariş ve iletişim
@@ -244,7 +244,7 @@ firebase deploy
 - **Karides Kategorisi** - Dekoratif karides türleri
 - **Bitki Kategorisi** - Su bitkileri ve yosunlar
 - **Ekipman Kategorisi** - Filtre, ışık, ısıtıcı
-- **Aksesuar Kategorisi** - Dekorasyon ve bakım malzemeleri
+- **Sağlık & Bakım Kategorisi** - Su testleri, ilaçlar ve sağlık malzemeleri
 
 ### 📦 Ürün Detay Sayfaları
 - **Detaylı Ürün Bilgileri** - Açıklama, fiyat, stok
