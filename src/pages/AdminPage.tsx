@@ -169,7 +169,7 @@ const AdminPage: React.FC = () => {
     setShowSliderEditor(true);
   };
 
-  const handleDeleteSlider = (slideId: string) => {
+  const handleDeleteSlider = (slideId: number) => {
     if (window.confirm('Bu slider\'ı silmek istediğinizden emin misiniz?')) {
       deleteSlider(slideId);
     }
