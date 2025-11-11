@@ -243,10 +243,19 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       const docRef = await addDoc(collection(db, "products"), productData);
       const newProduct = { id: docRef.id, ...productData } as Product;
       setProducts(prev => [...prev, newProduct]);
-    } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error("Firebase'e ürün eklenirken hata oluştu: ", error);
+        console.log('✅ Ürün başarıyla Firebase\'e eklendi:', newProduct);
       }
+    } catch (error: any) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error("❌ Firebase'e ürün eklenirken hata oluştu: ", error);
+      }
+      // Hata mesajını kullanıcıya göstermek için throw et
+      throw new Error(
+        error?.code === 'permission-denied' 
+          ? 'Ürün ekleme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
+          : error?.message || 'Ürün eklenirken bir hata oluştu. Lütfen tekrar deneyin.'
+      );
     }
   };
 
@@ -257,10 +266,18 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       setProducts(prev => prev.map(p =>
         p.id === id ? { ...p, ...productData } : p
       ));
-    } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error("Firebase'de ürün güncellenirken hata oluştu: ", error);
+        console.log('✅ Ürün başarıyla Firebase\'de güncellendi:', id);
       }
+    } catch (error: any) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error("❌ Firebase'de ürün güncellenirken hata oluştu: ", error);
+      }
+      throw new Error(
+        error?.code === 'permission-denied' 
+          ? 'Ürün güncelleme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
+          : error?.message || 'Ürün güncellenirken bir hata oluştu. Lütfen tekrar deneyin.'
+      );
     }
   };
 
@@ -268,10 +285,18 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
     try {
       await deleteDoc(doc(db, "products", id));
       setProducts(prev => prev.filter(p => p.id !== id));
-    } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error("Firebase'den ürün silinirken hata oluştu: ", error);
+        console.log('✅ Ürün başarıyla Firebase\'den silindi:', id);
       }
+    } catch (error: any) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error("❌ Firebase'den ürün silinirken hata oluştu: ", error);
+      }
+      throw new Error(
+        error?.code === 'permission-denied' 
+          ? 'Ürün silme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
+          : error?.message || 'Ürün silinirken bir hata oluştu. Lütfen tekrar deneyin.'
+      );
     }
   };
 

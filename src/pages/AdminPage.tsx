@@ -85,7 +85,7 @@ const AdminPage: React.FC = () => {
     setShowAddForm(true);
   };
 
-  const handleDeleteProduct = (productId: string) => {
+  const handleDeleteProduct = async (productId: string) => {
     // Sanitize productId
     const sanitizedId = productId.replace(/[^a-zA-Z0-9_-]/g, '');
     if (sanitizedId !== productId) {
@@ -95,38 +95,45 @@ const AdminPage: React.FC = () => {
     // Use a more secure confirmation method
     const confirmed = window.confirm('Bu ürünü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');
     if (confirmed) {
-      if (process.env.NODE_ENV === 'development') {
+      try {
+        await deleteProduct(sanitizedId);
+        alert('✅ Ürün başarıyla silindi!');
+      } catch (error: any) {
+        const errorMessage = error?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
+        alert(`❌ Hata: ${errorMessage}`);
+        console.error('Ürün silme hatası:', error);
       }
-      deleteProduct(sanitizedId);
-      if (process.env.NODE_ENV === 'development') {
-      }
-      alert('Ürün başarıyla silindi!');
     }
   };
 
-  const handleSaveProduct = (productData: Partial<Product>) => {
-    if (process.env.NODE_ENV === 'development') {
-    }
-    if (editingProduct) {
-      // Update existing product
-      if (process.env.NODE_ENV === 'development') {
+  const handleSaveProduct = async (productData: Partial<Product>) => {
+    try {
+      if (editingProduct) {
+        // Update existing product
+        await updateProduct(editingProduct.id, productData);
+        alert('✅ Ürün başarıyla güncellendi!');
+      } else {
+        // Add new product
+        await addProduct(productData as Omit<Product, 'id'>);
+        alert('✅ Yeni ürün başarıyla eklendi!');
       }
-      updateProduct(editingProduct.id, productData);
-      alert('Ürün başarıyla güncellendi!');
-    } else {
-      // Add new product
-      if (process.env.NODE_ENV === 'development') {
-      }
-      addProduct(productData as Omit<Product, 'id'>);
-      alert('Yeni ürün başarıyla eklendi!');
+      
+      // Close form and reset state only on success
+      setShowAddForm(false);
+      setEditingProduct(null);
       
       // Force a re-render by updating the active tab
       setTimeout(() => {
         setActiveTab('products');
       }, 100);
+    } catch (error: any) {
+      // Show error message to user
+      const errorMessage = error?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
+      alert(`❌ Hata: ${errorMessage}`);
+      console.error('Ürün kaydetme hatası:', error);
+      
+      // Don't close the form if there's an error, so user can fix and retry
     }
-    setShowAddForm(false);
-    setEditingProduct(null);
   };
 
   const handleCancelEdit = () => {

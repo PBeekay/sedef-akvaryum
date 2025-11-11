@@ -7,14 +7,24 @@ import { getStorage } from "firebase/storage";
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
+// IMPORTANT: Never commit API keys to public repositories!
+// Always use environment variables for sensitive data.
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY || "AIzaSyDx8gblokEpOu9tdBkqIRf8LK7WsJxX4ek",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || "sedef-akvaryum.firebaseapp.com",
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || "sedef-akvaryum",
   storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET || "sedef-akvaryum.firebasestorage.app",
   messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID || "641783453291",
   appId: process.env.REACT_APP_FIREBASE_APP_ID || "1:641783453291:web:7c92e856ee9739a0e2432e"
 };
+
+// Validate that required environment variables are set
+if (!firebaseConfig.apiKey) {
+  throw new Error(
+    'Missing Firebase API Key! Please set REACT_APP_FIREBASE_API_KEY in your .env file. ' +
+    'See .env.example for reference.'
+  );
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
