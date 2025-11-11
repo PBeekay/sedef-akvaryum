@@ -26,7 +26,7 @@ const HomePage: React.FC = () => {
   const newProducts = products.filter(product => product.new);
 
   // Hero slider data from admin context
-  const fallbackSlide = {
+  const fallbackSlide = React.useMemo(() => ({
     id: 'fallback-slide',
     title: 'Sedef Akvaryum Mağazası',
     subtitle: 'Admin panelinden slider içeriği ekleyin.',
@@ -36,8 +36,52 @@ const HomePage: React.FC = () => {
     icon: '🦐',
     buttonText: 'Ürünleri İncele',
     buttonLink: '/category/fish',
-  };
-  const heroSlides = sliderData.length > 0 ? sliderData : [fallbackSlide];
+  }), []);
+  
+  // Use sliderData if available, otherwise use fallback
+  // Firebase document IDs are already unique, so we just use them directly
+  const heroSlides = React.useMemo(() => {
+    if (sliderData.length === 0) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('⚠️ Slider data boş, fallback kullanılıyor');
+      }
+      return [fallbackSlide];
+    }
+    
+    // Debug: Log slider data
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 Slider data:', sliderData);
+      console.log('📊 Slider sayısı:', sliderData.length);
+      sliderData.forEach((slide, index) => {
+        console.log(`  Slider ${index}:`, { id: slide.id, title: slide.title });
+      });
+    }
+    
+    // Filter out any slides without IDs (shouldn't happen with Firebase, but just in case)
+    const validSlides = sliderData.filter(slide => {
+      if (!slide || !slide.id) {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('⚠️ Geçersiz slider bulundu (ID yok):', slide);
+        }
+        return false;
+      }
+      return true;
+    });
+    
+    // If no valid slides after filtering, use fallback
+    if (validSlides.length === 0) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('⚠️ Geçerli slider bulunamadı, fallback kullanılıyor');
+      }
+      return [fallbackSlide];
+    }
+    
+    // Use valid slides from database
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Kullanılacak slider sayısı:', validSlides.length);
+    }
+    return validSlides;
+  }, [sliderData, fallbackSlide]);
 
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -75,8 +119,14 @@ const HomePage: React.FC = () => {
     setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
 
+  // Reset currentSlide when heroSlides changes
   useEffect(() => {
-    if (currentSlide >= heroSlides.length) {
+    if (heroSlides.length === 0) {
+      setCurrentSlide(0);
+      return;
+    }
+    // If currentSlide is out of bounds, reset to 0
+    if (currentSlide >= heroSlides.length || currentSlide < 0) {
       setCurrentSlide(0);
     }
   }, [heroSlides.length, currentSlide]);
@@ -131,13 +181,13 @@ const HomePage: React.FC = () => {
                 </h1>
                 <div className="mb-8 space-y-3">
                   <h2 className="text-2xl md:text-3xl font-bold mb-3 text-yellow-200 drop-shadow-md">
-                    {heroSlides[currentSlide].title}
+                    {heroSlides[currentSlide]?.title || heroSlides[0]?.title || 'Sedef Akvaryum'}
                   </h2>
                   <p className="text-lg text-white/90 mb-3 font-medium">
-                    {heroSlides[currentSlide].subtitle}
+                    {heroSlides[currentSlide]?.subtitle || heroSlides[0]?.subtitle || ''}
                   </p>
                   <p className="text-base text-white/80 leading-relaxed">
-                    {heroSlides[currentSlide].description}
+                    {heroSlides[currentSlide]?.description || heroSlides[0]?.description || ''}
                   </p>
                 </div>
               </div>
@@ -148,7 +198,7 @@ const HomePage: React.FC = () => {
              <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80">
               {heroSlides.map((slide, index) => (
                 <div
-                  key={slide.id}
+                  key={slide.id || `slide-${index}`}
                   className={`absolute inset-0 transition-all duration-500 ease-in-out ${
                     index === currentSlide ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
                   }`}
@@ -239,9 +289,9 @@ const HomePage: React.FC = () => {
 
           {/* Slide Indicators */}
         <div className="flex justify-center mt-10 space-x-3">
-          {heroSlides.map((_, index) => (
+          {heroSlides.map((slide, index) => (
             <button
-              key={index}
+              key={slide.id || `slide-${index}`}
               onClick={() => goToSlide(index)}
               className={`transition-all duration-300 rounded-full ${
                 index === currentSlide 

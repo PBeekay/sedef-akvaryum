@@ -5,6 +5,8 @@ import { Product } from '../types/Product';
 import { useAdmin } from '../context/AdminContext';
 import { useAuth } from '../context/AuthContext';
 import { useStock } from '../context/StockContext';
+import { storage } from '../firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 interface AdminProduct extends Product {
   isEditing?: boolean;
@@ -974,6 +976,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
   });
 
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
+  const [uploading, setUploading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1027,36 +1031,82 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
   //   }
   // };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    setUploading(true);
     const currentImages = formData.images || [];
+    const uploadPromises: Promise<string>[] = [];
 
-    const readFileAsDataUrl = (file: File): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        if (!file.type.startsWith('image/')) {
-          reject(new Error(`Geçersiz dosya türü: ${file.name}`));
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = (event) => resolve((event.target?.result as string) || '');
-        reader.onerror = () => reject(new Error(`Dosya okunamadı: ${file.name}`));
-        reader.readAsDataURL(file);
-      });
-    };
+    // Her dosya için Firebase Storage'a yükleme
+    Array.from(files).forEach((file) => {
+      if (!file.type.startsWith('image/')) {
+        alert(`Geçersiz dosya türü: ${file.name}. Lütfen sadece resim dosyası seçin.`);
+        return;
+      }
 
-    Promise.all(Array.from(files).map(readFileAsDataUrl))
-      .then((loadedImages) => {
-        const updatedImages = [...currentImages, ...loadedImages.filter(Boolean)];
-        handleInputChange('images', updatedImages);
-        if (!formData.image && updatedImages.length > 0) {
-          handleInputChange('image', updatedImages[0]);
-        }
-      })
-      .catch((err) => {
-        alert(err.message || 'Görseller yüklenirken bir hata oluştu');
+      const uploadPromise = new Promise<string>((resolve, reject) => {
+        // Storage'da dosya yolu: products/timestamp-filename
+        const timestamp = Date.now();
+        const fileName = `${timestamp}-${file.name}`;
+        const storageRef = ref(storage, `products/${fileName}`);
+
+        // Yükleme işlemini başlat
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        // Progress takibi
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress((prev) => ({
+              ...prev,
+              [fileName]: progress
+            }));
+          },
+          (error) => {
+            console.error('Upload error:', error);
+            reject(new Error(`${file.name} yüklenirken hata oluştu: ${error.message}`));
+          },
+          async () => {
+            // Yükleme tamamlandı, URL'i al
+            try {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(downloadURL);
+            } catch (error) {
+              reject(new Error(`${file.name} için URL alınırken hata oluştu`));
+            }
+          }
+        );
       });
+
+      uploadPromises.push(uploadPromise);
+    });
+
+    try {
+      // Tüm yüklemelerin tamamlanmasını bekle
+      const uploadedUrls = await Promise.all(uploadPromises);
+      const updatedImages = [...currentImages, ...uploadedUrls.filter(Boolean)];
+      
+      handleInputChange('images', updatedImages);
+      if (!formData.image && updatedImages.length > 0) {
+        handleInputChange('image', updatedImages[0]);
+      }
+      
+      // Progress'i temizle
+      setUploadProgress({});
+      setUploading(false);
+      
+      // Input'u temizle (aynı dosyayı tekrar seçebilmek için)
+      if (e.target) {
+        e.target.value = '';
+      }
+    } catch (err: any) {
+      setUploading(false);
+      setUploadProgress({});
+      alert(err.message || 'Görseller yüklenirken bir hata oluştu');
+    }
   };
 
   const handleAddImageUrl = () => {
@@ -1143,16 +1193,26 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
           <div className="space-y-4">
             {/* File Upload */}
             <div 
-              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-400 transition-colors"
+              className={`border-2 border-dashed border-gray-300 rounded-lg p-6 text-center transition-colors ${
+                uploading 
+                  ? 'opacity-50 cursor-not-allowed' 
+                  : 'hover:border-primary-400 cursor-pointer'
+              }`}
               onDragOver={(e) => {
+                if (uploading) return;
                 e.preventDefault();
                 e.currentTarget.classList.add('border-primary-400', 'bg-primary-50');
               }}
               onDragLeave={(e) => {
+                if (uploading) return;
                 e.preventDefault();
                 e.currentTarget.classList.remove('border-primary-400', 'bg-primary-50');
               }}
               onDrop={(e) => {
+                if (uploading) {
+                  e.preventDefault();
+                  return;
+                }
                 e.preventDefault();
                 e.currentTarget.classList.remove('border-primary-400', 'bg-primary-50');
                 
@@ -1173,20 +1233,43 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
                 className="hidden"
                 id="image-upload"
                 multiple
+                disabled={uploading}
               />
               <label
                 htmlFor="image-upload"
-                className="cursor-pointer flex flex-col items-center gap-2"
+                className={`flex flex-col items-center gap-2 ${
+                  uploading ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                }`}
               >
-                <div className="text-4xl">📁</div>
+                <div className="text-4xl">{uploading ? '⏳' : '📁'}</div>
                 <div className="text-sm font-medium text-gray-700">
-                  Dosya Seç veya Sürükle
+                  {uploading ? 'Yükleniyor...' : 'Dosya Seç veya Sürükle'}
                 </div>
                 <div className="text-xs text-gray-500">
                   JPG, PNG, GIF
                 </div>
               </label>
             </div>
+
+            {/* Upload Progress */}
+            {uploading && Object.keys(uploadProgress).length > 0 && (
+              <div className="space-y-2">
+                {Object.entries(uploadProgress).map(([fileName, progress]) => (
+                  <div key={fileName} className="space-y-1">
+                    <div className="flex justify-between text-sm text-gray-600">
+                      <span className="truncate flex-1">{fileName}</span>
+                      <span className="ml-2">{Math.round(progress)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Divider */}
             <div className="relative">
