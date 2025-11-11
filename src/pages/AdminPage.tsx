@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useStock } from '../context/StockContext';
 import { storage } from '../firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { generateProductInfoWithAI, findSimilarProduct } from '../services/aiService';
 
 interface AdminProduct extends Product {
   isEditing?: boolean;
@@ -957,6 +958,7 @@ interface ProductFormProps {
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, categories }) => {
+  const { products } = useAdmin();
   const [formData, setFormData] = useState({
     name: product?.name || '',
     category: product?.category || 'fish',
@@ -1005,6 +1007,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
   const [newImageUrl, setNewImageUrl] = useState('');
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [uploading, setUploading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1166,20 +1169,110 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
     handleInputChange('image', imageUrl);
   };
 
+  const handleFillWithAI = async () => {
+    if (!formData.name.trim()) {
+      alert('Lütfen önce ürün adını girin.');
+      return;
+    }
+
+    setAiLoading(true);
+    try {
+      // Önce veritabanında benzer ürün ara
+      const similarProduct = findSimilarProduct(formData.name, formData.category, products);
+      
+      if (similarProduct) {
+        // Benzer ürün bulundu, bilgilerini kullan
+        if (similarProduct.description) handleInputChange('description', similarProduct.description);
+        if (similarProduct.shortDescription) handleInputChange('shortDescription', similarProduct.shortDescription);
+        if (similarProduct.waterParameters) handleInputChange('waterParameters', similarProduct.waterParameters);
+        if (similarProduct.size) handleInputChange('size', similarProduct.size);
+        if (similarProduct.difficulty) handleInputChange('difficulty', similarProduct.difficulty);
+        if (similarProduct.breeding) handleInputChange('breeding', similarProduct.breeding);
+        if (similarProduct.diet) handleInputChange('diet', similarProduct.diet);
+        if (similarProduct.lifespan) handleInputChange('lifespan', similarProduct.lifespan);
+        if (similarProduct.tankSize) handleInputChange('tankSize', similarProduct.tankSize);
+        if (similarProduct.socialBehavior) handleInputChange('socialBehavior', similarProduct.socialBehavior);
+        if (similarProduct.quickInfo) handleInputChange('quickInfo', similarProduct.quickInfo);
+        if (similarProduct.careInfo) handleInputChange('careInfo', similarProduct.careInfo);
+        if (similarProduct.colors) handleInputChange('colors', similarProduct.colors);
+        if (similarProduct.species) handleInputChange('species', similarProduct.species);
+        
+        alert('✅ Veritabanındaki benzer ürünün bilgileri ile dolduruldu!');
+        return;
+      }
+
+      // Benzer ürün bulunamadı, AI kullan
+      const aiInfo = await generateProductInfoWithAI(formData.name, formData.category);
+      
+      // AI'dan gelen bilgileri form'a doldur
+      if (aiInfo.description) handleInputChange('description', aiInfo.description);
+      if (aiInfo.shortDescription) handleInputChange('shortDescription', aiInfo.shortDescription);
+      if (aiInfo.waterParameters) handleInputChange('waterParameters', aiInfo.waterParameters);
+      if (aiInfo.size) handleInputChange('size', aiInfo.size);
+      if (aiInfo.difficulty) handleInputChange('difficulty', aiInfo.difficulty);
+      if (aiInfo.breeding) handleInputChange('breeding', aiInfo.breeding);
+      if (aiInfo.diet) handleInputChange('diet', aiInfo.diet);
+      if (aiInfo.lifespan) handleInputChange('lifespan', aiInfo.lifespan);
+      if (aiInfo.tankSize) handleInputChange('tankSize', aiInfo.tankSize);
+      if (aiInfo.socialBehavior) handleInputChange('socialBehavior', aiInfo.socialBehavior);
+      if (aiInfo.quickInfo) handleInputChange('quickInfo', aiInfo.quickInfo);
+      if (aiInfo.careInfo) handleInputChange('careInfo', aiInfo.careInfo);
+      if (aiInfo.colors) handleInputChange('colors', aiInfo.colors);
+      if (aiInfo.species) handleInputChange('species', aiInfo.species);
+      
+      alert('✅ AI ile ürün bilgileri başarıyla dolduruldu!');
+    } catch (error: any) {
+      console.error('AI doldurma hatası:', error);
+      alert(`❌ Hata: ${error.message || 'Ürün bilgileri doldurulamadı. Lütfen manuel olarak doldurun.'}`);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Ürün Adı
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Ürün Adı
+            </label>
+            <button
+              type="button"
+              onClick={handleFillWithAI}
+              disabled={aiLoading || !formData.name.trim()}
+              className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+              title="AI ile ürün bilgilerini otomatik doldur"
+            >
+              {aiLoading ? (
+                <>
+                  <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Yükleniyor...</span>
+                </>
+              ) : (
+                <>
+                  <span>🤖</span>
+                  <span>AI ile Doldur</span>
+                </>
+              )}
+            </button>
+          </div>
           <input
             type="text"
             value={formData.name}
             onChange={(e) => handleInputChange('name', e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            placeholder="Örn: Silver Pas Kaplı Tetra"
             required
           />
+          {formData.name && (
+            <p className="mt-1 text-xs text-gray-500">
+              💡 Ürün adını girdikten sonra "AI ile Doldur" butonuna tıklayın
+            </p>
+          )}
         </div>
 
         <div>
