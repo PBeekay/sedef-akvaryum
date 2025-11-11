@@ -72,34 +72,61 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 
   // *** YENİ: SLIDER'LARI FIREBASE'DEN ÇEKME ***
   useEffect(() => {
-    const fetchSliders = async () => {
-        setLoadingSliders(true);
-        try {
-            const slidersCollection = collection(db, "sliders");
-            const sliderSnapshot = await getDocs(slidersCollection);
-            const sliderList = sliderSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as SliderData[];
-            
-            // DEBUG: Firebase'den gelen slider verilerini konsola yazdır (sadece development)
-            if (process.env.NODE_ENV === 'development') {
-                console.log('🎠 Firebase\'den çekilen slider\'lar:', sliderList);
-                console.log('📊 Toplam slider sayısı:', sliderList.length);
-            }
-            
-            setSliderData(sliderList);
-        } catch (error) {
-            if (process.env.NODE_ENV === 'development') {
-                console.error("❌ Firebase'den slider'lar çekilirken hata oluştu: ", error);
-            }
-            // Hata durumunda varsayılan verileri kullan
-            setSliderData(defaultSliderData);
-        } finally {
-            setLoadingSliders(false);
-        }
+    let isMounted = true;
+    const slidersCollection = collection(db, "sliders");
+
+    const handleSnapshot = (snapshot: QuerySnapshot<DocumentData>) => {
+      if (!isMounted) return;
+
+      const sliderList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as SliderData[];
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🎠 Firebase onSnapshot slider güncellemesi:', sliderList);
+        console.log('📊 Toplam slider sayısı:', sliderList.length);
+      }
+
+      setSliderData(sliderList);
+      setLoadingSliders(false);
     };
+
+    const unsubscribe = onSnapshot(
+      slidersCollection,
+      handleSnapshot,
+      (error) => {
+        if (process.env.NODE_ENV === 'development') {
+          console.error("❌ Firebase onSnapshot slider dinlenirken hata oluştu: ", error);
+        }
+        if (isMounted) {
+          setLoadingSliders(false);
+        }
+      }
+    );
+
+    const fetchSliders = async () => {
+      setLoadingSliders(true);
+      try {
+        const sliderSnapshot = await getDocs(slidersCollection);
+        handleSnapshot(sliderSnapshot);
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error("❌ Firebase'den slider'lar çekilirken hata oluştu: ", error);
+        }
+        if (isMounted) {
+          setSliderData(defaultSliderData);
+          setLoadingSliders(false);
+        }
+      }
+    };
+
     fetchSliders();
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   // *** YENİ: ÜRÜNLERİ FIREBASE'DEN ÇEKME ***

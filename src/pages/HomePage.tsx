@@ -26,90 +26,20 @@ const HomePage: React.FC = () => {
   const newProducts = products.filter(product => product.new);
 
   // Hero slider data from admin context
-  const heroSlides = sliderData;
-
-  type HeroSlide = typeof heroSlides extends Array<infer T> ? T : never;
-
-  const fallbackSlide: HeroSlide = {
+  const fallbackSlide = {
     id: 'fallback-slide',
     title: 'Sedef Akvaryum Mağazası',
     subtitle: 'Admin panelinden slider içeriği ekleyin.',
-    description: 'Gerçek zamanlı yönetim paneliyle slider içeriklerinizi ekleyin; yeni slaytlar eklediğinizde burada görüntülenecek.',
+    description: 'Slider içerikleriniz henüz hazır değil. Admin panelinden slayt eklediğinizde burada görünecek.',
     image: '/shrimp.png',
+    category: 'fish',
     icon: '🦐',
     buttonText: 'Ürünleri İncele',
     buttonLink: '/category/fish',
-    category: 'fish',
   };
-
-  const normalizedSlides: HeroSlide[] = heroSlides
-    .map((slide, index) => {
-      if (!slide) return null;
-
-      const safeTitle =
-        typeof slide.title === 'string' && slide.title.trim().length > 0
-          ? slide.title
-          : `Sedef Akvaryum Slider ${index + 1}`;
-
-      const safeSubtitle =
-        typeof slide.subtitle === 'string' && slide.subtitle.trim().length > 0
-          ? slide.subtitle
-          : 'Slider içeriğini admin panelinden düzenleyin.';
-
-      const safeDescription =
-        typeof slide.description === 'string' && slide.description.trim().length > 0
-          ? slide.description
-          : 'Başlık, açıklama ve bağlantı alanlarını doldurarak ziyaretçileriniz için dikkat çekici bir slider oluşturun.';
-
-      const safeImage =
-        typeof slide.image === 'string' && slide.image.trim().length > 0
-          ? slide.image
-          : '/shrimp.png';
-
-      const safeIcon =
-        typeof slide.icon === 'string' && slide.icon.trim().length > 0
-          ? slide.icon
-          : '🐠';
-
-      const safeButtonText =
-        typeof slide.buttonText === 'string' && slide.buttonText.trim().length > 0
-          ? slide.buttonText
-          : 'Ürünleri İncele';
-
-      const safeButtonLink =
-        typeof slide.buttonLink === 'string' && slide.buttonLink.trim().length > 0
-          ? slide.buttonLink
-          : '/category/fish';
-
-      const safeCategory =
-        typeof slide.category === 'string' && slide.category.trim().length > 0
-          ? slide.category
-          : 'fish';
-
-      return {
-        ...slide,
-        id: typeof slide.id === 'string' && slide.id.trim().length > 0 ? slide.id : `slide-${index}`,
-        title: safeTitle,
-        subtitle: safeSubtitle,
-        description: safeDescription,
-        image: safeImage,
-        icon: safeIcon,
-        buttonText: safeButtonText,
-        buttonLink: safeButtonLink,
-        category: safeCategory,
-      } as HeroSlide;
-    })
-    .filter((slide): slide is HeroSlide => slide !== null);
-
-  // Guard for empty hero slider data
-  const hasSlides = normalizedSlides.length > 0;
+  const heroSlides = sliderData.length > 0 ? sliderData : [fallbackSlide];
 
   const [currentSlide, setCurrentSlide] = useState(0);
-  
-  const displaySlides = hasSlides ? normalizedSlides : [fallbackSlide];
-  const currentSlideData = displaySlides[Math.min(currentSlide, displaySlides.length - 1)];
-
-  const normalizedSlidesLength = normalizedSlides.length;
 
   // Simulate initial loading
   useEffect(() => {
@@ -120,39 +50,36 @@ const HomePage: React.FC = () => {
 
   // Auto-slide functionality
   useEffect(() => {
-    if (!hasSlides || normalizedSlidesLength === 0) {
-      setCurrentSlide(0);
+    if (heroSlides.length === 0) {
       return;
     }
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % normalizedSlidesLength);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000); // Change slide every 5 seconds
 
     return () => clearInterval(interval);
-  }, [hasSlides, normalizedSlidesLength]);
-
-  useEffect(() => {
-    if (hasSlides) {
-      setCurrentSlide((prev) => Math.min(prev, normalizedSlidesLength - 1));
-    } else {
-      setCurrentSlide(0);
-    }
-  }, [hasSlides, normalizedSlidesLength]);
+  }, [heroSlides.length]);
 
   const goToSlide = (index: number) => {
-    if (!hasSlides) return;
+    if (heroSlides.length === 0) return;
     setCurrentSlide(index);
   };
 
   const nextSlide = () => {
-    if (!hasSlides) return;
-    setCurrentSlide((prev) => (prev + 1) % normalizedSlidesLength);
+    if (heroSlides.length === 0) return;
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
   };
 
   const prevSlide = () => {
-    if (!hasSlides) return;
-    setCurrentSlide((prev) => (prev - 1 + normalizedSlidesLength) % normalizedSlidesLength);
+    if (heroSlides.length === 0) return;
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
   };
+
+  useEffect(() => {
+    if (currentSlide >= heroSlides.length) {
+      setCurrentSlide(0);
+    }
+  }, [heroSlides.length, currentSlide]);
 
   return (
     <div className="min-h-screen">
@@ -204,13 +131,13 @@ const HomePage: React.FC = () => {
                 </h1>
                 <div className="mb-8 space-y-3">
                   <h2 className="text-2xl md:text-3xl font-bold mb-3 text-yellow-200 drop-shadow-md">
-                    {currentSlideData.title}
+                    {heroSlides[currentSlide].title}
                   </h2>
                   <p className="text-lg text-white/90 mb-3 font-medium">
-                    {currentSlideData.subtitle}
+                    {heroSlides[currentSlide].subtitle}
                   </p>
                   <p className="text-base text-white/80 leading-relaxed">
-                    {currentSlideData.description}
+                    {heroSlides[currentSlide].description}
                   </p>
                 </div>
               </div>
@@ -219,17 +146,13 @@ const HomePage: React.FC = () => {
                                       {/* Image Slider */}
             <div className="animate-slide-up relative w-full z-20">
              <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80">
-              {displaySlides.map((slide, index) => (
-                  <div
-                  key={slide.id ?? `fallback-${index}`}
-                    className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                    hasSlides
-                      ? index === currentSlide
-                        ? 'opacity-100 translate-x-0'
-                        : 'opacity-0 translate-x-full'
-                      : 'opacity-100 translate-x-0'
-                    }`}
-                  >
+              {heroSlides.map((slide, index) => (
+                <div
+                  key={slide.id}
+                  className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                    index === currentSlide ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+                  }`}
+                >
                                                                                           <img
                            src={slide.image}
                            alt={slide.title}
@@ -291,51 +214,45 @@ const HomePage: React.FC = () => {
               </div>
 
               {/* Navigation Arrows */}
-            {hasSlides && (
-              <>
-                <button
-                  onClick={prevSlide}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
-                  aria-label="Önceki slayt"
-                  type="button"
-                >
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button
-                  onClick={nextSlide}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
-                  aria-label="Sonraki slayt"
-                  type="button"
-                >
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </>
-            )}
+            <button
+              onClick={prevSlide}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
+              aria-label="Önceki slayt"
+              type="button"
+            >
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
+              aria-label="Sonraki slayt"
+              type="button"
+            >
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
             </div>
           </div>
 
           {/* Slide Indicators */}
-        {hasSlides && (
-          <div className="flex justify-center mt-10 space-x-3">
-            {normalizedSlides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`transition-all duration-300 rounded-full ${
-                  index === currentSlide 
-                    ? 'w-10 h-3 bg-yellow-300 shadow-lg shadow-yellow-300/50' 
-                    : 'w-3 h-3 bg-white/50 hover:bg-white/75 hover:scale-125'
-                }`}
-                aria-label={`Slayt ${index + 1}`}
-                type="button"
-              />
-            ))}
-          </div>
-        )}
+        <div className="flex justify-center mt-10 space-x-3">
+          {heroSlides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`transition-all duration-300 rounded-full ${
+                index === currentSlide 
+                  ? 'w-10 h-3 bg-yellow-300 shadow-lg shadow-yellow-300/50' 
+                  : 'w-3 h-3 bg-white/50 hover:bg-white/75 hover:scale-125'
+              }`}
+              aria-label={`Slayt ${index + 1}`}
+              type="button"
+            />
+          ))}
+        </div>
         </div>
       </section>
 
