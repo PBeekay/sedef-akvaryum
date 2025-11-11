@@ -178,22 +178,42 @@ const AdminPage: React.FC = () => {
     setShowSliderEditor(true);
   };
 
-  const handleDeleteSlider = (slideId: string) => {
+  const handleDeleteSlider = async (slideId: string) => {
     if (window.confirm('Bu slider\'ı silmek istediğinizden emin misiniz?')) {
-      deleteSlider(slideId);
+      try {
+        await deleteSlider(slideId);
+        alert('✅ Slider başarıyla silindi!');
+      } catch (error: any) {
+        const errorMessage = error?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
+        alert(`❌ Hata: ${errorMessage}`);
+        console.error('Slider silme hatası:', error);
+      }
     }
   };
 
-  const handleSaveSlider = (slideData: any) => {
-    if (editingSlider) {
-      // Slider güncelleme
-      updateSlider(editingSlider.id, slideData);
-    } else {
-      // Yeni slider ekleme
-      addSlider(slideData);
+  const handleSaveSlider = async (slideData: any) => {
+    try {
+      if (editingSlider) {
+        // Slider güncelleme
+        await updateSlider(editingSlider.id, slideData);
+        alert('✅ Slider başarıyla güncellendi!');
+      } else {
+        // Yeni slider ekleme
+        await addSlider(slideData);
+        alert('✅ Yeni slider başarıyla eklendi!');
+      }
+      
+      // Close form and reset state only on success
+      setShowSliderEditor(false);
+      setEditingSlider(null);
+    } catch (error: any) {
+      // Show error message to user
+      const errorMessage = error?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
+      alert(`❌ Hata: ${errorMessage}`);
+      console.error('Slider kaydetme hatası:', error);
+      
+      // Don't close the form if there's an error, so user can fix and retry
     }
-    setShowSliderEditor(false);
-    setEditingSlider(null);
   };
 
   const handleCancelSliderEdit = () => {
@@ -2115,11 +2135,16 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
     category: slide?.category || 'fish'
   });
 
-  // const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  // const [imagePreview, setImagePreview] = useState<string>(''); // Removed unused variable
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploading, setUploading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Eğer resim yükleniyorsa bekle
+    if (uploading) {
+      alert('Lütfen resim yüklenmesini bekleyin...');
+      return;
+    }
     onSave(formData);
   };
 
@@ -2127,17 +2152,65 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      // setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        // setImagePreview(result); // Removed unused
-        handleInputChange('image', result);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Lütfen sadece resim dosyası seçin.');
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    try {
+      // Storage'da dosya yolu: sliders/timestamp-filename
+      const timestamp = Date.now();
+      const fileName = `${timestamp}-${file.name}`;
+      const storageRef = ref(storage, `sliders/${fileName}`);
+
+      // Yükleme işlemini başlat
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      // Progress takibi ve URL alma
+      const downloadURL = await new Promise<string>((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+          },
+          (error) => {
+            console.error('Upload error:', error);
+            reject(new Error(`${file.name} yüklenirken hata oluştu: ${error.message}`));
+          },
+          async () => {
+            try {
+              const url = await getDownloadURL(uploadTask.snapshot.ref);
+              resolve(url);
+            } catch (error) {
+              reject(new Error(`${file.name} için URL alınırken hata oluştu`));
+            }
+          }
+        );
+      });
+
+      // URL'i form data'ya ekle
+      handleInputChange('image', downloadURL);
+      setUploadProgress(100);
+      
+      // Input'u temizle
+      if (e.target) {
+        e.target.value = '';
+      }
+    } catch (error: any) {
+      alert(error.message || 'Resim yüklenirken bir hata oluştu.');
+      console.error('Slider resim yükleme hatası:', error);
+    } finally {
+      setUploading(false);
+      // Progress'i bir süre sonra temizle
+      setTimeout(() => setUploadProgress(0), 2000);
     }
   };
 
@@ -2249,25 +2322,80 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
           Resim
         </label>
         <div className="space-y-4">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
+          {/* File Upload */}
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              disabled={uploading}
+              className="hidden"
+              id="slider-image-upload"
+            />
+            <label
+              htmlFor="slider-image-upload"
+              className={`cursor-pointer flex flex-col items-center gap-2 ${
+                uploading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              <div className="text-4xl">{uploading ? '⏳' : '📁'}</div>
+              <div className="text-sm font-medium text-gray-700">
+                {uploading ? 'Yükleniyor...' : 'Resim Dosyası Seç'}
+              </div>
+              <div className="text-xs text-gray-500">
+                JPG, PNG, GIF (Firebase Storage'a yüklenecek)
+              </div>
+            </label>
+          </div>
+
+          {/* Upload Progress */}
+          {uploading && uploadProgress > 0 && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Yükleniyor...</span>
+                <span>{Math.round(uploadProgress)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">veya</span>
+            </div>
+          </div>
+
+          {/* URL Input */}
           <input
             type="url"
             value={formData.image}
             onChange={(e) => handleInputChange('image', e.target.value)}
-            placeholder="Veya resim URL'si girin"
+            placeholder="Resim URL'si girin (örn: https://example.com/image.jpg)"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
+
+          {/* Image Preview */}
           {formData.image && (
             <div className="mt-4">
+              <p className="text-sm text-gray-600 mb-2">Önizleme:</p>
               <img
                 src={formData.image}
                 alt="Önizleme"
                 className="w-full h-48 object-cover rounded-lg border"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                  alert('Resim yüklenemedi. Lütfen geçerli bir URL girin veya dosya yükleyin.');
+                }}
               />
             </div>
           )}

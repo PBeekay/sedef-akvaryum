@@ -202,10 +202,18 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       const docRef = await addDoc(collection(db, "sliders"), slide);
       const newSlider = { id: docRef.id, ...slide } as SliderData;
       setSliderData(prev => [...prev, newSlider]);
-    } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error("Firebase'e slider eklenirken hata oluştu: ", error);
+        console.log('✅ Slider başarıyla Firebase\'e eklendi:', newSlider);
       }
+    } catch (error: any) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error("❌ Firebase'e slider eklenirken hata oluştu: ", error);
+      }
+      throw new Error(
+        error?.code === 'permission-denied' 
+          ? 'Slider ekleme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
+          : error?.message || 'Slider eklenirken bir hata oluştu. Lütfen tekrar deneyin.'
+      );
     }
   };
 
@@ -216,10 +224,18 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       setSliderData(prev => prev.map(s =>
         s.id === id ? { ...s, ...slide } : s
       ));
-    } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error("Firebase'de slider güncellenirken hata oluştu: ", error);
+        console.log('✅ Slider başarıyla Firebase\'de güncellendi:', id);
       }
+    } catch (error: any) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error("❌ Firebase'de slider güncellenirken hata oluştu: ", error);
+      }
+      throw new Error(
+        error?.code === 'permission-denied' 
+          ? 'Slider güncelleme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
+          : error?.message || 'Slider güncellenirken bir hata oluştu. Lütfen tekrar deneyin.'
+      );
     }
   };
 
@@ -227,10 +243,18 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
     try {
       await deleteDoc(doc(db, "sliders", id));
       setSliderData(prev => prev.filter(s => s.id !== id));
-    } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error("Firebase'den slider silinirken hata oluştu: ", error);
+        console.log('✅ Slider başarıyla Firebase\'den silindi:', id);
       }
+    } catch (error: any) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error("❌ Firebase'den slider silinirken hata oluştu: ", error);
+      }
+      throw new Error(
+        error?.code === 'permission-denied' 
+          ? 'Slider silme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
+          : error?.message || 'Slider silinirken bir hata oluştu. Lütfen tekrar deneyin.'
+      );
     }
   };
 
