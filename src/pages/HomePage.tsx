@@ -28,8 +28,89 @@ const HomePage: React.FC = () => {
   // Hero slider data from admin context
   const heroSlides = sliderData;
 
+  type HeroSlide = typeof heroSlides extends Array<infer T> ? T : never;
+
+  const fallbackSlide: HeroSlide = {
+    id: 'fallback-slide',
+    title: 'Sedef Akvaryum Mağazası',
+    subtitle: 'Admin panelinden slider içeriği ekleyin.',
+    description: 'Gerçek zamanlı yönetim paneliyle slider içeriklerinizi ekleyin; yeni slaytlar eklediğinizde burada görüntülenecek.',
+    image: '/shrimp.png',
+    icon: '🦐',
+    buttonText: 'Ürünleri İncele',
+    buttonLink: '/category/fish',
+    category: 'fish',
+  };
+
+  const normalizedSlides: HeroSlide[] = heroSlides
+    .map((slide, index) => {
+      if (!slide) return null;
+
+      const safeTitle =
+        typeof slide.title === 'string' && slide.title.trim().length > 0
+          ? slide.title
+          : `Sedef Akvaryum Slider ${index + 1}`;
+
+      const safeSubtitle =
+        typeof slide.subtitle === 'string' && slide.subtitle.trim().length > 0
+          ? slide.subtitle
+          : 'Slider içeriğini admin panelinden düzenleyin.';
+
+      const safeDescription =
+        typeof slide.description === 'string' && slide.description.trim().length > 0
+          ? slide.description
+          : 'Başlık, açıklama ve bağlantı alanlarını doldurarak ziyaretçileriniz için dikkat çekici bir slider oluşturun.';
+
+      const safeImage =
+        typeof slide.image === 'string' && slide.image.trim().length > 0
+          ? slide.image
+          : '/shrimp.png';
+
+      const safeIcon =
+        typeof slide.icon === 'string' && slide.icon.trim().length > 0
+          ? slide.icon
+          : '🐠';
+
+      const safeButtonText =
+        typeof slide.buttonText === 'string' && slide.buttonText.trim().length > 0
+          ? slide.buttonText
+          : 'Ürünleri İncele';
+
+      const safeButtonLink =
+        typeof slide.buttonLink === 'string' && slide.buttonLink.trim().length > 0
+          ? slide.buttonLink
+          : '/category/fish';
+
+      const safeCategory =
+        typeof slide.category === 'string' && slide.category.trim().length > 0
+          ? slide.category
+          : 'fish';
+
+      return {
+        ...slide,
+        id: typeof slide.id === 'string' && slide.id.trim().length > 0 ? slide.id : `slide-${index}`,
+        title: safeTitle,
+        subtitle: safeSubtitle,
+        description: safeDescription,
+        image: safeImage,
+        icon: safeIcon,
+        buttonText: safeButtonText,
+        buttonLink: safeButtonLink,
+        category: safeCategory,
+      } as HeroSlide;
+    })
+    .filter((slide): slide is HeroSlide => slide !== null);
+
+  // Guard for empty hero slider data
+  const hasSlides = normalizedSlides.length > 0;
+
   const [currentSlide, setCurrentSlide] = useState(0);
   
+  const displaySlides = hasSlides ? normalizedSlides : [fallbackSlide];
+  const currentSlideData = displaySlides[Math.min(currentSlide, displaySlides.length - 1)];
+
+  const normalizedSlidesLength = normalizedSlides.length;
+
   // Simulate initial loading
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 800);
@@ -39,23 +120,38 @@ const HomePage: React.FC = () => {
 
   // Auto-slide functionality
   useEffect(() => {
+    if (!hasSlides || normalizedSlidesLength === 0) {
+      setCurrentSlide(0);
+      return;
+    }
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+      setCurrentSlide((prev) => (prev + 1) % normalizedSlidesLength);
     }, 5000); // Change slide every 5 seconds
 
     return () => clearInterval(interval);
-  }, [heroSlides.length]);
+  }, [hasSlides, normalizedSlidesLength]);
+
+  useEffect(() => {
+    if (hasSlides) {
+      setCurrentSlide((prev) => Math.min(prev, normalizedSlidesLength - 1));
+    } else {
+      setCurrentSlide(0);
+    }
+  }, [hasSlides, normalizedSlidesLength]);
 
   const goToSlide = (index: number) => {
+    if (!hasSlides) return;
     setCurrentSlide(index);
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    if (!hasSlides) return;
+    setCurrentSlide((prev) => (prev + 1) % normalizedSlidesLength);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+    if (!hasSlides) return;
+    setCurrentSlide((prev) => (prev - 1 + normalizedSlidesLength) % normalizedSlidesLength);
   };
 
   return (
@@ -108,26 +204,30 @@ const HomePage: React.FC = () => {
                 </h1>
                 <div className="mb-8 space-y-3">
                   <h2 className="text-2xl md:text-3xl font-bold mb-3 text-yellow-200 drop-shadow-md">
-                    {heroSlides[currentSlide].title}
+                    {currentSlideData.title}
                   </h2>
                   <p className="text-lg text-white/90 mb-3 font-medium">
-                    {heroSlides[currentSlide].subtitle}
+                    {currentSlideData.subtitle}
                   </p>
                   <p className="text-base text-white/80 leading-relaxed">
-                    {heroSlides[currentSlide].description}
+                    {currentSlideData.description}
                   </p>
                 </div>
               </div>
             </div>
 
                                       {/* Image Slider */}
-              <div className="animate-slide-up relative w-full z-20">
-               <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80">
-                {heroSlides.map((slide, index) => (
+            <div className="animate-slide-up relative w-full z-20">
+             <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80">
+              {displaySlides.map((slide, index) => (
                   <div
-                    key={slide.id}
+                  key={slide.id ?? `fallback-${index}`}
                     className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                      index === currentSlide ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+                    hasSlides
+                      ? index === currentSlide
+                        ? 'opacity-100 translate-x-0'
+                        : 'opacity-0 translate-x-full'
+                      : 'opacity-100 translate-x-0'
                     }`}
                   >
                                                                                           <img
@@ -151,9 +251,12 @@ const HomePage: React.FC = () => {
                                const slideDiv = document.createElement('div');
                                slideDiv.className = 'w-full h-80 flex items-center justify-center text-white text-4xl font-bold';
                                
-                               const backgroundStyle = slide.id === 1 ? 'linear-gradient(135deg, #1a237e, #3949ab)' :
-                                                      slide.id === 2 ? 'linear-gradient(135deg, #4a148c, #8e24aa)' :
-                                                      'linear-gradient(135deg, #d84315, #f4511e)';
+                               const gradientPalette = [
+                                 'linear-gradient(135deg, #1a237e, #3949ab)',
+                                 'linear-gradient(135deg, #4a148c, #8e24aa)',
+                                 'linear-gradient(135deg, #d84315, #f4511e)'
+                               ];
+                               const backgroundStyle = gradientPalette[index % gradientPalette.length];
                                slideDiv.style.background = backgroundStyle;
                                
                                const centerDiv = document.createElement('div');
@@ -188,30 +291,37 @@ const HomePage: React.FC = () => {
               </div>
 
               {/* Navigation Arrows */}
-              <button
-                onClick={prevSlide}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
-                aria-label="Önceki slayt"
-              >
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                onClick={nextSlide}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
-                aria-label="Sonraki slayt"
-              >
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+            {hasSlides && (
+              <>
+                <button
+                  onClick={prevSlide}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
+                  aria-label="Önceki slayt"
+                  type="button"
+                >
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
+                  aria-label="Sonraki slayt"
+                  type="button"
+                >
+                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
             </div>
           </div>
 
           {/* Slide Indicators */}
+        {hasSlides && (
           <div className="flex justify-center mt-10 space-x-3">
-            {heroSlides.map((_, index) => (
+            {normalizedSlides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
@@ -221,9 +331,11 @@ const HomePage: React.FC = () => {
                     : 'w-3 h-3 bg-white/50 hover:bg-white/75 hover:scale-125'
                 }`}
                 aria-label={`Slayt ${index + 1}`}
+                type="button"
               />
             ))}
           </div>
+        )}
         </div>
       </section>
 
