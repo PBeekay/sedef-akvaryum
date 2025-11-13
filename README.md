@@ -182,19 +182,8 @@ npm run type-check
    REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
    REACT_APP_FIREBASE_APP_ID=your_app_id
    REACT_APP_GA_MEASUREMENT_ID=your_ga_id
-   REACT_APP_ADMIN_EMAIL=admin@yourdomain.com
-   REACT_APP_MODERATOR_EMAIL=moderator@yourdomain.com
    NODE_ENV=production
    GENERATE_SOURCEMAP=false
-   ```
-
-4. **Security Headers:**
-   ```
-   Content-Security-Policy: [CSP değeri]
-   X-Frame-Options: DENY
-   X-Content-Type-Options: nosniff
-   Referrer-Policy: strict-origin-when-cross-origin
-   X-XSS-Protection: 1; mode=block
    ```
 
 ### Firebase Hosting
