@@ -6,20 +6,10 @@ import GoogleReviews from '../components/GoogleReviews';
 import { useAdmin } from '../context/AdminContext';
 import { ProductGridSkeleton } from '../components/SkeletonLoader';
 import LogoLoop from '../components/LogoLoop';
-import PullToRefresh from '../components/PullToRefresh';
-import { usePullToRefresh } from '../hooks/useSwipe';
 
 const HomePage: React.FC = () => {
   const { sliderData, products } = useAdmin();
   const [isLoading, setIsLoading] = useState(true);
-
-  // Pull to refresh
-  const handleRefresh = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    window.location.reload();
-  };
-
-  const { pullDistance, isRefreshing, refreshThreshold } = usePullToRefresh(handleRefresh);
   
   // Get featured and new products from admin context
   const featuredProducts = products.filter(product => product.featured);
@@ -133,12 +123,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Pull to Refresh Indicator */}
-      <PullToRefresh
-        pullDistance={pullDistance}
-        isRefreshing={isRefreshing}
-        refreshThreshold={refreshThreshold}
-      />
       {/* Hero Section with Slider */}
       <section className="relative bg-gradient-to-br from-ocean-600 via-primary-600 to-secondary-500 text-white py-20 overflow-hidden">
         {/* Background Video */}

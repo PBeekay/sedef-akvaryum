@@ -9,6 +9,7 @@ import BackToTop from './components/BackToTop';
 import ScrollProgressBar from './components/ScrollProgressBar';
 import RouteChangeTracker from './components/RouteChangeTracker';
 import PageLoader from './components/PageLoader';
+import useDisablePullToRefresh from './hooks/useDisablePullToRefresh';
 
 import { AuthProvider } from './context/AuthContext';
 import { AdminProvider } from './context/AdminContext';
@@ -31,6 +32,8 @@ const SuspenseLoader: React.FC = () => <PageLoader />;
 const AppContent: React.FC = () => {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith('/admin');
+
+  useDisablePullToRefresh();
 
   return (
     <>

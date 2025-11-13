@@ -126,10 +126,24 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Mobil tarayıcılarda pull-to-refresh'i devre dışı bırak */
+    overscroll-behavior-y: none;
+    /* iOS Safari'de pull-to-refresh'i devre dışı bırak */
+    -webkit-overflow-scrolling: touch;
   }
   
   body {
     font-family: 'Inter', system-ui, sans-serif;
+    /* Mobil tarayıcılarda pull-to-refresh'i devre dışı bırak */
+    overscroll-behavior-y: none;
+    /* Sayfa yenilemeyi önle */
+    touch-action: pan-y;
+  }
+  
+  /* Ana container için de overscroll-behavior ekle */
+  #root {
+    overscroll-behavior-y: none;
+    min-height: 100vh;
   }
   
   /* Accessibility - Respect reduced motion preference */
