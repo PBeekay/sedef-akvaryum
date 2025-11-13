@@ -29,6 +29,11 @@ const useDisablePullToRefresh = () => {
       document.body.scrollTop > 0;
 
     const handleTouchStart = (event: TouchEvent) => {
+      if (document.body.style.overflow === 'hidden') {
+        maybePreventPullToRefresh = false;
+        return;
+      }
+
       if (event.touches.length !== 1) {
         return;
       }
@@ -38,6 +43,11 @@ const useDisablePullToRefresh = () => {
     };
 
     const handleTouchMove = (event: TouchEvent) => {
+      if (document.body.style.overflow === 'hidden') {
+        maybePreventPullToRefresh = false;
+        return;
+      }
+
       if (!maybePreventPullToRefresh) {
         return;
       }
