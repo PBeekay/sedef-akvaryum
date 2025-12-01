@@ -14,6 +14,12 @@ const HomePage: React.FC = () => {
   const featuredProducts = products.filter(product => product.featured);
   const newProducts = products.filter(product => product.new);
 
+  // Limit initially visible items for performance
+  const [showAllFeatured, setShowAllFeatured] = useState(false);
+  const [showAllNew, setShowAllNew] = useState(false);
+  const visibleFeatured = showAllFeatured ? featuredProducts : featuredProducts.slice(0, 8);
+  const visibleNew = showAllNew ? newProducts : newProducts.slice(0, 8);
+
   // Hero slider data from admin context
   const fallbackSlide = React.useMemo(() => ({
     id: 'fallback-slide',
@@ -368,12 +374,24 @@ const HomePage: React.FC = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {featuredProducts.map((product) => (
+            {visibleFeatured.map((product) => (
               <ProductCard key={product.id} product={product} showDetails={false} />
             ))}
           </div>
           
-          <div className="text-center mt-12">
+          <div className="flex flex-col items-center mt-12 gap-4">
+            {featuredProducts.length > 8 && (
+              <button
+                type="button"
+                onClick={() => setShowAllFeatured((prev) => !prev)}
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-primary-200 text-primary-700 font-semibold bg-white hover:bg-primary-50 hover:border-primary-400 transition-colors duration-200 shadow-sm"
+              >
+                {showAllFeatured ? 'Daha Az Göster' : 'Tüm Öne Çıkan Ürünleri Görüntüle'}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={showAllFeatured ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'} />
+                </svg>
+              </button>
+            )}
             <Link
               to="/category/fish"
               className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-ocean-500 to-primary-500 text-white font-bold text-lg rounded-xl hover:from-ocean-600 hover:to-primary-600 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform"
@@ -413,10 +431,25 @@ const HomePage: React.FC = () => {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {newProducts.map((product) => (
+              {visibleNew.map((product) => (
                 <ProductCard key={product.id} product={product} showDetails={false} />
               ))}
             </div>
+
+            {newProducts.length > 8 && (
+              <div className="flex justify-center mt-10">
+                <button
+                  type="button"
+                  onClick={() => setShowAllNew((prev) => !prev)}
+                  className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-emerald-200 text-emerald-700 font-semibold bg-white hover:bg-emerald-50 hover:border-emerald-400 transition-colors duration-200 shadow-sm"
+                >
+                  {showAllNew ? 'Daha Az Göster' : 'Tüm Yeni Ürünleri Görüntüle'}
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={showAllNew ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'} />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </section>
       )}
