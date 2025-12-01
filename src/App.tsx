@@ -8,7 +8,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
 import ScrollProgressBar from './components/ScrollProgressBar';
 import RouteChangeTracker from './components/RouteChangeTracker';
-import PageLoader from './components/PageLoader';
 import useDisablePullToRefresh from './hooks/useDisablePullToRefresh';
 
 import { AuthProvider } from './context/AuthContext';
@@ -25,8 +24,8 @@ const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
-// Loading component for Suspense fallback - Use our custom PageLoader
-const SuspenseLoader: React.FC = () => <PageLoader />;
+// Loading component for Suspense fallback - keep UI boş, ekstra ekran gösterme
+const SuspenseLoader: React.FC = () => null;
 
 // Inner component to use useLocation hook
 const AppContent: React.FC = () => {

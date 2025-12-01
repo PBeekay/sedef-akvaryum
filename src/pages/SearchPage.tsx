@@ -5,6 +5,8 @@ import ProductCard from '../components/ProductCard';
 import SearchBar from '../components/SearchBar';
 import { ProductGridSkeleton } from '../components/SkeletonLoader';
 import { useAdmin } from '../context/AdminContext';
+import SEO from '../components/SEO';
+import VirtualProductList from '../components/VirtualProductList';
 
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -132,6 +134,11 @@ const SearchPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <SEO
+        title={query ? `"${query}" Arama Sonuçları - Sedef Akvaryum` : 'Akvaryum Ürünleri Ara - Sedef Akvaryum Eskişehir'}
+        description={query ? `"${query}" için akvaryum ürünleri arama sonuçları. Süs balığı, karides, akvaryum bitkileri ve tüm akvaryum malzemelerinde arama yapın.` : 'Sedef Akvaryum\'da akvaryum ürünleri arayın. Süs balığı, karides, bitki, yem ve tüm akvaryum malzemelerini bulun.'}
+        keywords={`akvaryum arama, ${query ? query + ', ' : ''}akvaryum ürünleri, süs balığı, karides, akvaryum malzemeleri, eskişehir akvaryum`}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Arama başlığı - Enhanced */}
         <div className="mb-12 animate-fade-in">
@@ -229,11 +236,20 @@ const SearchPage: React.FC = () => {
         {isLoading ? (
           <ProductGridSkeleton count={8} />
         ) : searchResults.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-fade-in">
-            {searchResults.map((product) => (
-              <ProductCard key={product.id} product={product} showDetails={true} />
-            ))}
-          </div>
+          searchResults.length > 40 ? (
+            <VirtualProductList
+              products={searchResults}
+              containerHeight={800}
+              itemHeight={420}
+              className="animate-fade-in"
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-fade-in">
+              {searchResults.map((product) => (
+                <ProductCard key={product.id} product={product} showDetails={true} />
+              ))}
+            </div>
+          )
         ) : query ? (
           <div className="text-center py-20 animate-fade-in">
             <div className="inline-block mb-6">

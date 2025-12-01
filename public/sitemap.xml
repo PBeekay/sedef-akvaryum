@@ -1,51 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://sedefakvaryum.com/</loc>
-    <lastmod>2024-01-15</lastmod>
+    <loc>https://sedefakvaryum.com.tr/</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/" />
   </url>
   <url>
-    <loc>https://sedefakvaryum.com/category/shrimp</loc>
-    <lastmod>2024-01-15</lastmod>
+    <loc>https://sedefakvaryum.com.tr/category/shrimp</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/category/shrimp" />
+  </url>
+  <url>
+    <loc>https://sedefakvaryum.com.tr/category/fish</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/category/fish" />
+  </url>
+  <url>
+    <loc>https://sedefakvaryum.com.tr/category/plants</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/category/plants" />
+  </url>
+  <url>
+    <loc>https://sedefakvaryum.com.tr/category/food</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/category/food" />
+  </url>
+  <url>
+    <loc>https://sedefakvaryum.com.tr/category/equipment</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/category/equipment" />
+  </url>
+  <url>
+    <loc>https://sedefakvaryum.com.tr/category/accessories</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/category/accessories" />
+  </url>
+  <url>
+    <loc>https://sedefakvaryum.com.tr/category/health</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/category/health" />
   </url>
   <url>
-    <loc>https://sedefakvaryum.com/category/fish</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sedefakvaryum.com/category/food</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sedefakvaryum.com/category/accessories</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://sedefakvaryum.com/contact</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://sedefakvaryum.com/guide</loc>
-    <lastmod>2024-01-15</lastmod>
+    <loc>https://sedefakvaryum.com.tr/contact</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/contact" />
   </url>
   <url>
-    <loc>https://sedefakvaryum.com/search</loc>
-    <lastmod>2024-01-15</lastmod>
+    <loc>https://sedefakvaryum.com.tr/search</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/search" />
   </url>
 </urlset>

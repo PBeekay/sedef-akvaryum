@@ -4,6 +4,7 @@ import { categories } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import { useAdmin } from '../context/AdminContext';
 import { ProductGridSkeleton, CategoryHeaderSkeleton } from '../components/SkeletonLoader';
+import SEO from '../components/SEO';
 
 const CategoryPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -81,8 +82,64 @@ const CategoryPage: React.FC = () => {
 
   const categoryInfo = getCategoryDescription(categoryId || '');
 
+  // SEO optimization for each category
+  const getCategorySEO = () => {
+    const seoData: Record<string, { title: string; description: string; keywords: string }> = {
+      fish: {
+        title: 'Süs Balığı - Akvaryum Balıkları | Sedef Akvaryum Eskişehir',
+        description: 'Eskişehir\'de süs balığı satışı. Guppy, platy, betta, discus, tetra ve daha fazla akvaryum balığı çeşidi. Akvaryum balığı fiyatları ve bakım bilgileri. Kaliteli süs balıkları için akvaryum mağazamızı ziyaret edin.',
+        keywords: 'akvaryum balığı, süs balığı, akvaryum balıkları, guppy, platy, betta, discus, tetra, eskişehir balık, akvaryum balığı satışı, akvaryum balığı fiyatları'
+      },
+      shrimp: {
+        title: 'Akvaryum Karidesi - Neocaridina, Caridina | Sedef Akvaryum',
+        description: 'Eskişehir\'de akvaryum karidesi satışı. Neocaridina, Caridina ve diğer akvaryum karidesı türleri. Akvaryum karides bakımı ve fiyatları. Sağlıklı akvaryum karideslerini mağazamızdan temin edin.',
+        keywords: 'akvaryum karidesi, neocaridina, caridina, akvaryum karides, karides satışı, eskişehir karides, akvaryum karides bakımı, akvaryum karides fiyatları'
+      },
+      plants: {
+        title: 'Akvaryum Bitkisi - Akvaryum Bitkileri | Sedef Akvaryum',
+        description: 'Eskişehir\'de akvaryum bitkisi satışı. Tatlı su akvaryum bitkileri, bitki bakımı ve akvaryum bitki fiyatları. Akvaryumunuz için kaliteli bitkiler ve akvaryum bitki gübresi.',
+        keywords: 'akvaryum bitkisi, akvaryum bitkileri, akvaryum bitki satışı, tatlı su bitkileri, eskişehir akvaryum bitkisi, akvaryum bitki bakımı, akvaryum bitki gübresi'
+      },
+      equipment: {
+        title: 'Akvaryum Ekipmanları - Akvaryum Filtresi, Işık | Sedef Akvaryum',
+        description: 'Eskişehir\'de akvaryum ekipmanları. Akvaryum filtresi, akvaryum ışığı, akvaryum ısıtıcısı, hava pompası ve tüm akvaryum malzemeleri. Akvaryum kurulumu için gerekli ekipmanlar.',
+        keywords: 'akvaryum ekipmanları, akvaryum filtresi, akvaryum ışığı, akvaryum ısıtıcısı, akvaryum pompası, eskişehir akvaryum ekipman, akvaryum kurulumu, akvaryum malzemeleri'
+      },
+      accessories: {
+        title: 'Akvaryum Aksesuarları - Dekorasyon ve Aksesuar | Sedef Akvaryum',
+        description: 'Eskişehir\'de akvaryum aksesuarları. Akvaryum dekorasyon, akvaryum süsleri, akvaryum taşları, kökleri ve tüm akvaryum aksesuar çeşitleri. Akvaryumunuzu güzelleştirin.',
+        keywords: 'akvaryum aksesuarları, akvaryum dekorasyon, akvaryum süsleri, akvaryum taşları, akvaryum kökü, eskişehir akvaryum aksesuar, akvaryum malzemeleri'
+      },
+      food: {
+        title: 'Akvaryum Yemi - Balık Yemi, Karides Yemi | Sedef Akvaryum',
+        description: 'Eskişehir\'de akvaryum yemi satışı. Balık yemi, karides yemi, toz yem ve tablet yem çeşitleri. Kaliteli akvaryum yemleri ile sağlıklı beslenme. Akvaryum yem fiyatları.',
+        keywords: 'akvaryum yemi, balık yemi, karides yemi, akvaryum yem satışı, toz yem, tablet yem, eskişehir akvaryum yemi, akvaryum yem fiyatları'
+      }
+    };
+    return seoData[categoryId || ''] || {
+      title: `${category.name} | Sedef Akvaryum Eskişehir`,
+      description: categoryInfo.short,
+      keywords: `akvaryum, ${category.name.toLowerCase()}, eskişehir akvaryum`
+    };
+  };
+
+  const categorySEO = getCategorySEO();
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <SEO
+        title={categorySEO.title}
+        description={categorySEO.description}
+        keywords={categorySEO.keywords}
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          "name": category.name,
+          "description": categoryInfo.short,
+          "url": `https://sedefakvaryum.com.tr/category/${categoryId}`,
+          "numberOfItems": filteredAndSortedProducts.length
+        }}
+      />
       {/* Category Banner */}
       <div className="relative bg-gradient-to-r from-ocean-500 via-primary-500 to-secondary-500 text-white py-16 overflow-hidden">
         {/* Animated background */}

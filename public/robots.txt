@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://sedefakvaryum.com/sitemap.xml
+Sitemap: https://sedefakvaryum.com.tr/sitemap.xml
 
 # Disallow admin pages
 Disallow: /admin

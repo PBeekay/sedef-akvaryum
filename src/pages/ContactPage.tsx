@@ -1,9 +1,22 @@
 import React from 'react';
 import { SEDEF_AKVARYUM_GOOGLE_MAPS_URL } from '../utils/googlePlaces';
+import SEO from '../components/SEO';
 
 const ContactPage: React.FC = () => {
   return (
     <div className="min-h-screen py-16 bg-gradient-to-br from-ocean-50 via-white to-primary-50 relative overflow-hidden">
+      <SEO
+        title="İletişim - Sedef Akvaryum | Eskişehir Akvaryum Mağazası"
+        description="Sedef Akvaryum iletişim bilgileri. Eskişehir'de akvaryum mağazamıza ulaşın. Adres, telefon, çalışma saatleri ve akvaryum danışmanlığı için bizi arayın. Akvaryum ürünleri hakkında bilgi alın."
+        keywords="sedef akvaryum iletişim, eskişehir akvaryum, akvaryum mağazası adres, akvaryum telefon, akvaryum danışmanlık"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          "name": "Sedef Akvaryum İletişim",
+          "description": "Eskişehir Sedef Akvaryum iletişim bilgileri",
+          "url": "https://sedefakvaryum.com.tr/contact"
+        }}
+      />
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-72 h-72 bg-ocean-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-bounce-gentle"></div>

@@ -23,13 +23,25 @@ const useDisablePullToRefresh = () => {
     let lastTouchY = 0;
     let maybePreventPullToRefresh = false;
 
+    const isInteractiveElement = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) {
+        return false;
+      }
+
+      return Boolean(
+        target.closest(
+          'button, a, input, select, textarea, label, [role="button"], [role="link"], [data-touch-interactive="true"]'
+        )
+      );
+    };
+
     const canScrollUp = () =>
       window.scrollY > 0 ||
       document.documentElement.scrollTop > 0 ||
       document.body.scrollTop > 0;
 
     const handleTouchStart = (event: TouchEvent) => {
-      if (document.body.style.overflow === 'hidden') {
+      if (document.body.style.overflow === 'hidden' || isInteractiveElement(event.target)) {
         maybePreventPullToRefresh = false;
         return;
       }
@@ -43,7 +55,7 @@ const useDisablePullToRefresh = () => {
     };
 
     const handleTouchMove = (event: TouchEvent) => {
-      if (document.body.style.overflow === 'hidden') {
+      if (document.body.style.overflow === 'hidden' || isInteractiveElement(event.target)) {
         maybePreventPullToRefresh = false;
         return;
       }

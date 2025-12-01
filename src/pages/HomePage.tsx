@@ -4,12 +4,11 @@ import { categories } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import GoogleReviews from '../components/GoogleReviews';
 import { useAdmin } from '../context/AdminContext';
-import { ProductGridSkeleton } from '../components/SkeletonLoader';
 import LogoLoop from '../components/LogoLoop';
+import SEO from '../components/SEO';
 
 const HomePage: React.FC = () => {
   const { sliderData, products } = useAdmin();
-  const [isLoading, setIsLoading] = useState(true);
   
   // Get featured and new products from admin context
   const featuredProducts = products.filter(product => product.featured);
@@ -75,13 +74,6 @@ const HomePage: React.FC = () => {
 
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Simulate initial loading
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
-  
-
   // Auto-slide functionality
   useEffect(() => {
     if (heroSlides.length === 0) {
@@ -123,54 +115,67 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section with Slider */}
-      <section className="relative bg-gradient-to-br from-ocean-600 via-primary-600 to-secondary-500 text-white py-20 overflow-hidden">
-        {/* Background Video */}
-        <div className="absolute inset-0 z-0">
-          <video
-            className="w-full h-full object-cover"
-            src="/videos/133871-758336534_small.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            onLoadStart={() => console.log('Video loading started')}
-            onCanPlay={() => console.log('Video can play')}
-            onError={(e) => console.error('Video error:', e)}
-          />
-          {/* Dark overlay for readability */}
-          <div className="absolute inset-0 bg-black/40" />
-        </div>
-        {/* Animated Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full">
-            <div className="absolute top-20 left-20 w-96 h-96 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-bounce-gentle"></div>
-            <div className="absolute bottom-20 right-20 w-96 h-96 bg-yellow-300 rounded-full mix-blend-overlay filter blur-3xl animate-bounce-gentle" style={{ animationDelay: '2s' }}></div>
-          </div>
-        </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <SEO
+        title="Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası - Süs Balığı, Karides ve Akvaryum Malzemeleri"
+        description="Eskişehir'de akvaryum mağazası arıyorsanız Sedef Akvaryum tam size göre! Süs balığı, akvaryum karidesi, akvaryum bitkileri, akvaryum yemi, akvaryum filtresi ve tüm akvaryum malzemeleri. Uzman akvaryum danışmanlığı, akvaryum kurulumu ve hızlı teslimat. Akvaryum hobiniz için güvenilir adres."
+        keywords="akvaryum, akvaryum mağazası, akvaryum malzemeleri, süs balığı, akvaryum karidesi, akvaryum bitkileri, akvaryum yemi, akvaryum filtresi, akvaryum ekipmanları, eskişehir akvaryum, akvaryum kurulumu, akvaryum bakımı, akvaryum hobisi, neocaridina, caridina, guppy, platy, betta, discus, tetra"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Sedef Akvaryum Ana Sayfa",
+          "description": "Eskişehir'in en güvenilir akvaryum mağazası. Süs balığı, akvaryum karidesi ve tüm akvaryum malzemeleri.",
+          "url": "https://sedefakvaryum.com.tr/",
+          "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Akvaryum Karidesleri"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Süs Balıkları"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Akvaryum Bitkileri"
+              },
+              {
+                "@type": "ListItem",
+                "position": 4,
+                "name": "Akvaryum Ekipmanları"
+              }
+            ]
+          }
+        }}
+      />
+      {/* Hero Section with Slider (video kaldırıldı, sade beyaz arka plan) */}
+      <section className="bg-white py-16 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
-            <div className="animate-fade-in relative z-20">
+            <div className="animate-fade-in">
               <div className="transition-all duration-500 ease-in-out">
                 <div className="inline-block mb-4">
-                  <span className="px-4 py-2 bg-yellow-400/20 backdrop-blur-sm rounded-full text-yellow-200 text-sm font-semibold border border-yellow-300/30">
+                  <span className="px-4 py-2 bg-ocean-50 rounded-full text-ocean-600 text-sm font-semibold border border-ocean-100">
                     ✨ Akvaryum Uzmanları
                   </span>
                 </div>
-                <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight">
+                <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight text-gray-900">
                   Hoş Geldiniz{' '}
-                  <span className="block text-yellow-300 drop-shadow-lg">Sedef Akvaryum</span>
+                  <span className="block text-ocean-600">Sedef Akvaryum</span>
                 </h1>
                 <div className="mb-8 space-y-3">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-3 text-yellow-200 drop-shadow-md">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-3 text-gray-800">
                     {heroSlides[currentSlide]?.title || heroSlides[0]?.title || 'Sedef Akvaryum'}
                   </h2>
-                  <p className="text-lg text-white/90 mb-3 font-medium">
+                  <p className="text-lg text-gray-700 mb-3 font-medium">
                     {heroSlides[currentSlide]?.subtitle || heroSlides[0]?.subtitle || ''}
                   </p>
-                  <p className="text-base text-white/80 leading-relaxed">
+                  <p className="text-base text-gray-600 leading-relaxed">
                     {heroSlides[currentSlide]?.description || heroSlides[0]?.description || ''}
                   </p>
                 </div>
@@ -178,8 +183,8 @@ const HomePage: React.FC = () => {
             </div>
 
                                       {/* Image Slider */}
-            <div className="animate-slide-up relative w-full z-20">
-             <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80">
+            <div className="animate-slide-up relative w-full">
+             <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80 bg-gray-50">
               {heroSlides.map((slide, index) => (
                 <div
                   key={slide.id || `slide-${index}`}
@@ -238,7 +243,7 @@ const HomePage: React.FC = () => {
                              }
                            }}
                          />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                     <div className="absolute bottom-4 left-4 bg-white text-gray-800 p-4 rounded-xl shadow-lg">
                       <div className="text-2xl font-bold">{slide.icon}</div>
                       <p className="text-sm font-medium">{slide.title}</p>
@@ -250,7 +255,7 @@ const HomePage: React.FC = () => {
               {/* Navigation Arrows */}
             <button
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 rounded-full p-3 transition-all duration-300 hover:scale-110 shadow-lg z-20"
               aria-label="Önceki slayt"
               type="button"
             >
@@ -260,7 +265,7 @@ const HomePage: React.FC = () => {
             </button>
             <button
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all duration-300 backdrop-blur-md hover:scale-110 shadow-lg z-20"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 rounded-full p-3 transition-all duration-300 hover:scale-110 shadow-lg z-20"
               aria-label="Sonraki slayt"
               type="button"
             >
@@ -362,15 +367,11 @@ const HomePage: React.FC = () => {
             </p>
           </div>
           
-          {isLoading ? (
-            <ProductGridSkeleton count={8} />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-              {featuredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} showDetails={false} />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} showDetails={false} />
+            ))}
+          </div>
           
           <div className="text-center mt-12">
             <Link

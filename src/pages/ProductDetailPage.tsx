@@ -5,6 +5,7 @@ import ProductCard from '../components/ProductCard';
 import { useAdmin } from '../context/AdminContext';
 import { ProductDetailSkeleton } from '../components/SkeletonLoader';
 import ImageGallery from '../components/ImageGallery';
+import SEO from '../components/SEO';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -71,8 +72,50 @@ const ProductDetailPage: React.FC = () => {
     ? product.images 
     : product.image ? [product.image] : [];
 
+  // Get category name in Turkish
+  const categoryNames: Record<string, string> = {
+    fish: 'Süs Balığı',
+    shrimp: 'Akvaryum Karidesi',
+    plants: 'Akvaryum Bitkisi',
+    equipment: 'Akvaryum Ekipmanı',
+    accessories: 'Akvaryum Aksesuarı',
+    food: 'Akvaryum Yemi'
+  };
+  const categoryName = categoryNames[product.category] || 'Akvaryum Ürünü';
+
   return (
     <div className="min-h-screen py-8 bg-gradient-to-b from-gray-50 to-white">
+      <SEO
+        title={`${product.name} - ${categoryName} | Sedef Akvaryum Eskişehir`}
+        description={`${product.name} - ${product.description || `${categoryName} satışı`}. Akvaryum ürünleri ve malzemeleri Eskişehir'de. Fiyat: ${product.price.toFixed(2)}₺. Hızlı teslimat ve uzman danışmanlık.`}
+        keywords={`${product.name}, ${categoryName.toLowerCase()}, akvaryum, akvaryum malzemeleri, eskişehir akvaryum, ${product.category}, akvaryum ürünleri`}
+        image={productImages[0] || 'https://sedefakvaryum.com.tr/shrimp.png'}
+        type="product"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": product.name,
+          "description": product.description || `${categoryName} - ${product.name}`,
+          "image": productImages,
+          "brand": {
+            "@type": "Brand",
+            "name": "Sedef Akvaryum"
+          },
+          "offers": {
+            "@type": "Offer",
+            "url": `https://sedefakvaryum.com.tr/product/${product.id}`,
+            "priceCurrency": "TRY",
+            "price": product.price.toFixed(2),
+            "availability": product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "seller": {
+              "@type": "Organization",
+              "name": "Sedef Akvaryum"
+            }
+          },
+          "category": categoryName,
+          "sku": product.id
+        }}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb - Enhanced */}
         <nav className="mb-8 animate-fade-in">
