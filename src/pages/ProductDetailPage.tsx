@@ -13,8 +13,8 @@ const ProductDetailPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const product = products.find(p => p.id === id);
   
-  // Debug: Bitki ürünleri için console log
-  if (product && product.category === 'plants') {
+  // Debug: Bitki ürünleri için console log (sadece development)
+  if (process.env.NODE_ENV === 'development' && product && product.category === 'plants') {
     console.log('Plant product data:', {
       id: product.id,
       name: product.name,

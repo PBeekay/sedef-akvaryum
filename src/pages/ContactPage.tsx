@@ -65,15 +65,15 @@ const ContactPage: React.FC = () => {
                 <div className="ml-2 space-y-3 text-gray-700">
                   <div className="flex justify-between items-center bg-white/60 rounded-lg p-2 px-3">
                     <span className="font-semibold">Pazartesi - Cuma:</span>
-                    <span className="text-blue-600 font-bold">09:00 - 20:00</span>
+                    <span className="text-blue-600 font-bold">10:00 - 20:00</span>
                   </div>
                   <div className="flex justify-between items-center bg-white/60 rounded-lg p-2 px-3">
                     <span className="font-semibold">Cumartesi:</span>
-                    <span className="text-blue-600 font-bold">10:00 - 18:00</span>
+                    <span className="text-blue-600 font-bold">10:00 - 20:00</span>
                   </div>
                   <div className="flex justify-between items-center bg-white/60 rounded-lg p-2 px-3">
                     <span className="font-semibold">Pazar:</span>
-                    <span className="text-blue-600 font-bold">12:00 - 18:00</span>
+                    <span className="text-blue-600 font-bold">14:00 - 18:00</span>
                   </div>
                 </div>
               </div>
