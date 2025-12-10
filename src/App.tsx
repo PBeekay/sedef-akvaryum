@@ -8,6 +8,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
 import ScrollProgressBar from './components/ScrollProgressBar';
 import RouteChangeTracker from './components/RouteChangeTracker';
+import SnowEffect from './components/SnowEffect';
 import useDisablePullToRefresh from './hooks/useDisablePullToRefresh';
 
 import { AuthProvider } from './context/AuthContext';
@@ -81,6 +82,9 @@ const AppContent: React.FC = () => {
 
         {/* Scroll Progress Bar */}
         <ScrollProgressBar />
+
+        {/* Snow Effect - Hide on admin pages */}
+        {!isAdminPage && <SnowEffect enabled={true} intensity="medium" />}
 
         {/* Bottom Navigation (Mobile Only) */}
         <BottomNav />

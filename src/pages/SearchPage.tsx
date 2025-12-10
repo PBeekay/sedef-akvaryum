@@ -241,6 +241,9 @@ const SearchPage: React.FC = () => {
               products={searchResults}
               containerHeight={800}
               itemHeight={420}
+              columns={4}
+              showScrollIndicator={true}
+              showProductCount={true}
               className="animate-fade-in"
             />
           ) : (
