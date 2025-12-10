@@ -4,7 +4,7 @@ import SEO from '../components/SEO';
 
 const ContactPage: React.FC = () => {
   return (
-    <div className="min-h-screen py-16 bg-gradient-to-br from-ocean-50 via-white to-primary-50 relative overflow-hidden">
+    <div className="min-h-screen py-16 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       <SEO
         title="İletişim - Sedef Akvaryum | Eskişehir Akvaryum Mağazası"
         description="Sedef Akvaryum iletişim bilgileri. Eskişehir'de akvaryum mağazamıza ulaşın. Adres, telefon, çalışma saatleri ve akvaryum danışmanlığı için bizi arayın. Akvaryum ürünleri hakkında bilgi alın."
@@ -31,11 +31,11 @@ const ContactPage: React.FC = () => {
             <span className="text-6xl animate-bounce-gentle inline-block">📬</span>
           </div>
           <h1 className="text-5xl md:text-6xl font-extrabold mb-6">
-            <span className="bg-gradient-to-r from-ocean-600 via-primary-600 to-secondary-600 bg-clip-text text-transparent">
+            <span className="text-white">
               İletişim
             </span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto font-medium">
+          <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto font-medium">
             Sorularınız için bize ulaşın - Size yardımcı olmak için buradayız! 💬
           </p>
          </div>

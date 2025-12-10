@@ -126,7 +126,7 @@ const CategoryPage: React.FC = () => {
   const categorySEO = getCategorySEO();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <SEO
         title={categorySEO.title}
         description={categorySEO.description}
@@ -187,8 +187,8 @@ const CategoryPage: React.FC = () => {
         ) : (
           <div className="text-center py-20 animate-fade-in">
             <div className="text-6xl mb-4">😔</div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">Ürün Bulunamadı</h3>
-            <p className="text-gray-600 mb-6">Bu kategoride henüz ürün bulunmuyor.</p>
+            <h3 className="text-2xl font-bold text-white mb-2">Ürün Bulunamadı</h3>
+            <p className="text-white/80 mb-6">Bu kategoride henüz ürün bulunmuyor.</p>
           </div>
         )}
 

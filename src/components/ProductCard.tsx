@@ -11,7 +11,7 @@ const ProductCard: React.FC<ProductCardProps> = memo(({ product, showDetails = f
   return (
     <Link 
       to={`/product/${product.id}`} 
-      className="group block bg-white rounded-lg border border-gray-200 hover:border-primary-300 hover:shadow-lg active:scale-98 transition-all duration-200 overflow-hidden touch-manipulation"
+      className="group block bg-white/80 backdrop-blur-sm rounded-lg border border-white/30 hover:border-primary-300 hover:shadow-lg active:scale-98 transition-all duration-200 overflow-hidden touch-manipulation"
     >
       {/* Image Section - Compact */}
       <div className="relative overflow-hidden bg-gray-100">

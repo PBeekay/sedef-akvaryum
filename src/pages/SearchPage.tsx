@@ -133,7 +133,7 @@ const SearchPage: React.FC = () => {
   // };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <SEO
         title={query ? `"${query}" Arama Sonuçları - Sedef Akvaryum` : 'Akvaryum Ürünleri Ara - Sedef Akvaryum Eskişehir'}
         description={query ? `"${query}" için akvaryum ürünleri arama sonuçları. Süs balığı, karides, akvaryum bitkileri ve tüm akvaryum malzemelerinde arama yapın.` : 'Sedef Akvaryum\'da akvaryum ürünleri arayın. Süs balığı, karides, bitki, yem ve tüm akvaryum malzemelerini bulun.'}

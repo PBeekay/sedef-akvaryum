@@ -84,7 +84,7 @@ const ProductDetailPage: React.FC = () => {
   const categoryName = categoryNames[product.category] || 'Akvaryum Ürünü';
 
   return (
-    <div className="min-h-screen py-8 bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen py-8 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <SEO
         title={`${product.name} - ${categoryName} | Sedef Akvaryum Eskişehir`}
         description={`${product.name} - ${product.description || `${categoryName} satışı`}. Akvaryum ürünleri ve malzemeleri Eskişehir'de. Fiyat: ${product.price.toFixed(2)}₺. Hızlı teslimat ve uzman danışmanlık.`}

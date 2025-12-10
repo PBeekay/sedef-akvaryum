@@ -83,8 +83,8 @@ const AppContent: React.FC = () => {
         {/* Scroll Progress Bar */}
         <ScrollProgressBar />
 
-        {/* Snow Effect - Hide on admin pages */}
-        {!isAdminPage && <SnowEffect enabled={true} intensity="medium" />}
+        {/* Snow Effect - Light intensity for all pages, hide on admin pages */}
+        {!isAdminPage && <SnowEffect enabled={true} intensity="light" />}
 
         {/* Bottom Navigation (Mobile Only) */}
         <BottomNav />

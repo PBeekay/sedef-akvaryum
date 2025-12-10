@@ -120,7 +120,7 @@ const HomePage: React.FC = () => {
   }, [heroSlides.length, currentSlide]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
       <SEO
         title="Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası - Süs Balığı, Karides ve Akvaryum Malzemeleri"
         description="Eskişehir'de akvaryum mağazası arıyorsanız Sedef Akvaryum tam size göre! Süs balığı, akvaryum karidesi, akvaryum bitkileri, akvaryum yemi, akvaryum filtresi ve tüm akvaryum malzemeleri. Uzman akvaryum danışmanlığı, akvaryum kurulumu ve hızlı teslimat. Akvaryum hobiniz için güvenilir adres."
@@ -158,30 +158,30 @@ const HomePage: React.FC = () => {
           }
         }}
       />
-      {/* Hero Section with Slider (video kaldırıldı, sade beyaz arka plan) */}
-      <section className="bg-white py-16 border-b border-gray-100">
+      {/* Hero Section with Slider (yılbaşı teması) */}
+      <section className="bg-white/10 backdrop-blur-sm py-16 border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
             <div className="animate-fade-in">
               <div className="transition-all duration-500 ease-in-out">
                 <div className="inline-block mb-4">
-                  <span className="px-4 py-2 bg-ocean-50 rounded-full text-ocean-600 text-sm font-semibold border border-ocean-100">
+                  <span className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-yellow-200 text-sm font-semibold border border-white/30">
                     ✨ Akvaryum Uzmanları
                   </span>
                 </div>
-                <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight text-gray-900">
+                <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight text-white">
                   Hoş Geldiniz{' '}
-                  <span className="block text-ocean-600">Sedef Akvaryum</span>
+                  <span className="block text-yellow-300">Sedef Akvaryum</span>
                 </h1>
                 <div className="mb-8 space-y-3">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-3 text-gray-800">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-3 text-white">
                     {heroSlides[currentSlide]?.title || heroSlides[0]?.title || 'Sedef Akvaryum'}
                   </h2>
-                  <p className="text-lg text-gray-700 mb-3 font-medium">
+                  <p className="text-lg text-white/90 mb-3 font-medium">
                     {heroSlides[currentSlide]?.subtitle || heroSlides[0]?.subtitle || ''}
                   </p>
-                  <p className="text-base text-gray-600 leading-relaxed">
+                  <p className="text-base text-white/80 leading-relaxed">
                     {heroSlides[currentSlide]?.description || heroSlides[0]?.description || ''}
                   </p>
                 </div>
@@ -305,7 +305,7 @@ const HomePage: React.FC = () => {
       <LogoLoop />
 
       {/* Categories Section */}
-      <section className="py-12 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+      <section className="py-12 bg-white/10 backdrop-blur-sm relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -315,10 +315,8 @@ const HomePage: React.FC = () => {
                 🏪 Ürün Kategorileri
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
-              <span className="bg-gradient-to-r from-ocean-600 via-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                Kategorilerimizi Keşfedin
-              </span>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white">
+              Kategorilerimizi Keşfedin
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Sevimli balıklardan temel aksesuarlara kadar, dostlarınıza en iyi bakımı 
@@ -335,7 +333,7 @@ const HomePage: React.FC = () => {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-ocean-400 via-primary-500 to-secondary-500 rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-500"></div>
-                <div className="relative bg-white rounded-xl p-6 text-center shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-2 border-2 border-transparent group-hover:border-primary-200">
+                <div className="relative bg-white/80 backdrop-blur-sm rounded-xl p-6 text-center shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-2 border-2 border-white/30 group-hover:border-primary-200">
                   <div className="flex flex-col items-center">
                     <div className="text-5xl mb-4 transform group-hover:scale-125 group-hover:rotate-12 transition-all duration-300">
                       {category.icon}
@@ -355,7 +353,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-12 bg-white relative">
+      <section className="py-12 bg-white/10 backdrop-blur-sm relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-block mb-4">
@@ -363,12 +361,10 @@ const HomePage: React.FC = () => {
                 ⭐ En Popüler
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
-              <span className="bg-gradient-to-r from-ocean-600 via-primary-600 to-secondary-600 bg-clip-text text-transparent">
-                Öne Çıkan Ürünler
-              </span>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white">
+              Öne Çıkan Ürünler
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
               Müşterilerimizin en çok sevdiği popüler ve yüksek puanlı ürünlerimiz.
             </p>
           </div>
@@ -384,7 +380,7 @@ const HomePage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowAllFeatured((prev) => !prev)}
-                className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-primary-200 text-primary-700 font-semibold bg-white hover:bg-primary-50 hover:border-primary-400 transition-colors duration-200 shadow-sm"
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-white/30 text-white font-semibold bg-white/20 backdrop-blur-sm hover:bg-white/30 hover:border-white/50 transition-colors duration-200 shadow-sm"
               >
                 {showAllFeatured ? 'Daha Az Göster' : 'Tüm Öne Çıkan Ürünleri Görüntüle'}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -408,7 +404,7 @@ const HomePage: React.FC = () => {
 
       {/* New Arrivals Section */}
       {newProducts.length > 0 && (
-        <section className="py-12 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+        <section className="py-12 bg-white/10 backdrop-blur-sm relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full opacity-5">
             <div className="absolute top-20 right-20 w-72 h-72 bg-green-400 rounded-full filter blur-3xl"></div>
           </div>
@@ -420,12 +416,10 @@ const HomePage: React.FC = () => {
                   🆕 Yeni Geldiler
                 </span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
-                <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  Yeni Gelenler
-                </span>
+              <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white">
+                Yeni Gelenler
               </h2>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
                 Ailemize katılan en son üyelerimizi keşfedin.
               </p>
             </div>
@@ -441,7 +435,7 @@ const HomePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowAllNew((prev) => !prev)}
-                  className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-emerald-200 text-emerald-700 font-semibold bg-white hover:bg-emerald-50 hover:border-emerald-400 transition-colors duration-200 shadow-sm"
+                  className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-white/30 text-white font-semibold bg-white/20 backdrop-blur-sm hover:bg-white/30 hover:border-white/50 transition-colors duration-200 shadow-sm"
                 >
                   {showAllNew ? 'Daha Az Göster' : 'Tüm Yeni Ürünleri Görüntüle'}
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
