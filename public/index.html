@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/shrimp.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#2563eb" />
-    <meta http-equiv="Content-Security-Policy" content="
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="%PUBLIC_URL%/shrimp.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://www.googleapis.com https://www.googletagmanager.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
@@ -18,76 +19,89 @@
     form-action 'self';
   ">
 
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-73Q74LPY26"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-73Q74LPY26', {
-        page_path: window.location.pathname,
-        send_page_view: false // React-GA4 will handle page views
-      });
-    </script>
-    
-    <!-- Security headers are set at the hosting/proxy layer -->
-    
-    <!-- Primary Meta Tags -->
-    <title>Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası - Balık, Karides ve Akvaryum Malzemeleri</title>
-    <meta name="title" content="Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası - Balık, Karides ve Akvaryum Malzemeleri">
-    <meta name="description" content="Eskişehir'de akvaryum mağazası arıyorsanız Sedef Akvaryum tam size göre! Süs balığı, akvaryum karidesi, akvaryum bitkileri, akvaryum yemi ve tüm akvaryum malzemeleri. Uzman akvaryum danışmanlığı ve hızlı teslimat. Akvaryum hobiniz için güvenilir adres.">
-    <meta name="keywords" content="akvaryum, akvaryum mağazası, akvaryum malzemeleri, süs balığı, akvaryum karidesi, akvaryum bitkileri, akvaryum yemi, akvaryum filtresi, akvaryum sağlık, akvaryum bakım, eskişehir akvaryum, neocaridina, caridina, guppy, platy, tetra, betta, discus, akvaryum ekipmanları, akvaryum aksesuar, akvaryum kurulumu, akvaryum hobisi">
-    <meta name="author" content="Sedef Akvaryum">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="googlebot" content="index, follow">
-    <link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/" />
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://sedefakvaryum.com.tr/">
-    <meta property="og:title" content="Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası">
-    <meta property="og:description" content="Eskişehir'de akvaryum mağazası arıyorsanız Sedef Akvaryum tam size göre! Süs balığı, akvaryum karidesi, akvaryum bitkileri ve tüm akvaryum malzemeleri. Akvaryum hobiniz için güvenilir adres.">
-    <meta property="og:image" content="https://sedefakvaryum.com.tr/shrimp.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Sedef Akvaryum - Akvaryum Malzemeleri ve Süs Balıkları">
-    <meta property="og:site_name" content="Sedef Akvaryum">
-    <meta property="og:locale" content="tr_TR">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://sedefakvaryum.com.tr/">
-    <meta property="twitter:title" content="Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası">
-    <meta property="twitter:description" content="Eskişehir'de akvaryum mağazası arıyorsanız Sedef Akvaryum tam size göre! Süs balığı, akvaryum karidesi, akvaryum bitkileri ve tüm akvaryum malzemeleri.">
-    <meta property="twitter:image" content="https://sedefakvaryum.com.tr/shrimp.png">
-    <meta property="twitter:image:alt" content="Sedef Akvaryum - Akvaryum Malzemeleri ve Süs Balıkları">
-    
-    <!-- Additional Meta Tags -->
-    <meta name="format-detection" content="telephone=no">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Sedef Akvaryum">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://sedefakvaryum.com.tr/">
-    
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Manifest -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    
-    <!-- Apple Touch Icons -->
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/shrimp.png" />
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/shrimp.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/shrimp.png">
-    
-    <!-- Structured Data -->
-    <script type="application/ld+json">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-73Q74LPY26"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-73Q74LPY26', {
+      page_path: window.location.pathname,
+      send_page_view: false // React-GA4 will handle page views
+    });
+  </script>
+
+  <!-- Security headers are set at the hosting/proxy layer -->
+
+  <!-- Primary Meta Tags -->
+  <title>Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası - Balık, Karides ve Akvaryum Malzemeleri</title>
+  <meta name="title"
+    content="Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası - Balık, Karides ve Akvaryum Malzemeleri">
+  <meta name="description"
+    content="Eskişehir'de akvaryum mağazası arıyorsanız Sedef Akvaryum tam size göre! Süs balığı, akvaryum karidesi, akvaryum bitkileri, akvaryum yemi ve tüm akvaryum malzemeleri. Uzman akvaryum danışmanlığı ve hızlı teslimat. Akvaryum hobiniz için güvenilir adres.">
+  <meta name="keywords"
+    content="akvaryum, akvaryum mağazası, akvaryum malzemeleri, süs balığı, akvaryum karidesi, akvaryum bitkileri, akvaryum yemi, akvaryum filtresi, akvaryum sağlık, akvaryum bakım, eskişehir akvaryum, neocaridina, caridina, guppy, platy, tetra, betta, discus, akvaryum ekipmanları, akvaryum aksesuar, akvaryum kurulumu, akvaryum hobisi">
+  <meta name="author" content="Sedef Akvaryum">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow">
+  <link rel="alternate" hreflang="tr" href="https://sedefakvaryum.com.tr/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sedefakvaryum.com.tr/">
+  <meta property="og:title" content="Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası">
+  <meta property="og:description"
+    content="Eskişehir'de akvaryum mağazası arıyorsanız Sedef Akvaryum tam size göre! Süs balığı, akvaryum karidesi, akvaryum bitkileri ve tüm akvaryum malzemeleri. Akvaryum hobiniz için güvenilir adres.">
+  <meta property="og:image" content="https://sedefakvaryum.com.tr/shrimp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Sedef Akvaryum - Akvaryum Malzemeleri ve Süs Balıkları">
+  <meta property="og:site_name" content="Sedef Akvaryum">
+  <meta property="og:locale" content="tr_TR">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://sedefakvaryum.com.tr/">
+  <meta property="twitter:title" content="Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası">
+  <meta property="twitter:description"
+    content="Eskişehir'de akvaryum mağazası arıyorsanız Sedef Akvaryum tam size göre! Süs balığı, akvaryum karidesi, akvaryum bitkileri ve tüm akvaryum malzemeleri.">
+  <meta property="twitter:image" content="https://sedefakvaryum.com.tr/shrimp.png">
+  <meta property="twitter:image:alt" content="Sedef Akvaryum - Akvaryum Malzemeleri ve Süs Balıkları">
+
+  <!-- Additional Meta Tags -->
+  <meta name="format-detection" content="telephone=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Sedef Akvaryum">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://sedefakvaryum.com.tr/">
+
+  <!-- Preconnect to external domains -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="preload"
+    as="style">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet">
+  </noscript>
+
+  <!-- Manifest -->
+  <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/shrimp.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/shrimp.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/shrimp.png">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "PetStore",
@@ -191,9 +205,11 @@
       }
     }
     </script>
-  </head>
-  <body>
-    <noscript>Bu uygulamayı çalıştırmak için JavaScript'i etkinleştirmeniz gerekiyor.</noscript>
-    <div id="root"></div>
-  </body>
+</head>
+
+<body>
+  <noscript>Bu uygulamayı çalıştırmak için JavaScript'i etkinleştirmeniz gerekiyor.</noscript>
+  <div id="root"></div>
+</body>
+
 </html>

@@ -8,7 +8,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
 import ScrollProgressBar from './components/ScrollProgressBar';
 import RouteChangeTracker from './components/RouteChangeTracker';
-import SnowEffect from './components/SnowEffect';
+
 import useDisablePullToRefresh from './hooks/useDisablePullToRefresh';
 
 import { AuthProvider } from './context/AuthContext';
@@ -19,7 +19,7 @@ import { StockProvider } from './context/StockContext';
 const HomePage = lazy(() => import('./pages/HomePage'));
 const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
-const ContactPage = lazy(() => import('./pages/ContactPage'));
+
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
@@ -39,7 +39,7 @@ const AppContent: React.FC = () => {
     <>
       {/* Google Analytics Route Tracking */}
       <RouteChangeTracker />
-      
+
       <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-white text-primary-700 px-3 py-2 rounded-md shadow">
         İçeriğe geç
       </a>
@@ -59,7 +59,7 @@ const AppContent: React.FC = () => {
               <Route path="/yem" element={<Navigate to="/category/food" replace />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
               <Route path="/category/:categoryId" element={<CategoryPage />} />
-              <Route path="/contact" element={<ContactPage />} />
+
               <Route path="/search" element={<SearchPage />} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
               <Route path="/admin" element={<AdminPage />} />
@@ -83,8 +83,7 @@ const AppContent: React.FC = () => {
         {/* Scroll Progress Bar */}
         <ScrollProgressBar />
 
-        {/* Snow Effect - Light intensity for all pages, hide on admin pages */}
-        {!isAdminPage && <SnowEffect enabled={true} intensity="light" />}
+
 
         {/* Bottom Navigation (Mobile Only) */}
         <BottomNav />
@@ -110,3 +109,4 @@ function App() {
 }
 
 export default App;
+

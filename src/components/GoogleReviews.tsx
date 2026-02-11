@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  SEDEF_AKVARYUM_PLACE_ID, 
+import {
+  SEDEF_AKVARYUM_PLACE_ID,
   SEDEF_AKVARYUM_GOOGLE_MAPS_URL,
   formatReviewDate,
   type GooglePlaceReview
 } from '../utils/googlePlaces';
 
-interface GoogleReview extends GooglePlaceReview {}
+interface GoogleReview extends GooglePlaceReview { }
 
 interface GoogleReviewsProps {
   placeId?: string;
@@ -81,36 +81,36 @@ const GoogleReviews: React.FC<GoogleReviewsProps> = ({
     const loadReviews = async () => {
       try {
         setIsLoading(true);
-        
+
         // Google Places API'yi kullanmaya çalış
         // Not: Gerçek uygulamada Google Places API key gerekli
         // Şimdilik mock data kullanıyoruz, ama gerçek API entegrasyonu için hazır
-        
+
         // Simüle edilmiş API çağrısı
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         // Mock data kullanıyoruz (gerçek API entegrasyonu için yorum satırlarını kaldırın)
-        const sortedReviews = [...mockReviews].sort((a, b) => 
+        const sortedReviews = [...mockReviews].sort((a, b) =>
           new Date(b.time).getTime() - new Date(a.time).getTime()
         );
-        
+
         setReviews(sortedReviews.slice(0, maxReviews));
-        
+
         // Ortalama rating hesapla (not used in UI currently)
         // const avgRating = getAverageRating(mockReviews);
-        
+
         /* 
         // Gerçek Google Places API entegrasyonu için:
         // const response = await fetch(`/api/google-places/reviews?placeId=${placeId}&maxReviews=${maxReviews}`);
         // const data = await response.json();
         // setReviews(data.reviews);
         */
-        
+
       } catch (err) {
         setError('Yorumlar yüklenirken bir hata oluştu.');
-        
+
         // Hata durumunda mock data kullan
-        const sortedReviews = [...mockReviews].sort((a, b) => 
+        const sortedReviews = [...mockReviews].sort((a, b) =>
           new Date(b.time).getTime() - new Date(a.time).getTime()
         );
         setReviews(sortedReviews.slice(0, maxReviews));
@@ -144,11 +144,11 @@ const GoogleReviews: React.FC<GoogleReviewsProps> = ({
   // Get avatar color based on name
   const getAvatarColor = (name: string) => {
     const colors = [
-      'bg-yellow-200', 
-      'bg-teal-200', 
-      'bg-purple-200', 
-      'bg-pink-200', 
-      'bg-blue-200', 
+      'bg-yellow-200',
+      'bg-teal-200',
+      'bg-purple-200',
+      'bg-pink-200',
+      'bg-blue-200',
       'bg-green-200'
     ];
     const index = name.charCodeAt(0) % colors.length;
@@ -159,9 +159,8 @@ const GoogleReviews: React.FC<GoogleReviewsProps> = ({
     return Array.from({ length: 5 }, (_, index) => (
       <svg
         key={index}
-        className={`w-4 h-4 ${
-          index < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
-        }`}
+        className={`w-4 h-4 ${index < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+          }`}
         viewBox="0 0 20 20"
       >
         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -186,16 +185,20 @@ const GoogleReviews: React.FC<GoogleReviewsProps> = ({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index} className="bg-white rounded-2xl shadow-lg p-6 animate-pulse">
+              <div key={index} className="bg-white rounded-2xl shadow-lg p-6 animate-pulse h-64 flex flex-col">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full mr-3"></div>
+                  <div className="w-12 h-12 bg-gray-200 rounded-full mr-3 shrink-0"></div>
                   <div className="flex-1">
                     <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
                     <div className="h-3 bg-gray-200 rounded w-1/3"></div>
                   </div>
                 </div>
-                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="flex-grow space-y-2">
+                  <div className="h-3 bg-gray-200 rounded w-full"></div>
+                  <div className="h-3 bg-gray-200 rounded w-full"></div>
+                  <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                </div>
+                <div className="h-3 bg-gray-200 rounded w-16 mt-4"></div>
               </div>
             ))}
           </div>
@@ -248,9 +251,9 @@ const GoogleReviews: React.FC<GoogleReviewsProps> = ({
           {/* Reviews Grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             {getVisibleReviews().map((review) => (
-              <div 
-                key={review.id} 
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 flex flex-col"
+              <div
+                key={review.id}
+                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex flex-col h-64"
               >
                 {/* User Info */}
                 <div className="flex items-center mb-4">
@@ -270,7 +273,7 @@ const GoogleReviews: React.FC<GoogleReviewsProps> = ({
                 </div>
 
                 {/* Review Text */}
-                <p className="text-gray-600 text-sm leading-relaxed flex-grow italic mb-3">
+                <p className="text-gray-600 text-sm leading-relaxed flex-grow italic mb-3 line-clamp-4 overflow-hidden">
                   "{review.text}"
                 </p>
 
@@ -303,9 +306,8 @@ const GoogleReviews: React.FC<GoogleReviewsProps> = ({
               <button
                 key={index}
                 onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  index === currentSlide ? 'bg-orange-500' : 'bg-gray-300'
-                }`}
+                className={`w-3 h-3 rounded-full transition-colors ${index === currentSlide ? 'bg-orange-500' : 'bg-gray-300'
+                  }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
             ))}

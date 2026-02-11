@@ -1,132 +1,76 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { categories } from '../data/products';
+import { categoryConfig } from '../data/categoryConfig';
 import ProductCard from '../components/ProductCard';
 import { useAdmin } from '../context/AdminContext';
-import { ProductGridSkeleton, CategoryHeaderSkeleton } from '../components/SkeletonLoader';
 import SEO from '../components/SEO';
+
+type SortOption = 'featured' | 'price-asc' | 'price-desc' | 'newest';
 
 const CategoryPage: React.FC = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const { products } = useAdmin();
-  const [isLoading, setIsLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<SortOption>('featured');
 
-  // Simulate loading for skeleton
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, [categoryId]);
-
+  // Products are already loaded via AdminContext
   const category = categories.find(cat => cat.id === categoryId);
   const allProducts = products.filter(product => product.category === categoryId);
 
   const filteredAndSortedProducts = useMemo(() => {
-    return allProducts;
-  }, [allProducts]);
+    let result = [...allProducts];
+
+    switch (sortBy) {
+      case 'price-asc':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'newest':
+        // Assuming newest are added last or have a 'new' flag
+        // For now sorting by 'new' flag first, then id
+        result.sort((a, b) => (a.new === b.new ? 0 : a.new ? -1 : 1));
+        break;
+      case 'featured':
+      default:
+        // Featured first, then default order
+        result.sort((a, b) => (a.featured === b.featured ? 0 : a.featured ? -1 : 1));
+        break;
+    }
+
+    return result;
+  }, [allProducts, sortBy]);
 
   if (!category) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-               <div className="text-center">
-         <h1 className="text-2xl font-bold text-gray-800 mb-4">Kategori Bulunamadı</h1>
-         <p className="text-gray-600">Aradığınız kategori mevcut değil.</p>
-       </div>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-  return (
-    <div className="min-h-screen py-12 bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-12">
-            <CategoryHeaderSkeleton />
-          </div>
-          <ProductGridSkeleton count={8} />
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Kategori Bulunamadı</h1>
+          <p className="text-gray-600">Aradığınız kategori mevcut değil.</p>
         </div>
       </div>
     );
   }
 
-  // Get category description
-  const getCategoryDescription = (catId: string) => {
-    const descriptions: Record<string, { short: string; tips: string[] }> = {
-      fish: {
-        short: 'Renkli tropikal balıklardan dayanıklı japon balıklarına kadar geniş koleksiyonumuz. Yeni başlayanlar ve deneyimli akvaryumcular için ideal.',
-        tips: ['Grup halinde yaşayan türler için en az 5-6 adet alın', 'Su parametrelerine dikkat edin', 'Yeni balıkları karantinaya alın']
-      },
-      shrimp: {
-        short: 'Neocaridina türleri ile akvaryumunuzu renklendirin. Hem güzel hem de tankınızı temiz tutan bu dostlar bakımı kolay türlerdir.',
-        tips: ['Stabil su parametreleri çok önemli', 'Yeterli saklanma yeri sağlayın', 'Kaliteli karides yemi kullanın']
-      },
-      plants: {
-        short: 'Akvaryumunuzda doğal bir görünüm sağlayacak bitki türleri. Düşük ışıkta bile gelişen dayanıklı bitkiler.',
-        tips: ['Düzenli gübreleme yapın', 'Işık ihtiyacına dikkat edin', 'Kök yapısına uygun substrat kullanın']
-      },
-      equipment: {
-        short: 'Akvaryumunuz için gerekli tüm ekipmanlar. Filtreler, ısıtıcılar, aydınlatma ve daha fazlası.',
-        tips: ['Tank boyutuna uygun filtre seçin', 'Yedek ekipman bulundurun', 'Düzenli bakım yapın']
-      },
-      accessories: {
-        short: 'Balık ve karideslerinizin sağlığı için gerekli bakım ürünleri. Su testleri, ilaçlar ve sağlık malzemeleri.',
-        tips: ['Düzenli su testleri yapın', 'Hastalık belirtilerini takip edin', 'Veteriner tavsiyesi alın']
-      },
-      food: {
-        short: 'Balık ve karidesleriniz için yüksek kaliteli yemler. Dengeli beslenme için özel formüller.',
-        tips: ['Günde 2-3 kez az miktarda yem verin', 'Çeşitli yem türleri kullanın', 'Fazla yem vermeyin']
-      }
-    };
-    return descriptions[catId] || { short: '', tips: [] };
+  // Get category info from config
+  const categoryInfo = categoryConfig[categoryId || ''] || {
+    name: category?.name || '',
+    description: { short: '', tips: [] },
+    seo: { title: '', description: '', keywords: '' }
   };
 
-  const categoryInfo = getCategoryDescription(categoryId || '');
+  const categorySEO = categoryInfo.seo;
 
-  // SEO optimization for each category
-  const getCategorySEO = () => {
-    const seoData: Record<string, { title: string; description: string; keywords: string }> = {
-      fish: {
-        title: 'Süs Balığı - Akvaryum Balıkları | Sedef Akvaryum Eskişehir',
-        description: 'Eskişehir\'de süs balığı satışı. Guppy, platy, betta, discus, tetra ve daha fazla akvaryum balığı çeşidi. Akvaryum balığı fiyatları ve bakım bilgileri. Kaliteli süs balıkları için akvaryum mağazamızı ziyaret edin.',
-        keywords: 'akvaryum balığı, süs balığı, akvaryum balıkları, guppy, platy, betta, discus, tetra, eskişehir balık, akvaryum balığı satışı, akvaryum balığı fiyatları'
-      },
-      shrimp: {
-        title: 'Akvaryum Karidesi - Neocaridina, Caridina | Sedef Akvaryum',
-        description: 'Eskişehir\'de akvaryum karidesi satışı. Neocaridina, Caridina ve diğer akvaryum karidesı türleri. Akvaryum karides bakımı ve fiyatları. Sağlıklı akvaryum karideslerini mağazamızdan temin edin.',
-        keywords: 'akvaryum karidesi, neocaridina, caridina, akvaryum karides, karides satışı, eskişehir karides, akvaryum karides bakımı, akvaryum karides fiyatları'
-      },
-      plants: {
-        title: 'Akvaryum Bitkisi - Akvaryum Bitkileri | Sedef Akvaryum',
-        description: 'Eskişehir\'de akvaryum bitkisi satışı. Tatlı su akvaryum bitkileri, bitki bakımı ve akvaryum bitki fiyatları. Akvaryumunuz için kaliteli bitkiler ve akvaryum bitki gübresi.',
-        keywords: 'akvaryum bitkisi, akvaryum bitkileri, akvaryum bitki satışı, tatlı su bitkileri, eskişehir akvaryum bitkisi, akvaryum bitki bakımı, akvaryum bitki gübresi'
-      },
-      equipment: {
-        title: 'Akvaryum Ekipmanları - Akvaryum Filtresi, Işık | Sedef Akvaryum',
-        description: 'Eskişehir\'de akvaryum ekipmanları. Akvaryum filtresi, akvaryum ışığı, akvaryum ısıtıcısı, hava pompası ve tüm akvaryum malzemeleri. Akvaryum kurulumu için gerekli ekipmanlar.',
-        keywords: 'akvaryum ekipmanları, akvaryum filtresi, akvaryum ışığı, akvaryum ısıtıcısı, akvaryum pompası, eskişehir akvaryum ekipman, akvaryum kurulumu, akvaryum malzemeleri'
-      },
-      accessories: {
-        title: 'Akvaryum Aksesuarları - Dekorasyon ve Aksesuar | Sedef Akvaryum',
-        description: 'Eskişehir\'de akvaryum aksesuarları. Akvaryum dekorasyon, akvaryum süsleri, akvaryum taşları, kökleri ve tüm akvaryum aksesuar çeşitleri. Akvaryumunuzu güzelleştirin.',
-        keywords: 'akvaryum aksesuarları, akvaryum dekorasyon, akvaryum süsleri, akvaryum taşları, akvaryum kökü, eskişehir akvaryum aksesuar, akvaryum malzemeleri'
-      },
-      food: {
-        title: 'Akvaryum Yemi - Balık Yemi, Karides Yemi | Sedef Akvaryum',
-        description: 'Eskişehir\'de akvaryum yemi satışı. Balık yemi, karides yemi, toz yem ve tablet yem çeşitleri. Kaliteli akvaryum yemleri ile sağlıklı beslenme. Akvaryum yem fiyatları.',
-        keywords: 'akvaryum yemi, balık yemi, karides yemi, akvaryum yem satışı, toz yem, tablet yem, eskişehir akvaryum yemi, akvaryum yem fiyatları'
-      }
-    };
-    return seoData[categoryId || ''] || {
-      title: `${category.name} | Sedef Akvaryum Eskişehir`,
-      description: categoryInfo.short,
-      keywords: `akvaryum, ${category.name.toLowerCase()}, eskişehir akvaryum`
-    };
-  };
-
-  const categorySEO = getCategorySEO();
+  // Fallback dynamic SEO if not in config (though config covers all known categories)
+  if (!categorySEO.title && category) {
+    categorySEO.title = `${category.name} | Sedef Akvaryum Eskişehir`;
+    categorySEO.description = categoryInfo.description.short;
+    categorySEO.keywords = `akvaryum, ${category.name.toLowerCase()}, eskişehir akvaryum`;
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-transparent">
       <SEO
         title={categorySEO.title}
         description={categorySEO.description}
@@ -135,64 +79,75 @@ const CategoryPage: React.FC = () => {
           "@context": "https://schema.org",
           "@type": "CollectionPage",
           "name": category.name,
-          "description": categoryInfo.short,
+          "description": categoryInfo.description.short,
           "url": `https://sedefakvaryum.com.tr/category/${categoryId}`,
           "numberOfItems": filteredAndSortedProducts.length
         }}
       />
-      {/* Category Banner */}
-      <div className="relative bg-gradient-to-r from-ocean-500 via-primary-500 to-secondary-500 text-white py-16 overflow-hidden">
-        {/* Animated background */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-10 right-10 w-64 h-64 bg-yellow-300 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            {/* Icon */}
-            <div className="text-8xl animate-bounce-gentle">
+      {/* Compact Header & Filter Bar */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            {/* Left: Title & Info */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full text-2xl">
                 {category.icon}
               </div>
-            
-            {/* Content */}
-            <div className="flex-1 text-center md:text-left">
-              <h1 className="text-3xl md:text-4xl font-extrabold mb-3">
-                    {category.name}
+              <div>
+                <h1 className="text-lg font-bold text-gray-900 leading-none mb-1">
+                  {category.name}
                 </h1>
-              <p className="text-lg text-white/90 mb-4 leading-relaxed max-w-2xl">
-                {categoryInfo.short}
-              </p>
-              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                <span className="font-bold text-xl">{filteredAndSortedProducts.length}</span>
-                <span>ürün mevcut</span>
+                <p className="text-xs text-gray-500">
+                  {filteredAndSortedProducts.length} ürün listeleniyor
+                </p>
               </div>
+            </div>
+
+            {/* Right: Actions/Filters */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 hide-scrollbar">
+              <div className="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
+                <span className="text-xs font-medium text-gray-500 px-2 hidden sm:block">Sıralama:</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortOption)}
+                  className="bg-transparent border-none text-sm font-medium text-gray-700 focus:ring-0 py-1 pl-2 pr-8 cursor-pointer"
+                >
+                  <option value="featured">Önerilen</option>
+                  <option value="price-asc">En Düşük Fiyat</option>
+                  <option value="price-desc">En Yüksek Fiyat</option>
+                  <option value="newest">Yeniler</option>
+                </select>
               </div>
+
+              {/* Example Filter Checkbox (Visual only for now as requested) */}
+              <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors whitespace-nowrap">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+                Filtrele
+              </button>
             </div>
           </div>
         </div>
+      </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Products Grid */}
         {filteredAndSortedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-in">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 animate-fade-in">
             {filteredAndSortedProducts.map((product) => (
               <ProductCard key={product.id} product={product} showDetails={true} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 animate-fade-in">
+          <div className="text-center py-20 animate-fade-in bg-gray-50 rounded-3xl">
             <div className="text-6xl mb-4">😔</div>
-            <h3 className="text-2xl font-bold text-white mb-2">Ürün Bulunamadı</h3>
-            <p className="text-white/80 mb-6">Bu kategoride henüz ürün bulunmuyor.</p>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Ürün Bulunamadı</h3>
+            <p className="text-gray-500 mb-6">Bu kategoride henüz ürün bulunmuyor.</p>
           </div>
         )}
-
-        
       </div>
     </div>
   );

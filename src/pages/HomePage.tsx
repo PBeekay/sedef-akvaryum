@@ -6,19 +6,36 @@ import GoogleReviews from '../components/GoogleReviews';
 import { useAdmin } from '../context/AdminContext';
 import LogoLoop from '../components/LogoLoop';
 import SEO from '../components/SEO';
+import ContactSection from '../components/ContactSection';
 
 const HomePage: React.FC = () => {
   const { sliderData, products } = useAdmin();
-  
-  // Get featured and new products from admin context
-  const featuredProducts = products.filter(product => product.featured);
-  const newProducts = products.filter(product => product.new);
+
+  // Get featured and new products from admin context (Memoized to prevent re-renders)
+  const featuredProducts = React.useMemo(() => products.filter(product => product.featured), [products]);
+  const newProducts = React.useMemo(() => products.filter(product => product.new), [products]);
 
   // Limit initially visible items for performance
   const [showAllFeatured, setShowAllFeatured] = useState(false);
   const [showAllNew, setShowAllNew] = useState(false);
-  const visibleFeatured = showAllFeatured ? featuredProducts : featuredProducts.slice(0, 8);
-  const visibleNew = showAllNew ? newProducts : newProducts.slice(0, 8);
+
+  // Randomization State
+  const [randomFeatured, setRandomFeatured] = useState<typeof products>([]);
+  const [randomNew, setRandomNew] = useState<typeof products>([]);
+
+  useEffect(() => {
+    const shuffle = (array: typeof products) => {
+      return [...array].sort(() => Math.random() - 0.5);
+    };
+
+    if (products.length > 0) {
+      setRandomFeatured(shuffle(featuredProducts).slice(0, 10)); // 5x2 = 10 items
+      setRandomNew(shuffle(newProducts).slice(0, 10)); // 5x2 = 10 items
+    }
+  }, [products, featuredProducts, newProducts]);
+
+  const visibleFeatured = showAllFeatured ? featuredProducts : (randomFeatured.length > 0 ? randomFeatured : featuredProducts.slice(0, 10));
+  const visibleNew = showAllNew ? newProducts : (randomNew.length > 0 ? randomNew : newProducts.slice(0, 10));
 
   // Hero slider data from admin context
   const fallbackSlide = React.useMemo(() => ({
@@ -32,7 +49,7 @@ const HomePage: React.FC = () => {
     buttonText: 'Ürünleri İncele',
     buttonLink: '/category/fish',
   }), []);
-  
+
   // Use sliderData if available, otherwise use fallback
   // Firebase document IDs are already unique, so we just use them directly
   const heroSlides = React.useMemo(() => {
@@ -42,7 +59,7 @@ const HomePage: React.FC = () => {
       }
       return [fallbackSlide];
     }
-    
+
     // Debug: Log slider data
     if (process.env.NODE_ENV === 'development') {
       console.log('📊 Slider data:', sliderData);
@@ -51,7 +68,7 @@ const HomePage: React.FC = () => {
         console.log(`  Slider ${index}:`, { id: slide.id, title: slide.title });
       });
     }
-    
+
     // Filter out any slides without IDs (shouldn't happen with Firebase, but just in case)
     const validSlides = sliderData.filter(slide => {
       if (!slide || !slide.id) {
@@ -62,7 +79,7 @@ const HomePage: React.FC = () => {
       }
       return true;
     });
-    
+
     // If no valid slides after filtering, use fallback
     if (validSlides.length === 0) {
       if (process.env.NODE_ENV === 'development') {
@@ -70,7 +87,7 @@ const HomePage: React.FC = () => {
       }
       return [fallbackSlide];
     }
-    
+
     // Use valid slides from database
     if (process.env.NODE_ENV === 'development') {
       console.log('✅ Kullanılacak slider sayısı:', validSlides.length);
@@ -120,7 +137,7 @@ const HomePage: React.FC = () => {
   }, [heroSlides.length, currentSlide]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-transparent">
       <SEO
         title="Sedef Akvaryum | Eskişehir'in En İyi Akvaryum Mağazası - Süs Balığı, Karides ve Akvaryum Malzemeleri"
         description="Eskişehir'de akvaryum mağazası arıyorsanız Sedef Akvaryum tam size göre! Süs balığı, akvaryum karidesi, akvaryum bitkileri, akvaryum yemi, akvaryum filtresi ve tüm akvaryum malzemeleri. Uzman akvaryum danışmanlığı, akvaryum kurulumu ve hızlı teslimat. Akvaryum hobiniz için güvenilir adres."
@@ -159,7 +176,7 @@ const HomePage: React.FC = () => {
         }}
       />
       {/* Hero Section with Slider (yılbaşı teması) */}
-      <section className="bg-white/10 backdrop-blur-sm py-16 border-b border-white/20">
+      <section className="bg-gray-50 py-16 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
@@ -170,134 +187,139 @@ const HomePage: React.FC = () => {
                     ✨ Akvaryum Uzmanları
                   </span>
                 </div>
-                <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight text-white">
+                <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight text-gray-900">
                   Hoş Geldiniz{' '}
-                  <span className="block text-yellow-300">Sedef Akvaryum</span>
+                  <span className="block text-primary-600">Sedef Akvaryum</span>
                 </h1>
                 <div className="mb-8 space-y-3">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-3 text-white">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-3 text-gray-800">
                     {heroSlides[currentSlide]?.title || heroSlides[0]?.title || 'Sedef Akvaryum'}
                   </h2>
-                  <p className="text-lg text-white/90 mb-3 font-medium">
+                  <p className="text-lg text-gray-600 mb-3 font-medium">
                     {heroSlides[currentSlide]?.subtitle || heroSlides[0]?.subtitle || ''}
                   </p>
-                  <p className="text-base text-white/80 leading-relaxed">
+                  <p className="text-base text-gray-500 leading-relaxed">
                     {heroSlides[currentSlide]?.description || heroSlides[0]?.description || ''}
                   </p>
                 </div>
               </div>
             </div>
 
-                                      {/* Image Slider */}
+            {/* Image Slider */}
             <div className="animate-slide-up relative w-full">
-             <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80 bg-gray-50">
-              {heroSlides.map((slide, index) => (
-                <div
-                  key={slide.id || `slide-${index}`}
-                  className={`absolute inset-0 transition-all duration-500 ease-in-out ${
-                    index === currentSlide ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
-                  }`}
-                >
-                                                                                          <img
-                           src={slide.image}
-                           alt={slide.title}
-                           className="w-full h-80 object-cover"
-                           loading="lazy"
-                           decoding="async"
-                           onError={(e) => {
-                             const target = e.target as HTMLImageElement;
-                             if (process.env.NODE_ENV === 'development') {
-                             }
-                             // Fallback to gradient background
-                             target.style.display = 'none';
-                             const parent = target.parentElement;
-                             if (parent) {
-                               // Clear existing content safely
-                               parent.textContent = '';
-                               
-                               // Create elements safely without innerHTML
-                               const slideDiv = document.createElement('div');
-                               slideDiv.className = 'w-full h-80 flex items-center justify-center text-white text-4xl font-bold';
-                               
-                               const gradientPalette = [
-                                 'linear-gradient(135deg, #1a237e, #3949ab)',
-                                 'linear-gradient(135deg, #4a148c, #8e24aa)',
-                                 'linear-gradient(135deg, #d84315, #f4511e)'
-                               ];
-                               const backgroundStyle = gradientPalette[index % gradientPalette.length];
-                               slideDiv.style.background = backgroundStyle;
-                               
-                               const centerDiv = document.createElement('div');
-                               centerDiv.className = 'text-center';
-                               
-                               const iconDiv = document.createElement('div');
-                               iconDiv.className = 'text-6xl mb-4';
-                               iconDiv.textContent = slide.icon;
-                               
-                               const titleDiv = document.createElement('div');
-                               titleDiv.className = 'text-2xl';
-                               titleDiv.textContent = slide.title;
-                               
-                               centerDiv.appendChild(iconDiv);
-                               centerDiv.appendChild(titleDiv);
-                               slideDiv.appendChild(centerDiv);
-                               parent.appendChild(slideDiv);
-                             }
-                           }}
-                           onLoad={() => {
-                             if (process.env.NODE_ENV === 'development') {
-                             }
-                           }}
-                         />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 bg-white text-gray-800 p-4 rounded-xl shadow-lg">
-                      <div className="text-2xl font-bold">{slide.icon}</div>
-                      <p className="text-sm font-medium">{slide.title}</p>
+              <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80 bg-gray-50">
+                {heroSlides.map((slide, index) => (
+                  <div
+                    key={slide.id || `slide-${index}`}
+                    className={`absolute inset-0 transition-all duration-500 ease-in-out ${index === currentSlide ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full'
+                      }`}
+                  >
+                    <img
+                      src={slide.image}
+                      alt={slide.title}
+                      className="w-full h-80 object-cover"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (process.env.NODE_ENV === 'development') {
+                        }
+                        // Fallback to gradient background
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          // Clear existing content safely
+                          parent.textContent = '';
+
+                          // Create elements safely without innerHTML
+                          const slideDiv = document.createElement('div');
+                          slideDiv.className = 'w-full h-80 flex items-center justify-center text-white text-4xl font-bold';
+
+                          const gradientPalette = [
+                            'linear-gradient(135deg, #1a237e, #3949ab)',
+                            'linear-gradient(135deg, #4a148c, #8e24aa)',
+                            'linear-gradient(135deg, #d84315, #f4511e)'
+                          ];
+                          const backgroundStyle = gradientPalette[index % gradientPalette.length];
+                          slideDiv.style.background = backgroundStyle;
+
+                          const centerDiv = document.createElement('div');
+                          centerDiv.className = 'text-center';
+
+                          const iconDiv = document.createElement('div');
+                          iconDiv.className = 'text-6xl mb-4';
+                          iconDiv.textContent = slide.icon;
+
+                          const titleDiv = document.createElement('div');
+                          titleDiv.className = 'text-2xl';
+                          titleDiv.textContent = slide.title;
+
+                          centerDiv.appendChild(iconDiv);
+                          centerDiv.appendChild(titleDiv);
+                          slideDiv.appendChild(centerDiv);
+                          parent.appendChild(slideDiv);
+                        }
+                      }}
+                      onLoad={() => {
+                        if (process.env.NODE_ENV === 'development') {
+                        }
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    <div className="absolute bottom-6 left-6 right-6">
+                      <div className="bg-white/10 backdrop-blur-md border border-white/20 text-white p-4 rounded-xl shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <div className="flex items-center gap-3">
+                          <span className="text-3xl filter drop-shadow-md">{slide.icon}</span>
+                          <div>
+                            <h3 className="font-bold text-lg leading-tight shadow-black drop-shadow-sm">{slide.title}</h3>
+                            <p className="text-xs text-white/80 font-medium">Büyük İndirimler Sizi Bekliyor</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Navigation Arrows */}
-            <button
-              onClick={prevSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 rounded-full p-3 transition-all duration-300 hover:scale-110 shadow-lg z-20"
-              aria-label="Önceki slayt"
-              type="button"
-            >
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={nextSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 rounded-full p-3 transition-all duration-300 hover:scale-110 shadow-lg z-20"
-              aria-label="Sonraki slayt"
-              type="button"
-            >
-              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+              <button
+                onClick={prevSlide}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 rounded-full p-3 transition-all duration-300 hover:scale-110 shadow-lg z-20"
+                aria-label="Önceki slayt"
+                type="button"
+              >
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 rounded-full p-3 transition-all duration-300 hover:scale-110 shadow-lg z-20"
+                aria-label="Sonraki slayt"
+                type="button"
+              >
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             </div>
           </div>
 
           {/* Slide Indicators */}
-        <div className="flex justify-center mt-10 space-x-3">
-          {heroSlides.map((slide, index) => (
-            <button
-              key={slide.id || `slide-${index}`}
-              onClick={() => goToSlide(index)}
-              className={`transition-all duration-300 rounded-full ${
-                index === currentSlide 
-                  ? 'w-10 h-3 bg-yellow-300 shadow-lg shadow-yellow-300/50' 
-                  : 'w-3 h-3 bg-white/50 hover:bg-white/75 hover:scale-125'
-              }`}
-              aria-label={`Slayt ${index + 1}`}
-              type="button"
-            />
-          ))}
-        </div>
+          <div className="flex justify-center mt-10 space-x-3">
+            {heroSlides.map((slide, index) => (
+              <button
+                key={slide.id || `slide-${index}`}
+                onClick={() => goToSlide(index)}
+                className={`transition-all duration-300 rounded-full w-3 h-3 ${index === currentSlide
+                  ? 'bg-yellow-400 scale-125 shadow-lg shadow-yellow-300/50'
+                  : 'bg-white/50 hover:bg-white/75 hover:scale-110'
+                  }`}
+                aria-label={`Slayt ${index + 1}`}
+                type="button"
+              />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -305,9 +327,9 @@ const HomePage: React.FC = () => {
       <LogoLoop />
 
       {/* Categories Section */}
-      <section className="py-12 bg-white/10 backdrop-blur-sm relative overflow-hidden">
+      <section className="py-12 bg-transparent relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-        
+
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 animate-fade-in">
             <div className="inline-block mb-4">
@@ -315,36 +337,42 @@ const HomePage: React.FC = () => {
                 🏪 Ürün Kategorileri
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white">
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-gray-900">
               Kategorilerimizi Keşfedin
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Sevimli balıklardan temel aksesuarlara kadar, dostlarınıza en iyi bakımı 
+              Sevimli balıklardan temel aksesuarlara kadar, dostlarınıza en iyi bakımı
               sağlamak için ihtiyacınız olan her şeye sahibiz.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
             {categories.map((category, index) => (
               <Link
                 key={category.id}
                 to={`/category/${category.id}`}
-                className="group relative overflow-hidden"
+                className="group relative overflow-hidden rounded-2xl"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-ocean-400 via-primary-500 to-secondary-500 rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-500"></div>
-                <div className="relative bg-white/80 backdrop-blur-sm rounded-xl p-6 text-center shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-2 border-2 border-white/30 group-hover:border-primary-200">
-                  <div className="flex flex-col items-center">
-                    <div className="text-5xl mb-4 transform group-hover:scale-125 group-hover:rotate-12 transition-all duration-300">
-                      {category.icon}
-                    </div>
-                    <h3 className="font-bold text-gray-800 group-hover:text-primary-600 transition-colors duration-200 text-sm">
-                      {category.name}
-                    </h3>
+                {/* Hover Glow Background */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-ocean-400 to-primary-500 rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-500 will-change-transform"></div>
+
+                {/* Main Card Content */}
+                <div className="relative bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-1 group-hover:scale-[1.02] border border-gray-100/50 z-10 h-full flex flex-col justify-center">
+                  <div className="mb-4 transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 filter drop-shadow-sm">
+                    <span className="text-5xl">{category.icon}</span>
                   </div>
-                  
-                  {/* Decorative shine effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                  <h3 className="font-bold text-gray-800 group-hover:text-primary-600 transition-colors duration-200 text-lg">
+                    {category.name}
+                  </h3>
+
+                  {/* Subtle chevron for affordance */}
+                  <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+                    <span className="text-primary-500 text-sm font-medium flex items-center justify-center gap-1">
+                      İncele
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    </span>
+                  </div>
                 </div>
               </Link>
             ))}
@@ -353,7 +381,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-12 bg-white/10 backdrop-blur-sm relative">
+      <section className="py-12 bg-gray-50 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-block mb-4">
@@ -361,26 +389,26 @@ const HomePage: React.FC = () => {
                 ⭐ En Popüler
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white">
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-gray-900">
               Öne Çıkan Ürünler
             </h2>
-            <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Müşterilerimizin en çok sevdiği popüler ve yüksek puanlı ürünlerimiz.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {visibleFeatured.map((product) => (
               <ProductCard key={product.id} product={product} showDetails={false} />
             ))}
           </div>
-          
+
           <div className="flex flex-col items-center mt-12 gap-4">
             {featuredProducts.length > 8 && (
               <button
                 type="button"
                 onClick={() => setShowAllFeatured((prev) => !prev)}
-                className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-white/30 text-white font-semibold bg-white/20 backdrop-blur-sm hover:bg-white/30 hover:border-white/50 transition-colors duration-200 shadow-sm"
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold bg-white hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200 shadow-sm"
               >
                 {showAllFeatured ? 'Daha Az Göster' : 'Tüm Öne Çıkan Ürünleri Görüntüle'}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -404,11 +432,11 @@ const HomePage: React.FC = () => {
 
       {/* New Arrivals Section */}
       {newProducts.length > 0 && (
-        <section className="py-12 bg-white/10 backdrop-blur-sm relative overflow-hidden">
+        <section className="py-12 bg-transparent relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full opacity-5">
             <div className="absolute top-20 right-20 w-72 h-72 bg-green-400 rounded-full filter blur-3xl"></div>
           </div>
-          
+
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <div className="inline-block mb-4">
@@ -416,15 +444,15 @@ const HomePage: React.FC = () => {
                   🆕 Yeni Geldiler
                 </span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-white">
+              <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-gray-900">
                 Yeni Gelenler
               </h2>
-              <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Ailemize katılan en son üyelerimizi keşfedin.
               </p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {visibleNew.map((product) => (
                 <ProductCard key={product.id} product={product} showDetails={false} />
               ))}
@@ -435,7 +463,7 @@ const HomePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowAllNew((prev) => !prev)}
-                  className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-white/30 text-white font-semibold bg-white/20 backdrop-blur-sm hover:bg-white/30 hover:border-white/50 transition-colors duration-200 shadow-sm"
+                  className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold bg-white hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200 shadow-sm"
                 >
                   {showAllNew ? 'Daha Az Göster' : 'Tüm Yeni Ürünleri Görüntüle'}
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -448,9 +476,10 @@ const HomePage: React.FC = () => {
         </section>
       )}
 
-      
 
-             {/* Google Reviews Section */}
+
+      <ContactSection />
+      {/* Google Reviews Section */}
       <GoogleReviews />
     </div>
   );

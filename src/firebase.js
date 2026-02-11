@@ -10,7 +10,7 @@ import { getStorage } from "firebase/storage";
 // IMPORTANT: Never commit API keys to public repositories!
 // Always use environment variables for sensitive data.
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY || "AIzaSyDx8gblokEpOu9tdBkqIRf8LK7WsJxX4ek",
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || "sedef-akvaryum.firebaseapp.com",
   projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || "sedef-akvaryum",
   storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET || "sedef-akvaryum.firebasestorage.app",

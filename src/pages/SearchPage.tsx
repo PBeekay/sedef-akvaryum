@@ -22,9 +22,9 @@ const SearchPage: React.FC = () => {
 
   const searchProducts = useCallback((searchQuery: string): Product[] => {
     if (!searchQuery.trim()) return [];
-    
+
     const query = searchQuery.toLowerCase();
-    return products.filter(product => 
+    return products.filter(product =>
       product.name?.toLowerCase().includes(query) ||
       product.description?.toLowerCase().includes(query) ||
       product.category?.toLowerCase().includes(query) ||
@@ -60,7 +60,7 @@ const SearchPage: React.FC = () => {
     if (filters.priceRange !== 'all') {
       filtered = filtered.filter(product => {
         const price = product.price;
-        
+
         switch (filters.priceRange) {
           case '0-50':
             return price <= 50;
@@ -89,7 +89,7 @@ const SearchPage: React.FC = () => {
     }
 
     setIsLoading(true);
-    
+
     // Simüle edilmiş arama gecikmesi
     const timeoutId = setTimeout(() => {
       const results = searchProducts(query);
@@ -133,7 +133,7 @@ const SearchPage: React.FC = () => {
   // };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+    <div className="min-h-screen bg-gray-50">
       <SEO
         title={query ? `"${query}" Arama Sonuçları - Sedef Akvaryum` : 'Akvaryum Ürünleri Ara - Sedef Akvaryum Eskişehir'}
         description={query ? `"${query}" için akvaryum ürünleri arama sonuçları. Süs balığı, karides, akvaryum bitkileri ve tüm akvaryum malzemelerinde arama yapın.` : 'Sedef Akvaryum\'da akvaryum ürünleri arayın. Süs balığı, karides, bitki, yem ve tüm akvaryum malzemelerini bulun.'}
@@ -154,14 +154,15 @@ const SearchPage: React.FC = () => {
               </span>
             </h1>
           </div>
-          
+
           <div className="max-w-3xl mx-auto">
             <div className="relative group">
               <div className="absolute -inset-1 bg-gradient-to-r from-ocean-400 via-primary-500 to-secondary-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
               <div className="relative">
-                <SearchBar 
+                <SearchBar
                   className="w-full"
                   placeholder={query ? `"${query}" için arama yapın...` : "Arama yapın..."}
+                  fixedWidth={true}
                 />
               </div>
             </div>
@@ -227,7 +228,7 @@ const SearchPage: React.FC = () => {
                 </select>
               </div>
 
-              
+
             </div>
           </div>
         </div>

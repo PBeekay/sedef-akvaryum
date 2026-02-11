@@ -9,20 +9,22 @@ interface SearchBarProps {
   placeholder?: string;
   showResults?: boolean;
   onSearch?: (query: string) => void;
+  fixedWidth?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
   className = '',
   placeholder = 'Ürün ara...',
   showResults = true,
-  onSearch
+  onSearch,
+  fixedWidth = false
 }) => {
   const [query, setQuery] = useState('');
   const { products } = useAdmin();
   const [results, setResults] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(fixedWidth);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -97,7 +99,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setSelectedIndex(prev => 
+          setSelectedIndex(prev =>
             prev < results.length - 1 ? prev + 1 : prev
           );
           break;
@@ -150,12 +152,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <div 
-      ref={searchRef} 
+    <div
+      ref={searchRef}
       className={`relative ${className}`}
-      onMouseEnter={() => setIsExpanded(true)}
+      onMouseEnter={() => !fixedWidth && setIsExpanded(true)}
       onMouseLeave={() => {
-        if (!query.trim()) {
+        if (!fixedWidth && !query.trim()) {
           setIsExpanded(false);
           setShowDropdown(false);
         }
@@ -167,16 +169,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
             type="text"
             value={query}
             onChange={handleInputChange}
-            placeholder={isExpanded ? placeholder : ''}
-            className={`transition-all duration-300 ease-in-out px-4 py-2 pl-10 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-              isExpanded ? 'w-full' : 'w-10'
-            }`}
+            placeholder={isExpanded || fixedWidth ? placeholder : ''}
+            className={`transition-all duration-300 ease-in-out px-4 py-2 pl-10 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${fixedWidth ? 'w-full' : (isExpanded ? 'w-full' : 'w-10')
+              }`}
             onFocus={() => {
-              setIsExpanded(true);
+              !fixedWidth && setIsExpanded(true);
               query.trim() && setShowDropdown(true);
             }}
             onBlur={() => {
-              if (!query.trim()) {
+              if (!fixedWidth && !query.trim()) {
                 setTimeout(() => {
                   setIsExpanded(false);
                   setShowDropdown(false);
@@ -184,7 +185,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               }
             }}
           />
-          
+
           {/* Arama ikonu */}
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -220,9 +221,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <div
               key={product.id}
               onClick={() => handleProductClick(product)}
-              className={`flex items-center p-3 cursor-pointer hover:bg-gray-50 ${
-                index === selectedIndex ? 'bg-primary-50' : ''
-              }`}
+              className={`flex items-center p-3 cursor-pointer hover:bg-gray-50 ${index === selectedIndex ? 'bg-primary-50' : ''
+                }`}
             >
               <img
                 src={product.image}
@@ -243,13 +243,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 </p>
               </div>
               <div className="text-xs text-gray-400">
-                {product.category === 'shrimp' ? '🦐' : 
-                 product.category === 'fish' ? '🐠' : 
-                 product.category === 'food' ? '🍖' : '🏷️'}
+                {product.category === 'shrimp' ? '🦐' :
+                  product.category === 'fish' ? '🐠' :
+                    product.category === 'food' ? '🍖' : '🏷️'}
               </div>
             </div>
           ))}
-          
+
           {/* Tüm sonuçları görüntüle linki */}
           <div className="border-t border-gray-200 p-3">
             <button
