@@ -28,22 +28,41 @@ const ContactSection: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch pt-4">
                     {/* Map - Takes up 2/3 of the space */}
                     <div className="lg:col-span-2 h-full min-h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 relative group order-2 lg:order-1">
-                        <div className="absolute inset-0 bg-gray-200 animate-pulse" id="map-loader"></div>
-                        <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3066.4590193730246!2d30.51254507640333!3d39.77425309449139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cc1733fb62c9ab%3A0x30acbbcc17f8420d!2sSedef%20Akvaryum%20Hediye%20Evi!5e0!3m2!1str!2str!4v1759321097363!5m2!1str!2str"
-                            width="100%"
-                            height="100%"
-                            style={{ border: 0, minHeight: '400px' }}
-                            allowFullScreen={true}
-                            loading="lazy"
-                            referrerPolicy="no-referrer-when-downgrade"
-                            title="Sedef Akvaryum Hediye Evi Konumu"
-                            className="w-full h-full grayscale-0 hover:grayscale-0 transition-all duration-300 relative z-10"
-                            onLoad={(e) => {
-                                const loader = document.getElementById('map-loader');
-                                if (loader) loader.style.display = 'none';
-                            }}
-                        />
+                        {/* Wrapper Link to open in new tab */}
+                        <a
+                            href="https://www.google.com/maps/place/Sedef+Akvaryum+Hediye+Evi/@39.7742531,30.5125451,17z/data=!3m1!4b1!4m6!3m5!1s0x14cc1733fb62c9ab:0x30acbbcc17f8420d!8m2!3d39.774249!4d30.51512!16s%2Fg%2F11vj_xj8ss?entry=ttu"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block w-full h-full relative"
+                        >
+                            {/* Loading State */}
+                            <div className="absolute inset-0 bg-slate-100 flex items-center justify-center z-0">
+                                <span className="text-gray-400 animate-pulse">Harita yükleniyor...</span>
+                            </div>
+
+                            {/* Iframe with pointer-events-none to act as a static image */}
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3066.4590193730246!2d30.51254507640333!3d39.77425309449139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14cc1733fb62c9ab%3A0x30acbbcc17f8420d!2sSedef%20Akvaryum%20Hediye%20Evi!5e0!3m2!1str!2str!4v1759321097363!5m2!1str!2str"
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0, minHeight: '400px' }}
+                                allowFullScreen={true}
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                                title="Sedef Akvaryum Hediye Evi Konumu"
+                                className="w-full h-full relative z-10 pointer-events-none opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+                            />
+
+                            {/* Hover Overlay */}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
+                                <span className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-md text-blue-600 font-bold rounded-xl shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                    Haritada Aç
+                                </span>
+                            </div>
+                        </a>
                     </div>
 
                     {/* Contact Information - Takes up 1/3 */}
