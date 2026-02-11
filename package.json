@@ -47,7 +47,7 @@
     "security:audit": "npm audit --audit-level=moderate",
     "security:fix": "npm audit fix",
     "export:data": "npx ts-node scripts/export-data.ts",
-    "optimize:css": "npx ts-node scripts/inline-css.ts",
+    "optimize:css": "npx ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/inline-css.ts",
     "postbuild": "npm run optimize:css"
   },
   "eslintConfig": {
