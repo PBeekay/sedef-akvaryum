@@ -47,7 +47,11 @@ const Navbar: React.FC = () => {
   }, [location.pathname]);
 
   return (
-    <nav className={`bg-white/70 backdrop-blur-xl shadow-lg shadow-ocean-100/20 sticky top-0 z-50 border-b border-white/50 transition-all duration-300 ${isScrolled ? 'py-2' : 'py-3'
+    <>
+      {/* Gradient Top Bar */}
+      <div className="h-0.5 bg-gradient-to-r from-teal-500 via-ocean-400 to-teal-600 w-full fixed top-0 left-0 z-[51]" />
+
+      <nav className={`bg-white/75 backdrop-blur-xl shadow-lg shadow-teal-100/20 sticky top-0.5 z-50 border-b border-teal-100/50 transition-all duration-300 ${isScrolled ? 'py-2' : 'py-3'
       }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`flex justify-between items-center transition-all duration-300 ${isScrolled ? 'h-14' : 'h-18'
@@ -56,7 +60,7 @@ const Navbar: React.FC = () => {
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="text-3xl transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">🦐</div>
             <div className="flex flex-col">
-              <span className="text-xl font-extrabold bg-gradient-to-r from-primary-700 to-ocean-600 bg-clip-text text-transparent group-hover:from-primary-600 group-hover:to-ocean-500 transition-all duration-300">
+              <span className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-teal-700 to-ocean-500 bg-clip-text text-transparent group-hover:from-teal-600 group-hover:to-ocean-400 transition-all duration-300">
                 Sedef Akvaryum
               </span>
               <span className="text-xs text-gray-500 font-medium">Hediye Evi</span>
@@ -70,14 +74,14 @@ const Navbar: React.FC = () => {
                 key={category.id}
                 to={`/category/${category.id}`}
                 className={`group relative px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${isActive(`/category/${category.id}`)
-                  ? 'text-primary-600 bg-primary-50'
-                  : 'text-gray-700 hover:text-primary-600 hover:bg-ocean-50'
+                  ? 'text-teal-700 bg-teal-50'
+                  : 'text-gray-700 hover:text-teal-600 hover:bg-teal-50/70'
                   }`}
               >
                 <span className="text-lg transform group-hover:scale-125 transition-transform duration-300">{category.icon}</span>
                 <span>{category.name}</span>
                 {isActive(`/category/${category.id}`) && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-ocean-500 via-primary-500 to-secondary-500"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-500 to-ocean-400"></div>
                 )}
               </Link>
             ))}
@@ -88,8 +92,8 @@ const Navbar: React.FC = () => {
             <button
               onClick={toggleSearch}
               className={`p-2 rounded-lg transition-all duration-300 ${isSearchOpen
-                ? 'text-primary-600 bg-primary-50 ring-2 ring-primary-100'
-                : 'text-gray-600 hover:text-primary-600 hover:bg-ocean-50'
+                ? 'text-teal-600 bg-teal-50 ring-2 ring-teal-100'
+                : 'text-gray-600 hover:text-teal-600 hover:bg-teal-50'
                 }`}
               aria-label="Search"
             >
@@ -108,13 +112,13 @@ const Navbar: React.FC = () => {
                   id="navbar-search-input"
                   type="text"
                   placeholder="Ürün, kategori veya marka ara..."
-                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-100 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 bg-gray-50 focus:bg-white transition-all duration-300 text-gray-800 placeholder-gray-400 text-base"
+                  className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-100 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 bg-gray-50 focus:bg-white transition-all duration-300 text-gray-800 placeholder-gray-400 text-base"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <button
                   type="submit"
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary-600 transition-colors"
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-teal-600 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -138,8 +142,8 @@ const Navbar: React.FC = () => {
             <button
               onClick={toggleSearch}
               className={`p-2 rounded-lg transition-all duration-300 ${isSearchOpen
-                ? 'text-primary-600 bg-primary-50'
-                : 'text-gray-700 hover:text-primary-600 hover:bg-ocean-50'
+                ? 'text-teal-600 bg-teal-50'
+                : 'text-gray-700 hover:text-teal-600 hover:bg-teal-50'
                 }`}
               aria-label="Search"
             >
@@ -158,7 +162,7 @@ const Navbar: React.FC = () => {
               <input
                 type="text"
                 placeholder="Ürün ara..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg border-2 border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-200"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg border-2 border-gray-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus={isSearchOpen}
@@ -173,6 +177,7 @@ const Navbar: React.FC = () => {
         </div>
       </div>
     </nav>
+    </>
   );
 };
 

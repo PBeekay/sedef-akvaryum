@@ -71,15 +71,45 @@ module.exports = {
           700: '#b91c1c',
           800: '#991b1b',
           900: '#7f1d1d',
-        }
+        },
+        // Teal: Ocean/Aquatic Primary (Aquarium theme)
+        teal: {
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#14b8a6',
+          600: '#0d9488',
+          700: '#0f766e',
+          800: '#115e59',
+          900: '#134e4a',
+          950: '#042f2e',
+        },
+        // Navy: Deep Water (Aquarium theme background)
+        navy: {
+          50: '#eef4fb',
+          100: '#d5e4f3',
+          200: '#adc9e8',
+          300: '#7aa7d5',
+          400: '#4f87c0',
+          500: '#2f69a6',
+          600: '#1e5289',
+          700: '#163d6a',
+          800: '#0f2a4d',
+          900: '#0f2744',
+          950: '#071523',
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Outfit', 'system-ui', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
         'slide-up': 'slideUp 0.4s ease-out',
         'bounce-gentle': 'bounceGentle 2s infinite ease-in-out',
+        'float-bubble': 'floatBubble 6s ease-in-out infinite',
+        'shimmer-wave': 'shimmerWave 3s ease-in-out infinite',
       },
       scale: {
         '98': '0.98',
@@ -96,7 +126,15 @@ module.exports = {
         bounceGentle: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-3px)' },
-        }
+        },
+        floatBubble: {
+          '0%, 100%': { transform: 'translateY(0) scale(1)', opacity: '0.7' },
+          '50%': { transform: 'translateY(-20px) scale(1.05)', opacity: '1' },
+        },
+        shimmerWave: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
       }
     },
   },

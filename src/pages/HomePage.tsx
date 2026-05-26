@@ -175,39 +175,69 @@ const HomePage: React.FC = () => {
           }
         }}
       />
-      {/* Hero Section with Slider (yılbaşı teması) */}
-      <section className="bg-gray-50 py-16 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero Section with Slider */}
+      <section className="relative bg-gradient-to-br from-navy-900 via-teal-900 to-navy-800 py-20 md:py-28 overflow-hidden">
+        {/* Decorative Bubbles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+          <div className="absolute top-16 left-[8%] w-4 h-4 rounded-full bg-teal-400/30 animate-float-bubble" />
+          <div className="absolute top-32 left-[20%] w-2 h-2 rounded-full bg-cyan-300/40 animate-float-bubble" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-24 right-[15%] w-6 h-6 rounded-full bg-teal-300/20 animate-float-bubble" style={{ animationDelay: '2s' }} />
+          <div className="absolute bottom-24 left-[35%] w-3 h-3 rounded-full bg-ocean-400/30 animate-float-bubble" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute top-1/2 right-[8%] w-5 h-5 rounded-full bg-teal-500/25 animate-float-bubble" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute bottom-16 right-[25%] w-2 h-2 rounded-full bg-cyan-400/35 animate-float-bubble" style={{ animationDelay: '3s' }} />
+          {/* Large soft glow blobs */}
+          <div className="absolute -top-32 -left-32 w-96 h-96 bg-teal-600/15 rounded-full blur-3xl" />
+          <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-ocean-600/15 rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
             <div className="animate-fade-in">
               <div className="transition-all duration-500 ease-in-out">
-                <div className="inline-block mb-4">
-                  <span className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-yellow-200 text-sm font-semibold border border-white/30">
-                    ✨ Akvaryum Uzmanları
-                  </span>
+                <div className="inline-flex items-center gap-2 mb-5 px-4 py-2 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 text-sm font-semibold backdrop-blur-sm">
+                  <span>✦</span>
+                  <span>Akvaryum Uzmanları — Eskişehir</span>
                 </div>
-                <h1 className="text-3xl md:text-5xl font-extrabold mb-5 leading-tight text-gray-900">
+                <h1 className="text-4xl md:text-6xl font-extrabold mb-5 leading-tight tracking-tight text-white">
                   Hoş Geldiniz{' '}
-                  <span className="block text-primary-600">Sedef Akvaryum</span>
+                  <span className="block text-gradient-hero">Sedef Akvaryum</span>
                 </h1>
                 <div className="mb-8 space-y-3">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-3 text-gray-800">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-3 text-white/95">
                     {heroSlides[currentSlide]?.title || heroSlides[0]?.title || 'Sedef Akvaryum'}
                   </h2>
-                  <p className="text-lg text-gray-600 mb-3 font-medium">
+                  <p className="text-lg text-teal-200 mb-3 font-medium">
                     {heroSlides[currentSlide]?.subtitle || heroSlides[0]?.subtitle || ''}
                   </p>
-                  <p className="text-base text-gray-500 leading-relaxed">
+                  <p className="text-base text-white/70 leading-relaxed">
                     {heroSlides[currentSlide]?.description || heroSlides[0]?.description || ''}
                   </p>
+                </div>
+
+                {/* CTA Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 mt-8">
+                  <Link
+                    to="/category/shrimp"
+                    className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-teal-500 hover:bg-teal-400 text-white font-bold rounded-xl transition-all duration-300 shadow-lg shadow-teal-900/40 hover:shadow-teal-500/30 hover:scale-105"
+                  >
+                    <span>🦐</span>
+                    Karidesleri Keşfet
+                  </Link>
+                  <Link
+                    to="/category/fish"
+                    className="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl border border-white/20 hover:border-white/40 transition-all duration-300 backdrop-blur-sm"
+                  >
+                    <span>🐠</span>
+                    Tüm Balıklar
+                  </Link>
                 </div>
               </div>
             </div>
 
             {/* Image Slider */}
             <div className="animate-slide-up relative w-full">
-              <div className="relative overflow-hidden rounded-2xl shadow-2xl w-full h-80 bg-gray-50">
+              <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-navy-900/60 ring-1 ring-white/10 w-full h-80 md:h-96">
                 {heroSlides.map((slide, index) => (
                   <div
                     key={slide.id || `slide-${index}`}
@@ -284,21 +314,21 @@ const HomePage: React.FC = () => {
               {/* Navigation Arrows */}
               <button
                 onClick={prevSlide}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 rounded-full p-3 transition-all duration-300 hover:scale-110 shadow-lg z-20"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-white/15 hover:bg-white/30 text-white backdrop-blur-sm rounded-full p-2.5 transition-all duration-300 hover:scale-110 shadow-lg z-20 border border-white/20"
                 aria-label="Önceki slayt"
                 type="button"
               >
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-gray-700 rounded-full p-3 transition-all duration-300 hover:scale-110 shadow-lg z-20"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-white/15 hover:bg-white/30 text-white backdrop-blur-sm rounded-full p-2.5 transition-all duration-300 hover:scale-110 shadow-lg z-20 border border-white/20"
                 aria-label="Sonraki slayt"
                 type="button"
               >
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -306,14 +336,14 @@ const HomePage: React.FC = () => {
           </div>
 
           {/* Slide Indicators */}
-          <div className="flex justify-center mt-10 space-x-3">
+          <div className="flex justify-center mt-10 space-x-2">
             {heroSlides.map((slide, index) => (
               <button
                 key={slide.id || `slide-${index}`}
                 onClick={() => goToSlide(index)}
-                className={`transition-all duration-300 rounded-full w-3 h-3 ${index === currentSlide
-                  ? 'bg-yellow-400 scale-125 shadow-lg shadow-yellow-300/50'
-                  : 'bg-white/50 hover:bg-white/75 hover:scale-110'
+                className={`transition-all duration-300 rounded-full ${index === currentSlide
+                  ? 'w-6 h-2.5 bg-teal-400 shadow-md shadow-teal-400/50'
+                  : 'w-2.5 h-2.5 bg-white/30 hover:bg-white/60 hover:scale-110'
                   }`}
                 aria-label={`Slayt ${index + 1}`}
                 type="button"
@@ -327,18 +357,17 @@ const HomePage: React.FC = () => {
       <LogoLoop />
 
       {/* Categories Section */}
-      <section className="py-12 bg-transparent relative overflow-hidden">
+      <section className="py-16 bg-white relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16 animate-fade-in">
-            <div className="inline-block mb-4">
-              <span className="px-4 py-2 bg-primary-100 rounded-full text-primary-600 text-sm font-semibold">
-                🏪 Ürün Kategorileri
-              </span>
+            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-sm font-semibold">
+              <span>🏪</span>
+              <span>Ürün Kategorileri</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-gray-900">
-              Kategorilerimizi Keşfedin
+              Kategorilerimizi <span className="text-gradient">Keşfedin</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Sevimli balıklardan temel aksesuarlara kadar, dostlarınıza en iyi bakımı
@@ -347,50 +376,70 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {categories.map((category, index) => (
+            {categories.map((category, index) => {
+              const categoryColorMap: Record<string, { gradient: string; hoverGlow: string; iconBg: string }> = {
+                fish:        { gradient: 'from-orange-400 to-amber-500',   hoverGlow: 'from-orange-400 to-amber-400',   iconBg: 'bg-orange-50' },
+                shrimp:      { gradient: 'from-teal-500 to-cyan-500',      hoverGlow: 'from-teal-400 to-cyan-400',      iconBg: 'bg-teal-50' },
+                plants:      { gradient: 'from-green-500 to-emerald-500',  hoverGlow: 'from-green-400 to-emerald-400',  iconBg: 'bg-green-50' },
+                equipment:   { gradient: 'from-slate-500 to-blue-600',     hoverGlow: 'from-slate-400 to-blue-500',     iconBg: 'bg-slate-50' },
+                accessories: { gradient: 'from-rose-400 to-pink-500',      hoverGlow: 'from-rose-400 to-pink-400',      iconBg: 'bg-rose-50' },
+                food:        { gradient: 'from-amber-400 to-orange-400',   hoverGlow: 'from-amber-400 to-orange-400',   iconBg: 'bg-amber-50' },
+              };
+              const config = categoryColorMap[category.id] || { gradient: 'from-teal-500 to-cyan-500', hoverGlow: 'from-teal-400 to-cyan-400', iconBg: 'bg-teal-50' };
+
+              return (
               <Link
                 key={category.id}
                 to={`/category/${category.id}`}
                 className="group relative overflow-hidden rounded-2xl"
-                style={{ animationDelay: `${index * 100}ms` }}
+                style={{ animationDelay: `${index * 80}ms` }}
               >
-                {/* Hover Glow Background */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-ocean-400 to-primary-500 rounded-2xl blur opacity-0 group-hover:opacity-40 transition duration-500 will-change-transform"></div>
+                {/* Glow halo on hover */}
+                <div className={`absolute -inset-0.5 bg-gradient-to-r ${config.hoverGlow} rounded-2xl blur-sm opacity-0 group-hover:opacity-50 transition-all duration-500`} />
 
-                {/* Main Card Content */}
-                <div className="relative bg-white rounded-2xl p-6 text-center shadow-sm hover:shadow-2xl transition-all duration-300 transform group-hover:-translate-y-1 group-hover:scale-[1.02] border border-gray-100/50 z-10 h-full flex flex-col justify-center">
-                  <div className="mb-4 transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 filter drop-shadow-sm">
-                    <span className="text-5xl">{category.icon}</span>
-                  </div>
-                  <h3 className="font-bold text-gray-800 group-hover:text-primary-600 transition-colors duration-200 text-lg">
-                    {category.name}
-                  </h3>
+                {/* Card body */}
+                <div className="relative bg-white rounded-2xl overflow-hidden shadow-sm group-hover:shadow-xl transition-all duration-300 border border-gray-100/80 z-10 h-full flex flex-col">
+                  {/* Top gradient bar */}
+                  <div className={`h-1.5 w-full bg-gradient-to-r ${config.gradient}`} />
 
-                  {/* Subtle chevron for affordance */}
-                  <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
-                    <span className="text-primary-500 text-sm font-medium flex items-center justify-center gap-1">
-                      İncele
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                    </span>
+                  <div className="p-6 flex flex-col items-center justify-center flex-1 text-center">
+                    {/* Icon container with category-tinted background */}
+                    <div className={`w-16 h-16 ${config.iconBg} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-sm`}>
+                      <span className="text-4xl">{category.icon}</span>
+                    </div>
+
+                    <h3 className="font-bold text-gray-800 group-hover:text-gray-900 transition-colors text-base leading-tight">
+                      {category.name}
+                    </h3>
+
+                    <div className="mt-2.5 overflow-hidden h-5">
+                      <span className={`text-xs font-semibold flex items-center justify-center gap-1 transform translate-y-5 group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-r ${config.gradient} bg-clip-text text-transparent`}>
+                        İncele
+                        <svg className="w-3 h-3 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </Link>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Featured Products Section */}
-      <section className="py-12 bg-gray-50 relative">
+      <section className="py-16 bg-teal-50/40 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="inline-block mb-4">
-              <span className="px-4 py-2 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full text-orange-600 text-sm font-semibold border border-orange-200">
+              <span className="px-4 py-2 bg-gradient-to-r from-accent-50 to-accent-100 border border-accent-200 rounded-full text-accent-700 text-sm font-semibold">
                 ⭐ En Popüler
               </span>
             </div>
             <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-gray-900">
-              Öne Çıkan Ürünler
+              Öne Çıkan <span className="text-gradient">Ürünler</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Müşterilerimizin en çok sevdiği popüler ve yüksek puanlı ürünlerimiz.
@@ -408,7 +457,7 @@ const HomePage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowAllFeatured((prev) => !prev)}
-                className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold bg-white hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200 shadow-sm"
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border-2 border-teal-200 text-teal-700 font-semibold bg-white hover:bg-teal-50 hover:border-teal-400 transition-all duration-200 shadow-sm"
               >
                 {showAllFeatured ? 'Daha Az Göster' : 'Tüm Öne Çıkan Ürünleri Görüntüle'}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -418,7 +467,7 @@ const HomePage: React.FC = () => {
             )}
             <Link
               to="/category/fish"
-              className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-ocean-500 to-primary-500 text-white font-bold text-lg rounded-xl hover:from-ocean-600 hover:to-primary-600 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform"
+              className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-teal-500 to-ocean-500 text-white font-bold text-lg rounded-xl hover:from-teal-600 hover:to-ocean-600 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 transform"
             >
               <span className="text-2xl">🐠</span>
               Balıkları Keşfet
@@ -432,7 +481,7 @@ const HomePage: React.FC = () => {
 
       {/* New Arrivals Section */}
       {newProducts.length > 0 && (
-        <section className="py-12 bg-transparent relative overflow-hidden">
+        <section className="py-16 bg-white relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full opacity-5">
             <div className="absolute top-20 right-20 w-72 h-72 bg-green-400 rounded-full filter blur-3xl"></div>
           </div>
@@ -445,7 +494,7 @@ const HomePage: React.FC = () => {
                 </span>
               </div>
               <h2 className="text-4xl md:text-5xl font-extrabold mb-6 text-gray-900">
-                Yeni Gelenler
+                Yeni <span className="text-gradient">Gelenler</span>
               </h2>
               <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
                 Ailemize katılan en son üyelerimizi keşfedin.
@@ -463,7 +512,7 @@ const HomePage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowAllNew((prev) => !prev)}
-                  className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold bg-white hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200 shadow-sm"
+                  className="inline-flex items-center gap-2 px-8 py-3 rounded-xl border-2 border-teal-200 text-teal-700 font-semibold bg-white hover:bg-teal-50 hover:border-teal-400 transition-all duration-200 shadow-sm"
                 >
                   {showAllNew ? 'Daha Az Göster' : 'Tüm Yeni Ürünleri Görüntüle'}
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

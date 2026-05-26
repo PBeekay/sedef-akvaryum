@@ -3,17 +3,17 @@ import React from 'react';
 
 const ContactSection: React.FC = () => {
     return (
-        <section id="contact" className="py-16 bg-white border-t border-gray-200 relative overflow-hidden">
+        <section id="contact" className="py-16 bg-teal-50/40 border-t border-teal-100/60 relative overflow-hidden">
             {/* Animated Background Elements - Simplified for section */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
-                <div className="absolute top-20 left-10 w-72 h-72 bg-blue-50 rounded-full mix-blend-multiply filter blur-3xl animate-bounce-gentle"></div>
-                <div className="absolute bottom-20 right-10 w-72 h-72 bg-green-50 rounded-full mix-blend-multiply filter blur-3xl animate-bounce-gentle" style={{ animationDelay: '2s' }}></div>
+                <div className="absolute top-20 left-10 w-72 h-72 bg-teal-50 rounded-full mix-blend-multiply filter blur-3xl animate-bounce-gentle"></div>
+                <div className="absolute bottom-20 right-10 w-72 h-72 bg-cyan-50 rounded-full mix-blend-multiply filter blur-3xl animate-bounce-gentle" style={{ animationDelay: '2s' }}></div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="text-center mb-12 animate-fade-in">
                     <div className="inline-block mb-4">
-                        <span className="px-4 py-2 bg-blue-50 rounded-full text-blue-600 text-sm font-semibold border border-blue-100">
+                        <span className="px-4 py-2 bg-teal-50 rounded-full text-teal-700 text-sm font-semibold border border-teal-200">
                             📬 Bize Ulaşın
                         </span>
                     </div>
@@ -55,7 +55,7 @@ const ContactSection: React.FC = () => {
 
                             {/* Hover Overlay */}
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none">
-                                <span className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-md text-blue-600 font-bold rounded-xl shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                <span className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-md text-teal-700 font-bold rounded-xl shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                     </svg>
@@ -70,7 +70,7 @@ const ContactSection: React.FC = () => {
                         {/* Working Hours */}
                         <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                             <div className="flex items-center mb-4">
-                                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mr-4">
+                                <div className="w-12 h-12 bg-teal-100 text-teal-700 rounded-xl flex items-center justify-center mr-4">
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
@@ -80,15 +80,15 @@ const ContactSection: React.FC = () => {
                             <div className="space-y-3 text-gray-600">
                                 <div className="flex justify-between items-center border-b border-gray-50 pb-2">
                                     <span className="font-medium">Pazartesi - Cuma:</span>
-                                    <span className="text-blue-600 font-bold">10:00 - 20:00</span>
+                                    <span className="text-teal-700 font-bold">10:00 - 20:00</span>
                                 </div>
                                 <div className="flex justify-between items-center border-b border-gray-50 pb-2">
                                     <span className="font-medium">Cumartesi:</span>
-                                    <span className="text-blue-600 font-bold">10:00 - 20:00</span>
+                                    <span className="text-teal-700 font-bold">10:00 - 20:00</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="font-medium">Pazar:</span>
-                                    <span className="text-blue-600 font-bold">14:00 - 18:00</span>
+                                    <span className="text-teal-700 font-bold">14:00 - 18:00</span>
                                 </div>
                             </div>
                         </div>
@@ -96,14 +96,14 @@ const ContactSection: React.FC = () => {
                         {/* Phone */}
                         <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                             <div className="flex items-center mb-4">
-                                <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mr-3">
+                                <div className="w-12 h-12 bg-teal-100 text-teal-700 rounded-xl flex items-center justify-center mr-3">
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                     </svg>
                                 </div>
                                 <h3 className="text-lg font-bold text-gray-900">Telefon</h3>
                             </div>
-                            <a href="tel:+905315073006" className="text-xl font-bold text-gray-800 hover:text-green-600 transition-colors block text-center bg-gray-50 rounded-xl p-3">
+                            <a href="tel:+905315073006" className="text-xl font-bold text-gray-800 hover:text-teal-700 transition-colors block text-center bg-gray-50 rounded-xl p-3">
                                 +90 531 507 30 06
                             </a>
                         </div>

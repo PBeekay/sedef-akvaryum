@@ -4,11 +4,27 @@ import { categories } from '../data/products';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="relative bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white overflow-hidden">
+    <footer className="relative bg-gradient-to-br from-navy-950 via-navy-900 to-teal-950 text-white overflow-hidden">
+      {/* Wave Divider */}
+      <div className="absolute top-0 left-0 right-0 overflow-hidden leading-none -translate-y-full pointer-events-none" aria-hidden="true">
+        <svg
+          viewBox="0 0 1440 80"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0,40 C180,80 360,0 540,40 C720,80 900,0 1080,40 C1260,80 1380,20 1440,40 L1440,80 L0,80 Z"
+            fill="#071523"
+          />
+        </svg>
+      </div>
+
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10">
-        <div className="absolute top-10 left-10 w-64 h-64 bg-ocean-400 rounded-full mix-blend-multiply filter blur-3xl animate-bounce-gentle"></div>
-        <div className="absolute bottom-10 right-10 w-64 h-64 bg-primary-400 rounded-full mix-blend-multiply filter blur-3xl animate-bounce-gentle" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-10 left-10 w-64 h-64 bg-teal-400 rounded-full mix-blend-multiply filter blur-3xl animate-bounce-gentle"></div>
+        <div className="absolute bottom-10 right-10 w-64 h-64 bg-navy-400 rounded-full mix-blend-multiply filter blur-3xl animate-bounce-gentle" style={{ animationDelay: '2s' }}></div>
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -18,7 +34,7 @@ const Footer: React.FC = () => {
             <div className="flex items-center space-x-3 mb-6 group">
               <div className="text-4xl transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">🦐</div>
               <div>
-                <span className="text-2xl font-extrabold bg-gradient-to-r from-ocean-300 to-primary-300 bg-clip-text text-transparent">Sedef Akvaryum</span>
+                <span className="text-2xl font-extrabold bg-gradient-to-r from-teal-300 to-cyan-200 bg-clip-text text-transparent">Sedef Akvaryum</span>
                 <p className="text-xs text-gray-400">Hediye Evi</p>
               </div>
             </div>
@@ -30,7 +46,7 @@ const Footer: React.FC = () => {
                 href="https://www.instagram.com/sedef_akvaryum_hediye_evi/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group p-3 bg-white/10 hover:bg-gradient-to-r hover:from-pink-500 hover:to-purple-500 rounded-xl transition-all duration-300 transform hover:scale-110 hover:shadow-lg"
+                className="group p-3 bg-teal-500/20 hover:bg-gradient-to-r hover:from-pink-500 hover:to-purple-500 rounded-xl transition-all duration-300 transform hover:scale-110 hover:shadow-lg"
                 aria-label="Instagram'da bizi takip edin"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -42,7 +58,7 @@ const Footer: React.FC = () => {
 
           {/* Categories */}
           <div>
-            <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-ocean-300 to-primary-300 bg-clip-text text-transparent">
+            <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-teal-300 to-cyan-200 bg-clip-text text-transparent">
               Kategoriler
             </h3>
             <ul className="space-y-3">
@@ -62,13 +78,13 @@ const Footer: React.FC = () => {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-ocean-300 to-primary-300 bg-clip-text text-transparent">
+            <h3 className="text-xl font-bold mb-6 bg-gradient-to-r from-teal-300 to-cyan-200 bg-clip-text text-transparent">
               İletişim Bilgileri
             </h3>
             <div className="space-y-4">
               <div className="flex items-start space-x-3 group">
-                <div className="p-2 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
-                  <svg className="w-5 h-5 text-ocean-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="p-2 bg-teal-500/20 rounded-lg group-hover:bg-white/20 transition-colors">
+                  <svg className="w-5 h-5 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -83,8 +99,8 @@ const Footer: React.FC = () => {
                 href="tel:+905315073006"
                 className="flex items-center space-x-3 group hover:text-white transition-colors"
               >
-                <div className="p-2 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors">
-                  <svg className="w-5 h-5 text-ocean-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="p-2 bg-teal-500/20 rounded-lg group-hover:bg-white/20 transition-colors">
+                  <svg className="w-5 h-5 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                 </div>
@@ -98,7 +114,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-700/50 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-400 text-center md:text-left">
-              © 2024 <span className="font-semibold text-ocean-300">Sedef Akvaryum</span>. Tüm hakları saklıdır.
+              © 2024 <span className="font-semibold text-teal-300">Sedef Akvaryum</span>. Tüm hakları saklıdır.
             </p>
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <span>Made with</span>

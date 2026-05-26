@@ -3,16 +3,8 @@
 @tailwind utilities;
 
 @layer components {
-  .btn-primary {
-    @apply px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors;
-  }
-
-  .btn-outline {
-    @apply px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors;
-  }
-
   .text-gradient {
-    @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-teal-700 via-teal-500 to-ocean-500 bg-clip-text text-transparent;
   }
 
   .line-clamp-2 {
@@ -142,7 +134,7 @@
   }
 
   body {
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     /* Typography Improvement */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -151,14 +143,16 @@
     overscroll-behavior-y: none;
     /* Sayfa yenilemeyi önle */
     touch-action: pan-y;
-    /* Soft Mist Theme */
-    background-color: #f8fafc;
-    /* slightly lighter gray/blue tint */
+    /* Aquatic Teal Theme */
+    background-color: #f0fdfa;
+    /* Very subtle teal-50 tint */
     color: #1e293b;
-    /* slate-800 for better readability implies */
+    /* slate-800 for better readability */
     min-height: 100vh;
     line-height: 1.6;
     /* More breathability */
+    letter-spacing: -0.01em;
+    /* Outfit benefits from slight tightening */
   }
 
   /* Ana container için de overscroll-behavior ekle */
@@ -182,7 +176,7 @@
 
   /* Better focus styles for accessibility */
   *:focus-visible {
-    outline: 3px solid theme('colors.primary.500');
+    outline: 3px solid theme('colors.teal.500');
     outline-offset: 2px;
     border-radius: 4px;
   }
@@ -192,7 +186,7 @@
     position: absolute;
     top: -40px;
     left: 0;
-    background: theme('colors.primary.600');
+    background: theme('colors.teal.600');
     color: white;
     padding: 8px 16px;
     text-decoration: none;
@@ -206,7 +200,7 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-teal-600 hover:bg-teal-700 text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:shadow-teal-500/20;
   }
 
   .btn-secondary {
@@ -214,33 +208,42 @@
   }
 
   .btn-outline {
-    @apply border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply border-2 border-teal-600 text-teal-700 hover:bg-teal-600 hover:text-white font-semibold py-2.5 px-5 rounded-xl transition-all duration-200;
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300;
+    @apply bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100/80;
   }
 
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200;
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all duration-200;
   }
 }
 
 @layer utilities {
   .text-gradient {
-    /* High contrast gradient: Deep Royal to Vibrant Blue */
-    @apply bg-gradient-to-r from-primary-800 to-primary-600 bg-clip-text text-transparent;
+    /* Aquatic gradient: Deep Teal to Ocean */
+    @apply bg-gradient-to-r from-teal-700 via-teal-500 to-ocean-500 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-hero {
+    /* Light hero gradient: Teal to White */
+    @apply bg-gradient-to-r from-teal-300 via-cyan-200 to-white bg-clip-text text-transparent;
   }
 
   .bg-gradient-primary {
-    @apply bg-gradient-to-r from-primary-800 to-primary-600;
+    @apply bg-gradient-to-r from-navy-800 to-teal-700;
   }
 
   .text-glow {
-    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    text-shadow: 0 0 24px rgba(13, 148, 136, 0.55);
   }
 
   .glass-panel {
-    @apply bg-white/90 backdrop-blur-xl border border-white/40 shadow-xl;
+    @apply bg-white/85 backdrop-blur-xl border border-teal-100/60 shadow-xl;
+  }
+
+  .glass-panel-dark {
+    @apply bg-navy-900/80 backdrop-blur-xl border border-teal-800/30 shadow-2xl;
   }
 }

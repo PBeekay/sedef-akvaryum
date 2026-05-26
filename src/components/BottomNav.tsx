@@ -37,11 +37,11 @@ const BottomNav: React.FC = () => {
           {/* Ana Sayfa */}
           <Link
             to="/"
-            className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 ${isHome ? 'text-primary-600 scale-110' : 'text-gray-400 hover:text-gray-600'
+            className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 ${isHome ? 'text-teal-600 scale-110' : 'text-gray-400 hover:text-gray-600'
               }`}
             onClick={() => setIsMenuOpen(false)}
           >
-            <div className={`p-2 rounded-xl transition-all ${isHome ? 'bg-primary-50' : 'bg-transparent'}`}>
+            <div className={`p-2 rounded-xl transition-all ${isHome ? 'bg-teal-50' : 'bg-transparent'}`}>
               <svg className="w-6 h-6" fill={isHome ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
@@ -55,7 +55,7 @@ const BottomNav: React.FC = () => {
           >
             <div className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${isMenuOpen
                 ? 'bg-gray-800 text-white rotate-90'
-                : 'bg-gradient-to-tr from-primary-500 to-ocean-500 text-white hover:scale-105 hover:shadow-primary-500/30'
+                : 'bg-gradient-to-tr from-teal-500 to-ocean-400 text-white hover:scale-105 hover:shadow-primary-500/30'
               }`}>
               {isMenuOpen ? (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -76,7 +76,7 @@ const BottomNav: React.FC = () => {
               }`}
             onClick={() => setIsMenuOpen(false)}
           >
-            <div className={`p-2 rounded-xl transition-all ${isSearch ? 'bg-primary-50' : 'bg-transparent'}`}>
+            <div className={`p-2 rounded-xl transition-all ${isSearch ? 'bg-teal-50' : 'bg-transparent'}`}>
               <svg className="w-6 h-6" fill="none" stroke={isSearch ? "currentColor" : "currentColor"} strokeWidth={isSearch ? 3 : 2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
@@ -94,7 +94,7 @@ const BottomNav: React.FC = () => {
           {/* Menu Header */}
           <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 p-6 flex items-center justify-between mb-2">
             <div>
-              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-ocean-600 to-primary-600 bg-clip-text text-transparent">
+              <h2 className="text-2xl font-extrabold bg-gradient-to-r from-teal-600 to-ocean-500 bg-clip-text text-transparent">
                 Menü
               </h2>
               <p className="text-sm text-gray-500">Kategoriler ve daha fazlası</p>
@@ -114,14 +114,14 @@ const BottomNav: React.FC = () => {
             <div className="grid grid-cols-2 gap-3">
               <Link
                 to="/"
-                className="bg-gray-50 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-primary-50 transition-colors border border-gray-100"
+                className="bg-gray-50 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-teal-50 transition-colors border border-gray-100"
               >
                 <span className="text-2xl">🏠</span>
                 <span className="font-semibold text-gray-700">Ana Sayfa</span>
               </Link>
               <Link
                 to="/search"
-                className="bg-gray-50 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-primary-50 transition-colors border border-gray-100"
+                className="bg-gray-50 p-4 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-teal-50 transition-colors border border-gray-100"
               >
                 <span className="text-2xl">🔍</span>
                 <span className="font-semibold text-gray-700">Arama</span>
@@ -137,18 +137,18 @@ const BottomNav: React.FC = () => {
                     key={category.id}
                     to={`/category/${category.id}`}
                     className={`flex items-center p-4 rounded-2xl transition-all duration-200 border ${isActive(`/category/${category.id}`)
-                        ? 'bg-gradient-to-r from-primary-50 to-ocean-50 border-primary-100 shadow-sm'
+                        ? 'bg-gradient-to-r from-teal-50 to-ocean-50 border-teal-100 shadow-sm'
                         : 'bg-white border-gray-100 hover:border-gray-200 hover:shadow-sm'
                       }`}
                   >
                     <span className="text-3xl mr-4 filter drop-shadow-sm">{category.icon}</span>
                     <div className="flex-1">
-                      <h4 className={`font-bold text-base ${isActive(`/category/${category.id}`) ? 'text-primary-700' : 'text-gray-800'}`}>
+                      <h4 className={`font-bold text-base ${isActive(`/category/${category.id}`) ? 'text-teal-700' : 'text-gray-800'}`}>
                         {category.name}
                       </h4>
                       <p className="text-xs text-gray-500 line-clamp-1">Kategori ürünlerini incele</p>
                     </div>
-                    <svg className={`w-5 h-5 ${isActive(`/category/${category.id}`) ? 'text-primary-500' : 'text-gray-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-5 h-5 ${isActive(`/category/${category.id}`) ? 'text-teal-500' : 'text-gray-300'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </Link>
