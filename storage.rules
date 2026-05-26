@@ -1,0 +1,40 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ===== Helper functions =====
+    function isStaff() {
+      return request.auth != null && (
+        request.auth.token.email == "admin@sedefakvaryum.com" ||
+        request.auth.token.email == "moderator@sedefakvaryum.com"
+      );
+    }
+
+    // Yüklenen dosya gerçekten görsel mi + boyut limiti?
+    // 5 MB üstüne ve image/* dışı içerik tipine izin yok.
+    function isValidImageUpload() {
+      return request.resource != null
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    // Ürün görselleri
+    match /products/{fileName} {
+      allow read: if true;
+      allow create, update: if isStaff() && isValidImageUpload();
+      allow delete: if isStaff();
+    }
+
+    // Slider görselleri
+    match /sliders/{fileName} {
+      allow read: if true;
+      allow create, update: if isStaff() && isValidImageUpload();
+      allow delete: if isStaff();
+    }
+
+    // Diğer tüm yollar — default deny
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

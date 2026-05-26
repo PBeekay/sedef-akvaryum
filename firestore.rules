@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===== Helper functions =====
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        request.auth.token.email == "admin@sedefakvaryum.com";
+    }
+
+    function isStaff() {
+      return isSignedIn() && (
+        request.auth.token.email == "admin@sedefakvaryum.com" ||
+        request.auth.token.email == "moderator@sedefakvaryum.com"
+      );
+    }
+
+    // Product / slider data validation — prevents malformed writes
+    // even if admin credentials are misused.
+    function isValidProduct(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 200
+        && data.price is number && data.price >= 0 && data.price <= 1000000
+        && data.category is string && data.category.size() <= 50
+        && data.image is string && data.image.size() <= 2048
+        && data.inStock is bool
+        && (!('description' in data) || (data.description is string && data.description.size() <= 20000))
+        && (!('shortDescription' in data) || (data.shortDescription is string && data.shortDescription.size() <= 500))
+        && (!('featured' in data) || data.featured is bool)
+        && (!('new' in data) || data.new is bool);
+    }
+
+    function isValidSlider(data) {
+      return data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && (!('subtitle' in data) || (data.subtitle is string && data.subtitle.size() <= 300))
+        && (!('description' in data) || (data.description is string && data.description.size() <= 2000))
+        && (!('image' in data) || (data.image is string && data.image.size() <= 2048))
+        && (!('buttonLink' in data) || (data.buttonLink is string && data.buttonLink.size() <= 2048));
+    }
+
+    // ===== Collections =====
+
+    // Ürünler – herkese okuma, sadece admin/moderator yazma + validation
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isStaff() && isValidProduct(request.resource.data);
+      allow update: if isStaff() && isValidProduct(request.resource.data);
+      allow delete: if isStaff();
+    }
+
+    // Slider verileri
+    match /sliders/{sliderId} {
+      allow read: if true;
+      allow create: if isStaff() && isValidSlider(request.resource.data);
+      allow update: if isStaff() && isValidSlider(request.resource.data);
+      allow delete: if isStaff();
+    }
+
+    // Kullanıcı profilleri — kendi document'ini okur/yazar
+    // ama 'role', 'isAdmin', 'email' gibi hassas alanlara dokunamaz.
+    match /users/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && request.auth.uid == userId
+        && !('role' in request.resource.data)
+        && !('isAdmin' in request.resource.data)
+        && !('isModerator' in request.resource.data);
+      allow update: if isSignedIn() && request.auth.uid == userId
+        && !('role' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('isAdmin' in request.resource.data.diff(resource.data).affectedKeys())
+        && !('isModerator' in request.resource.data.diff(resource.data).affectedKeys());
+      allow delete: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Admin-only collection
+    match /admin/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Default deny — tanımlı olmayan tüm collection'lar
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
