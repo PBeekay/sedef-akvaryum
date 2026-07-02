@@ -206,14 +206,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         console.log('✅ Slider başarıyla Firebase\'e eklendi:', newSlider);
       }
     } catch (error: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error("❌ Firebase'e slider eklenirken hata oluştu: ", error);
-      }
-      throw new Error(
-        error?.code === 'permission-denied' 
-          ? 'Slider ekleme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
-          : error?.message || 'Slider eklenirken bir hata oluştu. Lütfen tekrar deneyin.'
-      );
+      throw new Error(getFirestoreErrorMessage(error, 'Slider ekleme'));
     }
   };
 
@@ -228,14 +221,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         console.log('✅ Slider başarıyla Firebase\'de güncellendi:', id);
       }
     } catch (error: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error("❌ Firebase'de slider güncellenirken hata oluştu: ", error);
-      }
-      throw new Error(
-        error?.code === 'permission-denied' 
-          ? 'Slider güncelleme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
-          : error?.message || 'Slider güncellenirken bir hata oluştu. Lütfen tekrar deneyin.'
-      );
+      throw new Error(getFirestoreErrorMessage(error, 'Slider güncelleme'));
     }
   };
 
@@ -247,19 +233,50 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         console.log('✅ Slider başarıyla Firebase\'den silindi:', id);
       }
     } catch (error: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error("❌ Firebase'den slider silinirken hata oluştu: ", error);
-      }
-      throw new Error(
-        error?.code === 'permission-denied' 
-          ? 'Slider silme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
-          : error?.message || 'Slider silinirken bir hata oluştu. Lütfen tekrar deneyin.'
-      );
+      throw new Error(getFirestoreErrorMessage(error, 'Slider silme'));
     }
   };
 
   // Login ve Logout fonksiyonları Firebase Auth'a taşındı
   // Artık AuthContext'te yönetiliyor
+
+  // Firestore hatalarını kullanıcı dostu mesajlara dönüştür
+  const getFirestoreErrorMessage = (error: any, action: string): string => {
+    const code = error?.code || '';
+    const msg = error?.message || '';
+
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`❌ Firestore ${action} hatası:`, { code, msg, full: error });
+    }
+
+    if (code === 'permission-denied') {
+      // permission-denied hem yetki hem de veri doğrulama için gelir
+      // Firestore kural hatalarında msg içinde "Missing or insufficient permissions" yazar
+      if (msg.includes('Missing or insufficient permissions')) {
+        return `${action} izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.`;
+      }
+      // Veri doğrulama hataları için daha detaylı mesaj
+      return `${action} başarısız. Gönderilen verilerde sorun olabilir. Lütfen tüm alanları doğru doldurduğunuzdan emin olun (alan adları, fiyat, kategori, görsel URL'si ve stok durumu zorunludur).`;
+    }
+
+    if (code === 'unauthenticated') {
+      return `Oturum süreniz dolmuş olabilir. Lütfen tekrar giriş yapın.`;
+    }
+
+    if (code === 'not-found') {
+      return `${action} başarısız. İstenen kayıt bulunamadı.`;
+    }
+
+    if (code === 'already-exists') {
+      return `${action} başarısız. Bu kayıt zaten mevcut.`;
+    }
+
+    if (code === 'resource-exhausted') {
+      return `${action} başarısız. Çok fazla istek gönderildi. Lütfen biraz bekleyin ve tekrar deneyin.`;
+    }
+
+    return msg || `${action} sırasında bir hata oluştu. Lütfen tekrar deneyin.`;
+  };
 
   // *** GÜNCELLENMİŞ: Ürün Yönetim Fonksiyonları (Firebase Entegrasyonu) ***
   const addProduct = async (productData: Omit<Product, 'id'>) => {
@@ -271,15 +288,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         console.log('✅ Ürün başarıyla Firebase\'e eklendi:', newProduct);
       }
     } catch (error: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error("❌ Firebase'e ürün eklenirken hata oluştu: ", error);
-      }
-      // Hata mesajını kullanıcıya göstermek için throw et
-      throw new Error(
-        error?.code === 'permission-denied' 
-          ? 'Ürün ekleme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
-          : error?.message || 'Ürün eklenirken bir hata oluştu. Lütfen tekrar deneyin.'
-      );
+      throw new Error(getFirestoreErrorMessage(error, 'Ürün ekleme'));
     }
   };
 
@@ -294,14 +303,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         console.log('✅ Ürün başarıyla Firebase\'de güncellendi:', id);
       }
     } catch (error: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error("❌ Firebase'de ürün güncellenirken hata oluştu: ", error);
-      }
-      throw new Error(
-        error?.code === 'permission-denied' 
-          ? 'Ürün güncelleme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
-          : error?.message || 'Ürün güncellenirken bir hata oluştu. Lütfen tekrar deneyin.'
-      );
+      throw new Error(getFirestoreErrorMessage(error, 'Ürün güncelleme'));
     }
   };
 
@@ -313,14 +315,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         console.log('✅ Ürün başarıyla Firebase\'den silindi:', id);
       }
     } catch (error: any) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error("❌ Firebase'den ürün silinirken hata oluştu: ", error);
-      }
-      throw new Error(
-        error?.code === 'permission-denied' 
-          ? 'Ürün silme izniniz yok. Lütfen admin olarak giriş yaptığınızdan emin olun.'
-          : error?.message || 'Ürün silinirken bir hata oluştu. Lütfen tekrar deneyin.'
-      );
+      throw new Error(getFirestoreErrorMessage(error, 'Ürün silme'));
     }
   };
 
