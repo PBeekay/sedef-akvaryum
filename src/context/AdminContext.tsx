@@ -6,9 +6,8 @@ import { db } from '../firebase'; // Projenize eklediğiniz firebase.js dosyası
 
 import { useAuth } from './AuthContext';
 import { Product } from '../types/Product';
-import PageLoader from '../components/PageLoader';
-// initialProducts'a artık ihtiyacımız yok, bu satırı silebilirsiniz.
-// import { products as initialProducts } from '../data/products';
+
+// SliderData interface'i - Firebase uyumlu
 
 
 // SliderData interface'i - Firebase uyumlu
@@ -20,8 +19,12 @@ interface SliderData {
   image: string;
   category: string;
   icon: string;
-  buttonText: string;
-  buttonLink: string;
+  buttonText?: string;
+  buttonLink?: string;
+  badge?: string;
+  discountTag?: string;
+  price?: string;
+  oldPrice?: string;
 }
 
 // AdminContextType interface'i - Firebase Auth ile güncellendi
@@ -336,7 +339,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
 
   return (
     <AdminContext.Provider value={value}>
-      {(loadingProducts || loadingSliders) ? <PageLoader /> : children}
+      {children}
     </AdminContext.Provider>
   );
 };

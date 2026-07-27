@@ -7,14 +7,6 @@ interface ProductCardProps {
   showDetails?: boolean;
 }
 
-const categoryAccentMap: Record<string, string> = {
-  fish:        'from-orange-400 to-amber-400',
-  shrimp:      'from-teal-500 to-cyan-400',
-  plants:      'from-green-500 to-emerald-400',
-  equipment:   'from-slate-500 to-blue-500',
-  accessories: 'from-rose-400 to-pink-400',
-  food:        'from-amber-400 to-orange-400',
-};
 
 const categoryLabelMap: Record<string, string> = {
   fish:        'Balık',
@@ -23,95 +15,87 @@ const categoryLabelMap: Record<string, string> = {
   equipment:   'Ekipman',
   accessories: 'Sağlık & Bakım',
   food:        'Yem',
-};
-
-const ProductCard: React.FC<ProductCardProps> = memo(({ product, showDetails = false }) => {
+};const ProductCard: React.FC<ProductCardProps> = memo(({ product, showDetails = false }) => {
   return (
     <Link
       to={`/product/${product.id}`}
-      className="group block bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-teal-200/60 transition-all duration-300 overflow-hidden relative hover:-translate-y-0.5"
+      className="group block bg-white border border-slate-200/90 rounded-2xl overflow-hidden relative transform hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-lg p-3"
     >
-      {/* Category accent bar */}
-      <div className={`h-1 w-full bg-gradient-to-r ${categoryAccentMap[product.category] || 'from-teal-500 to-cyan-500'}`} />
-
-      {/* Image Section - Premium Interaction */}
-      <div className="relative overflow-hidden bg-gray-100">
+      {/* Image Section - Precise Modern Edge */}
+      <div className="relative overflow-hidden bg-slate-50 rounded-xl">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500 will-change-transform"
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700 ease-out will-change-transform"
           loading="lazy"
         />
 
-        {/* Quick View Overlay (Desktop Only for cleanliness) */}
-        <div className="hidden md:flex absolute inset-0 bg-navy-900/10 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 items-center justify-center z-10">
-          <span className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 bg-white/95 text-teal-700 font-bold px-6 py-2 rounded-full shadow-lg border border-teal-100/50 flex items-center gap-2 backdrop-blur-md text-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            İncele
-          </span>
-        </div>
+        {/* Natural Ambient Overlay */}
+        <div className="absolute inset-0 bg-emerald-900/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
         {/* Badges - Top Corners */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10">
           {product.featured && (
-            <span className="bg-gradient-to-r from-amber-400 to-yellow-400 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
-              ⭐ Öne Çıkan
+            <span className="liquid-pill text-[9px] uppercase tracking-wider font-extrabold text-amber-800 px-2.5 py-1 rounded-full flex items-center gap-1 border border-amber-100/50">
+              <span>🍃</span> Öne Çıkan
             </span>
           )}
           {product.new && (
-            <span className="bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
-              🆕 Yeni
+            <span className="liquid-pill text-[9px] uppercase tracking-wider font-extrabold text-emerald-800 px-2.5 py-1 rounded-full flex items-center gap-1 border border-emerald-100/50">
+              <span>🌿</span> Yeni
             </span>
           )}
         </div>
 
-        {/* Stock Badge - Top Right */}
+        {/* Stock Status Badge */}
         {!product.inStock && (
-          <div className="absolute top-2 right-2">
-            <span className="bg-red-500/90 backdrop-blur-sm text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
-              Stokta Yok
+          <div className="absolute top-2.5 right-2.5 z-10">
+            <span className="bg-slate-800/80 backdrop-blur-md text-white text-[9px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-full">
+              Tükendi
             </span>
           </div>
         )}
       </div>
 
       {/* Content Section */}
-      <div className="p-4 md:p-5 flex flex-col flex-grow">
+      <div className="p-3.5 flex flex-col flex-grow">
+        {/* Category Tag */}
+        <div className="mb-2">
+          <span className={`text-[9px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-50/60 text-emerald-800 border border-emerald-100/30`}>
+            {categoryLabelMap[product.category] || product.category}
+          </span>
+        </div>
+
         {/* Product Name */}
-        <h3 className="text-base md:text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-teal-700 transition-colors leading-snug">
+        <h3 className="text-sm font-bold text-[#2c3e44] mb-2 line-clamp-2 group-hover:text-emerald-700 transition-colors leading-snug">
           {product.name}
         </h3>
 
-        {/* Category Tag */}
-        <span className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-md mb-2 bg-gradient-to-r ${categoryAccentMap[product.category] || 'from-teal-500 to-cyan-500'} bg-clip-text text-transparent border border-gray-100`}>
-          {categoryLabelMap[product.category] || product.category}
-        </span>
-
-        {/* Short Description - Only if showDetails */}
+        {/* Short Description */}
         {showDetails && product.shortDescription && (
-          <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+          <p className="text-xs text-slate-500 mb-3 line-clamp-2 leading-relaxed">
             {product.shortDescription}
           </p>
         )}
 
-        {/* Price and Action Row */}
-        <div className="flex items-end justify-between mt-auto pt-3 border-t border-gray-100/50">
+        {/* Price and Stock status row */}
+        <div className="flex items-center justify-between mt-auto pt-3.5 border-t border-slate-100">
           <div className="flex flex-col">
-            <span className="text-xs text-gray-400 font-medium mb-0.5">Fiyat</span>
-            <span className="text-xl font-black text-teal-700 tracking-tight">
+            <span className="text-[9px] text-slate-400 uppercase tracking-widest font-semibold">Fiyat</span>
+            <span className="text-base font-black text-slate-800 tracking-tight">
               ₺{product.price.toFixed(2)}
             </span>
           </div>
+
           {product.inStock ? (
-            <div className="flex items-center gap-1.5 bg-green-50 px-2.5 py-1 rounded-md border border-green-100">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-              <span className="text-xs text-green-700 font-bold">Stokta</span>
-            </div>
+            <span className="text-[9px] font-bold tracking-wider uppercase text-emerald-600 bg-emerald-50/60 border border-emerald-100/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></span>
+              Stokta
+            </span>
           ) : (
-            <span className="text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded border border-red-100">Tükendi</span>
+            <span className="text-[9px] font-bold tracking-wider uppercase text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-full">
+              Tükendi
+            </span>
           )}
         </div>
       </div>

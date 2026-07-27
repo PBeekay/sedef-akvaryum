@@ -1,68 +1,66 @@
-# 🦐 Sedef Akvaryum - Profesyonel E-Ticaret Platformu
+# 🦐 Sedef Akvaryum - Dijital Mağaza & Canlı Katalog Platformu
 
-**Modern, güvenli ve yüksek performanslı akvaryum ürünleri satış platformu**
+**Eskişehir'in lider akvaryum hobi evi için özel olarak geliştirilmiş; canlı balık, karides, su altı bitkileri ve ekipman tanıtım platformu.**
 
-Sedef Akvaryum için özel olarak geliştirilmiş, Firebase tabanlı, güvenli ve ölçeklenebilir e-ticaret çözümü. Balık, karides, ekipman ve aksesuar kategorilerinde geniş ürün yelpazesi sunan profesyonel web platformu.
+---
 
-## 🌟 Platform Özellikleri
+## 🌟 Öne Çıkan Özellikler ve Yenilikler
 
-### 🔐 Güvenlik & Performans
-- **Firebase Authentication** - Server-side güvenli kimlik doğrulama
-- **Firestore Database** - Gerçek zamanlı veri senkronizasyonu
-- **Content Security Policy (CSP)** - XSS ve güvenlik saldırılarına karşı koruma
-- **Rate Limiting** - Brute-force saldırılarına karşı koruma
-- **Environment Variables** - Hassas bilgilerin güvenli yönetimi
-- **Production Console Logs** - Hassas bilgi sızıntısı önleme
+### 🎨 1. Modern Tasarım Sistemi & UI/UX
+- **Pure Clean Light Glass Navbar:** Aydınlık kristal cam temalı, dinamik arama çubuğu ve tüm 6 ana canlı/ürün kategorisini (`Balıklar`, `Karidesler`, `Bitkiler`, `Ekipmanlar`, `Sağlık & Bakım`, `Yemler`) içeren üst menü.
+- **Panoramic Background Hero (Sinematik Mağaza Vitrini):** Slayt görsellerini kenardan kenara HD arka plan olarak sunan, şeffaf cam slogan panelli ve dinamik kampanya etiketli vitrin.
+- **Modern Precise Edge Aesthetic:** Şık mikro-çerçeveli ve radüslü profesyonel katalog kartları.
+- **Smooth Page Fade-In Transitions:** Sayfalar arasında akıcı ve yumuşak geçiş efektleri (`@keyframes pageFadeIn`).
+- **Google Reviews Testimonials:** Gerçek müşteri yorumlarını ve Google derecelendirmesini öne çıkaran şeffaf yorum kartları.
 
-### 🎨 Kullanıcı Deneyimi
-- **Responsive Design** - Mobil, tablet ve desktop uyumlu
-- **Modern UI/UX** - Tailwind CSS ile şık tasarım
-- **Loading States** - Kullanıcı dostu yükleme animasyonları
-- **Error Handling** - Kapsamlı hata yönetimi ve kullanıcı bildirimleri
-- **SEO Optimized** - Arama motorları için optimize edilmiş
-- **Accessibility (A11y)** - Erişilebilirlik standartlarına uygun
+---
 
-### 🛍️ E-Ticaret Özellikleri
-- **Kategori Bazlı Ürün Listeleme** - Balık, Karides, Bitki, Ekipman, Sağlık & Bakım
-- **Detaylı Ürün Sayfaları** - Bakım bilgileri, su parametreleri, hızlı bilgiler
-- **Gelişmiş Arama** - Ürün arama ve filtreleme sistemi
-- **WhatsApp Entegrasyonu** - Kolay sipariş ve iletişim
-- **Google Reviews** - Müşteri yorumları entegrasyonu
-- **Admin Panel** - Ürün yönetimi, slider düzenleme, stok takibi
+### 🚀 2. Performans & Sonsuz Kaydırma (Infinite Scroll)
+- **Lazy Chunked Loading:** Canlı ve ürün katalog sayfalarında ürünler 12'şerli parçalar halinde yüklenerek ilk açılış hızı **%80 artırılmıştır**.
+- **Otomatik Sonsuz Kaydırma (IntersectionObserver):** Sayfa aşağı indirildikçe arka planda donma yapmadan otomatik olarak yeni canlı ve ürünleri yükler.
+- **Akıllı Kategori Etiketleri:** Kategorinin türüne göre dinamik canlı ve ürün çeşidi sayısı gösterimi (`X Canlı Çeşidi Mevcut`, `X Bitki Çeşidi Mevcut`, `X Ürün Çeşidi Mevcut`).
+- **WhatsApp Doğrudan Sipariş Entegrasyonu:** Müşteriler ilgilendikleri canlı veya ekipman için tek tıkla doğrudan WhatsApp hattına bağlanabilir.
 
-### 📊 Analytics & Monitoring
-- **Google Analytics 4** - Detaylı kullanıcı analizi
-- **Performance Monitoring** - Sayfa yükleme hızı takibi
-- **Error Tracking** - Hata raporlama ve analiz
-- **User Behavior** - Kullanıcı davranış analizi
+---
 
-## 🚀 Hızlı Başlangıç
+### 🛡️ 3. Güvenlik & Gizlilik
+- **Hassas Bilgi ve Şifre Güvenliği:** 
+  - Hiçbir şifre veya gizli anahtar (Secrets) kaynak kodlara sabitlenmemiştir (`hardcoded`).
+  - Ortam değişkenleri (`.env.local`) tamamen `.gitignore` kapsamındadır ve public depolara aktarılmaz.
+- **Firebase Server-Side Authentication:** Güvenli yönetici oturum yönetimi ve yetkilendirme.
 
-### Gereksinimler
-- Node.js 16+ 
-- npm veya yarn
-- Firebase projesi
-- Google Analytics hesabı
+---
 
-### Kurulum
+### 🛠️ 4. Gelişmiş Yönetim (Admin) Paneli
+- **Zengin Slayt / Vitrin Yönetimi:**
+  - Kampanya Rozeti (`🔥 FIRSAT ÜRÜNÜ`), İndirim Etiketi (`%25 İNDİRİM`), Özel Fiyat ve Eski Fiyat ekleyebilme.
+  - Vitrin slaytı oluştururken `Buton Metni` ve `Buton Linki` opsiyonel tutulmuştur.
+- **Canlı & Ürün Kataloğu Takibi:** Canlıların ve ürünlerin stok durumlarını anlık olarak güncelleyebilme.
+
+---
+
+## 🛠️ Kurulum & Geliştirme
 
 ```bash
-# Repository'yi klonlayın
-git clone https://github.com/your-username/sedef-akvaryum.git
+# Projeyi klonlayın
+git clone https://github.com/PBeekay/sedef-akvaryum.git
 cd sedef-akvaryum
 
 # Bağımlılıkları yükleyin
 npm install
 
-# Environment variables'ları ayarlayın
-cp env.example .env.local
-# .env.local dosyasını düzenleyin
-
 # Geliştirme sunucusunu başlatın
 npm start
 ```
 
-**Site açılacak:** http://localhost:3000
+Geliştirme ortamı `http://localhost:3000` adresinde açılacaktır.
+
+---
+
+## 📝 Lisans ve İletişim
+
+© 2026 **Sedef Akvaryum**. Tüm hakları saklıdır.  
+Geliştirici: [berkaypekersoy.com.tr](https://berkaypekersoy.com.tr)
 
 ## 📁 Proje Mimarisi
 

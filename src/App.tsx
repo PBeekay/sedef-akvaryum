@@ -48,23 +48,29 @@ const AppContent: React.FC = () => {
 
         <main id="main-content" role="main" className="flex-grow pb-20 md:pb-0" tabIndex={-1}>
           <Suspense fallback={<SuspenseLoader />}>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              {/* Turkish slug aliases → canonical category routes */}
-              <Route path="/balik" element={<Navigate to="/category/fish" replace />} />
-              <Route path="/karides" element={<Navigate to="/category/shrimp" replace />} />
-              <Route path="/bitkiler" element={<Navigate to="/category/plants" replace />} />
-              <Route path="/ekipman" element={<Navigate to="/category/equipment" replace />} />
-              <Route path="/aksesuarlar" element={<Navigate to="/category/accessories" replace />} />
-              <Route path="/yem" element={<Navigate to="/category/food" replace />} />
-              <Route path="/product/:id" element={<ProductDetailPage />} />
-              <Route path="/category/:categoryId" element={<CategoryPage />} />
+            <div key={location.pathname} className="page-transition">
+              <Routes location={location}>
+                <Route path="/" element={<HomePage />} />
+                {/* Turkish slug aliases → canonical category routes */}
+                <Route path="/balik" element={<Navigate to="/category/fish" replace />} />
+                <Route path="/karides" element={<Navigate to="/category/shrimp" replace />} />
+                <Route path="/bitkiler" element={<Navigate to="/category/plants" replace />} />
+                <Route path="/ekipman" element={<Navigate to="/category/equipment" replace />} />
+                <Route path="/aksesuarlar" element={<Navigate to="/category/accessories" replace />} />
+                <Route path="/yem" element={<Navigate to="/category/food" replace />} />
+                <Route path="/product/:id" element={<ProductDetailPage />} />
+                <Route path="/category/:categoryId" element={<CategoryPage />} />
+                <Route path="/search" element={<SearchPage />} />
 
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/admin/login" element={<AdminLoginPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
+                {/* Admin Routes */}
+                <Route path="/admin/login" element={<AdminLoginPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+
+                {/* 404 Route */}
+                <Route path="/404" element={<NotFoundPage />} />
+                <Route path="*" element={<Navigate to="/404" replace />} />
+              </Routes>
+            </div>
           </Suspense>
         </main>
 

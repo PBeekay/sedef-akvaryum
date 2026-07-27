@@ -141,20 +141,6 @@ const GoogleReviews: React.FC<GoogleReviewsProps> = ({
     setCurrentSlide(index);
   };
 
-  // Get avatar color based on name
-  const getAvatarColor = (name: string) => {
-    const colors = [
-      'bg-yellow-200',
-      'bg-teal-200',
-      'bg-purple-200',
-      'bg-pink-200',
-      'bg-blue-200',
-      'bg-green-200'
-    ];
-    const index = name.charCodeAt(0) % colors.length;
-    return colors[index];
-  };
-
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
       <svg
@@ -209,127 +195,124 @@ const GoogleReviews: React.FC<GoogleReviewsProps> = ({
 
   if (error) {
     return (
-      <div className={`py-16 px-4 bg-gradient-to-b from-amber-50/50 to-white ${className}`}>
-        <div className="max-w-7xl mx-auto text-center">
-          <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-          </svg>
-          <p className="text-gray-500">{error}</p>
-        </div>
+      <div className={`py-12 px-4 text-center ${className}`}>
+        <p className="text-slate-500 text-sm">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className={`py-16 px-4 bg-gradient-to-b from-amber-50/50 to-white ${className}`}>
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Müşteri Yorumları
-          </h2>
-          <p className="text-gray-600 text-lg max-w-3xl mx-auto">
-            Premium balık ve neocaridina karides kalitemiz hakkında müşterilerimizin ne söylediğini görün.
-          </p>
-        </div>
-
-        {/* Carousel Container */}
-        <div className="relative">
-          {/* Left Arrow */}
-          {totalSlides > 1 && (
-            <button
-              onClick={prevSlide}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white rounded-full p-3 shadow-lg hover:bg-gray-50 transition-colors hidden md:block"
-              aria-label="Previous reviews"
-            >
-              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          )}
-
-          {/* Reviews Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {getVisibleReviews().map((review) => (
-              <div
-                key={review.id}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 flex flex-col h-64"
-              >
-                {/* User Info */}
-                <div className="flex items-center mb-4">
-                  <div className={`w-12 h-12 rounded-full ${getAvatarColor(review.author_name)} flex items-center justify-center mr-3`}>
-                    <svg className="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">
-                      {review.author_name}
-                    </h4>
-                    <div className="flex items-center mt-1">
-                      {renderStars(review.rating)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Review Text */}
-                <p className="text-gray-600 text-sm leading-relaxed flex-grow italic mb-3 line-clamp-4 overflow-hidden">
-                  "{review.text}"
-                </p>
-
-                {/* Date */}
-                <p className="text-xs text-gray-400">
-                  {formatDate(review.time)}
-                </p>
-              </div>
-            ))}
+    <section className={`py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden ${className}`}>
+      <div className="max-w-7xl mx-auto relative z-10">
+        
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-3">
+              <span className="text-amber-400 font-bold text-xs">★ 4.9</span>
+              <span className="text-slate-400">|</span>
+              <span className="text-xs font-semibold text-emerald-700">Google Onaylı Müşteri Deneyimleri</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tight">
+              Müşterilerimiz Ne Diyor?
+            </h2>
           </div>
 
-          {/* Right Arrow */}
-          {totalSlides > 1 && (
-            <button
-              onClick={nextSlide}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white rounded-full p-3 shadow-lg hover:bg-gray-50 transition-colors hidden md:block"
-              aria-label="Next reviews"
-            >
-              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          )}
-        </div>
-
-        {/* Pagination Dots */}
-        {totalSlides > 1 && (
-          <div className="flex justify-center gap-2 mb-8">
-            {Array.from({ length: totalSlides }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`w-3 h-3 rounded-full transition-colors ${index === currentSlide ? 'bg-orange-500' : 'bg-gray-300'
-                  }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Footer - Google Maps Link */}
-        <div className="text-center">
           <a
             href={SEDEF_AKVARYUM_GOOGLE_MAPS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white hover:bg-slate-900 text-slate-800 hover:text-white border border-slate-200 shadow-sm text-xs font-bold transition-all shrink-0"
           >
-            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-            </svg>
-            Google Haritalar'da Tüm Yorumları Gör
+            <span>Google Haritalar Yorumları</span>
+            <span>↗</span>
           </a>
         </div>
+
+        {/* Reviews Cards Showcase */}
+        <div className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {getVisibleReviews().map((review) => (
+              <div
+                key={review.id}
+                className="bg-white/80 backdrop-blur-md rounded-3xl p-6 border border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group transform hover:-translate-y-1"
+              >
+                <div>
+                  {/* Top Rating & Avatar */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-extrabold text-sm flex items-center justify-center shadow-md">
+                        {review.author_name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-sm group-hover:text-emerald-700 transition-colors">
+                          {review.author_name}
+                        </h4>
+                        <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+                          <span>✓</span> Doğrulanmış Müşteri
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-0.5">
+                      {renderStars(review.rating)}
+                    </div>
+                  </div>
+
+                  {/* Review Text */}
+                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed italic mb-4">
+                    "{review.text}"
+                  </p>
+                </div>
+
+                {/* Card Footer Date & Badge */}
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                  <span>{formatDate(review.time)}</span>
+                  <span className="text-emerald-700 font-semibold">Sedef Akvaryum Hobi Evi</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Navigation Arrows & Indicators */}
+          {totalSlides > 1 && (
+            <div className="flex items-center justify-between mt-8">
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalSlides }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      index === currentSlide ? 'w-8 bg-emerald-600' : 'w-2 bg-slate-300'
+                    }`}
+                    aria-label={`Slayt ${index + 1}`}
+                  />
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={prevSlide}
+                  className="w-10 h-10 rounded-2xl bg-white hover:bg-emerald-600 text-slate-700 hover:text-white border border-slate-200 flex items-center justify-center transition-all shadow-sm"
+                  aria-label="Önceki"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={nextSlide}
+                  className="w-10 h-10 rounded-2xl bg-white hover:bg-emerald-600 text-slate-700 hover:text-white border border-slate-200 flex items-center justify-center transition-all shadow-sm"
+                  aria-label="Sonraki"
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+          )}
+
+        </div>
+
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -2132,7 +2132,11 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
     icon: slide?.icon || '🖼️',
     buttonText: slide?.buttonText || '',
     buttonLink: slide?.buttonLink || '',
-    category: slide?.category || 'fish'
+    category: slide?.category || 'fish',
+    badge: slide?.badge || '',
+    discountTag: slide?.discountTag || '',
+    price: slide?.price || '',
+    oldPrice: slide?.oldPrice || ''
   });
 
   const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -2292,28 +2296,88 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Buton Metni
+            Buton Metni (Opsiyonel)
           </label>
           <input
             type="text"
             value={formData.buttonText}
             onChange={(e) => handleInputChange('buttonText', e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            required
+            placeholder="Örn: İndirimi Kaçırma"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Buton Linki
+            Buton Linki (Opsiyonel)
           </label>
           <input
             type="text"
             value={formData.buttonLink}
             onChange={(e) => handleInputChange('buttonLink', e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            required
+            placeholder="Örn: /category/shrimp veya /product/12"
           />
+        </div>
+      </div>
+
+      {/* Special Offer & Discount Fields */}
+      <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200 space-y-4">
+        <h4 className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
+          🔥 Kampanya & Özel Fiyat Ayarları (Opsiyonel)
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Kampanya / Üst Rozet (Badge)
+            </label>
+            <input
+              type="text"
+              value={formData.badge}
+              onChange={(e) => handleInputChange('badge', e.target.value)}
+              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg bg-white"
+              placeholder="Örn: YENİ ÜRÜN veya FIRSAT ÜRÜNÜ"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              İndirim Oranı Etiketi
+            </label>
+            <input
+              type="text"
+              value={formData.discountTag}
+              onChange={(e) => handleInputChange('discountTag', e.target.value)}
+              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg bg-white"
+              placeholder="Örn: %20 İNDİRİM veya SINIRLI STOK"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Kampanyalı Fiyat (TL)
+            </label>
+            <input
+              type="text"
+              value={formData.price}
+              onChange={(e) => handleInputChange('price', e.target.value)}
+              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg bg-white font-bold text-emerald-700"
+              placeholder="Örn: 249 TL"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">
+              Eski Fiyat (TL)
+            </label>
+            <input
+              type="text"
+              value={formData.oldPrice}
+              onChange={(e) => handleInputChange('oldPrice', e.target.value)}
+              className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg bg-white text-gray-400 line-through"
+              placeholder="Örn: 350 TL"
+            />
+          </div>
         </div>
       </div>
 

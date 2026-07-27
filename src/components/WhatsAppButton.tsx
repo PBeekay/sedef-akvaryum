@@ -40,10 +40,10 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   if (variant === 'floating') {
     return (
       <>
-        {/* Desktop - Floating Circle Button */}
+        {/* Desktop & Mobile - Floating Circle Button Positioned Above BackToTop */}
         <button
           onClick={handleWhatsAppClick}
-          className={`hidden md:flex fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 ${className}`}
+          className={`flex fixed bottom-24 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full p-3.5 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 ${className}`}
           aria-label="WhatsApp üzerinden bize ulaşın"
         >
           <svg
