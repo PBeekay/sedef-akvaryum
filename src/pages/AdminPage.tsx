@@ -222,59 +222,60 @@ const AdminPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-100 py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
+        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 sm:p-6 rounded-2xl border border-slate-200/80 shadow-sm">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Paneli</h1>
-            <p className="text-gray-600">Sedef Akvaryum yönetim paneli</p>
+            <h1 className="text-xl sm:text-3xl font-black text-slate-800 tracking-tight">Admin Paneli</h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Sedef Akvaryum yönetim paneli</p>
           </div>
           <button
             onClick={handleLogout}
-            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="w-full sm:w-auto px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md shadow-red-600/10 flex items-center justify-center gap-2"
           >
-            Çıkış Yap
+            <span>🚪</span>
+            <span>Çıkış Yap</span>
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex flex-wrap gap-2 mb-8">
+        {/* Tabs - Scrollable horizontal bar on mobile */}
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto no-scrollbar pb-2 pt-1 -mx-3 px-3 sm:mx-0 sm:px-0">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+              className={`flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-200 shrink-0 ${
                 activeTab === tab.id
-                  ? 'bg-primary-600 text-white shadow-lg'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
+                  : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
               }`}
             >
-              <span className="text-lg">{tab.icon}</span>
+              <span className="text-base sm:text-lg">{tab.icon}</span>
               {tab.name}
             </button>
           ))}
         </div>
 
-        {/* Content */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        {/* Content Container */}
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-6 lg:p-8">
           {activeTab === 'products' && (
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <h2 className="text-2xl font-bold text-gray-800">Ürün Yönetimi</h2>
-                <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Ürün Yönetimi</h2>
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => {
                       localStorage.removeItem('sedef_akvaryum_products');
                       window.location.reload();
                     }}
-                    className="px-3 py-1 bg-red-500 text-white rounded text-sm"
+                    className="flex-1 sm:flex-none px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors"
                   >
-                    Cache Temizle
+                    🔄 Cache Temizle
                   </button>
                   <button
                     onClick={handleAddProduct}
-                    className="btn-primary"
+                    className="flex-1 sm:flex-none btn-zen py-2 px-4 text-xs font-bold shadow-md shadow-emerald-950/20"
                   >
                     + Yeni Ürün Ekle
                   </button>
@@ -282,21 +283,21 @@ const AdminPage: React.FC = () => {
               </div>
 
               {/* Filters */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1">
                   <input
                     type="text"
                     placeholder="Ürün ara..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:bg-white outline-none"
                   />
                 </div>
-                <div className="sm:w-48">
+                <div className="sm:w-56">
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-3.5 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 outline-none"
                   >
                     <option value="all">Tüm Kategoriler</option>
                     {categories.map(category => (
@@ -308,76 +309,78 @@ const AdminPage: React.FC = () => {
                 </div>
               </div>
 
-              {/* Products Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-200">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="border border-gray-200 px-4 py-2 text-left">Resim</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">Ürün Adı</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">Kategori</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">Fiyat</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">Stok</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">İşlemler</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredProducts.map((product) => (
-                      <tr key={product.id} className="hover:bg-gray-50">
-                        <td className="border border-gray-200 px-4 py-2">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-16 h-16 object-cover rounded"
-                          />
-                        </td>
-                        <td className="border border-gray-200 px-4 py-2">
-                          <div>
-                            <div className="font-medium">{product.name}</div>
-                            <div className="text-sm text-gray-500">{product.shortDescription}</div>
-                          </div>
-                        </td>
-                        <td className="border border-gray-200 px-4 py-2">
-                          <span className="inline-flex items-center gap-1">
-                            {categories.find(c => c.id === product.category)?.icon}
-                            {categories.find(c => c.id === product.category)?.name}
-                          </span>
-                        </td>
-                        <td className="border border-gray-200 px-4 py-2">
-                          ₺{product.price.toFixed(2)}
-                        </td>
-                        <td className="border border-gray-200 px-4 py-2">
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            product.inStock 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {product.inStock ? 'Stokta' : 'Stokta Yok'}
-                          </span>
-                        </td>
-                        <td className="border border-gray-200 px-4 py-2">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleEditProduct(product)}
-                              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                            >
-                              Düzenle
-                            </button>
-                            <button
-                              onClick={() => handleDeleteProduct(product.id)}
-                              className="text-red-600 hover:text-red-800 text-sm font-medium"
-                            >
-                              Sil
-                            </button>
-                          </div>
-                        </td>
+              {/* Products Responsive List / Table */}
+              <div className="overflow-hidden border border-slate-200 rounded-2xl">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
+                        <th className="px-3 py-3">Resim</th>
+                        <th className="px-3 py-3">Ürün Adı</th>
+                        <th className="px-3 py-3">Kategori</th>
+                        <th className="px-3 py-3">Fiyat</th>
+                        <th className="px-3 py-3">Stok</th>
+                        <th className="px-3 py-3 text-right">İşlemler</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredProducts.map((product) => (
+                        <tr key={product.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="px-3 py-2.5 shrink-0">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-xl border border-slate-200 shrink-0"
+                            />
+                          </td>
+                          <td className="px-3 py-2.5">
+                            <div className="font-bold text-slate-800 text-xs sm:text-sm">{product.name}</div>
+                            {product.shortDescription && (
+                              <div className="text-[11px] text-slate-400 line-clamp-1 max-w-[200px]">{product.shortDescription}</div>
+                            )}
+                          </td>
+                          <td className="px-3 py-2.5 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
+                              {categories.find(c => c.id === product.category)?.icon}
+                              {categories.find(c => c.id === product.category)?.name}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 font-bold text-emerald-700 whitespace-nowrap">
+                            ₺{product.price.toFixed(2)}
+                          </td>
+                          <td className="px-3 py-2.5 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              product.inStock 
+                                ? 'bg-emerald-100 text-emerald-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {product.inStock ? 'Stokta' : 'Stokta Yok'}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                            <div className="flex items-center justify-end gap-1 sm:gap-2">
+                              <button
+                                onClick={() => handleEditProduct(product)}
+                                className="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold rounded-lg transition-colors text-[11px]"
+                              >
+                                Düzenle
+                              </button>
+                              <button
+                                onClick={() => handleDeleteProduct(product.id)}
+                                className="px-2.5 py-1 bg-red-50 text-red-700 hover:bg-red-100 font-bold rounded-lg transition-colors text-[11px]"
+                              >
+                                Sil
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-              <div className="text-sm text-gray-500">
+              <div className="text-xs sm:text-sm font-semibold text-slate-500">
                 Toplam {filteredProducts.length} ürün bulundu
               </div>
             </div>
@@ -393,65 +396,65 @@ const AdminPage: React.FC = () => {
               </div>
 
               {/* Stock Summary */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div className="bg-emerald-50/80 p-3 sm:p-4 rounded-xl border border-emerald-200/80">
                   <div className="flex items-center">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="p-2 bg-emerald-100 rounded-lg shrink-0">
+                      <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-green-600">Stokta</p>
-                      <p className="text-2xl font-bold text-green-900">
+                    <div className="ml-2.5">
+                      <p className="text-[11px] font-bold text-emerald-700">Stokta</p>
+                      <p className="text-xl font-black text-emerald-950">
                         {stockItems.filter(item => item.quantity > item.lowStockThreshold).length}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                <div className="bg-amber-50/80 p-3 sm:p-4 rounded-xl border border-amber-200/80">
                   <div className="flex items-center">
-                    <div className="p-2 bg-orange-100 rounded-lg">
-                      <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="p-2 bg-amber-100 rounded-lg shrink-0">
+                      <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                       </svg>
                     </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-orange-600">Az Stok</p>
-                      <p className="text-2xl font-bold text-orange-900">
+                    <div className="ml-2.5">
+                      <p className="text-[11px] font-bold text-amber-700">Az Stok</p>
+                      <p className="text-xl font-black text-amber-950">
                         {stockItems.filter(item => item.quantity <= item.lowStockThreshold && item.quantity > 0).length}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                <div className="bg-red-50/80 p-3 sm:p-4 rounded-xl border border-red-200/80">
                   <div className="flex items-center">
-                    <div className="p-2 bg-red-100 rounded-lg">
-                      <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="p-2 bg-red-100 rounded-lg shrink-0">
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-red-600">Stokta Yok</p>
-                      <p className="text-2xl font-bold text-red-900">
+                    <div className="ml-2.5">
+                      <p className="text-[11px] font-bold text-red-700">Stokta Yok</p>
+                      <p className="text-xl font-black text-red-950">
                         {stockItems.filter(item => item.quantity === 0).length}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div className="bg-blue-50/80 p-3 sm:p-4 rounded-xl border border-blue-200/80">
                   <div className="flex items-center">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="p-2 bg-blue-100 rounded-lg shrink-0">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                       </svg>
                     </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-blue-600">Toplam Ürün</p>
-                      <p className="text-2xl font-bold text-blue-900">
+                    <div className="ml-2.5">
+                      <p className="text-[11px] font-bold text-blue-700">Toplam Ürün</p>
+                      <p className="text-xl font-black text-blue-950">
                         {stockItems.reduce((sum, item) => sum + item.quantity, 0)}
                       </p>
                     </div>
@@ -460,104 +463,102 @@ const AdminPage: React.FC = () => {
               </div>
 
               {/* Stock Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-200">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="border border-gray-200 px-4 py-2 text-left">Ürün</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">Kategori</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">Mevcut Stok</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">Düşük Stok Eşiği</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">Durum</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">Son Güncelleme</th>
-                      <th className="border border-gray-200 px-4 py-2 text-left">İşlemler</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {stockItems.map((stockItem) => {
-                      const product = products.find(p => p.id === stockItem.productId);
-                      if (!product) return null;
+              <div className="overflow-hidden border border-slate-200 rounded-2xl">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
+                        <th className="px-3 py-3">Ürün</th>
+                        <th className="px-3 py-3">Kategori</th>
+                        <th className="px-3 py-3">Mevcut Stok</th>
+                        <th className="px-3 py-3">Eşik</th>
+                        <th className="px-3 py-3">Durum</th>
+                        <th className="px-3 py-3 text-right">İşlemler</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {stockItems.map((stockItem) => {
+                        const product = products.find(p => p.id === stockItem.productId);
+                        if (!product) return null;
 
-                      const getStatusColor = () => {
-                        if (stockItem.quantity === 0) return 'bg-red-100 text-red-800';
-                        if (stockItem.quantity <= stockItem.lowStockThreshold) return 'bg-orange-100 text-orange-800';
-                        return 'bg-green-100 text-green-800';
-                      };
+                        const getStatusColor = () => {
+                          if (stockItem.quantity === 0) return 'bg-red-100 text-red-800';
+                          if (stockItem.quantity <= stockItem.lowStockThreshold) return 'bg-amber-100 text-amber-800';
+                          return 'bg-emerald-100 text-emerald-800';
+                        };
 
-                      const getStatusText = () => {
-                        if (stockItem.quantity === 0) return 'Stokta Yok';
-                        if (stockItem.quantity <= stockItem.lowStockThreshold) return 'Az Stok';
-                        return 'Stokta';
-                      };
+                        const getStatusText = () => {
+                          if (stockItem.quantity === 0) return 'Stokta Yok';
+                          if (stockItem.quantity <= stockItem.lowStockThreshold) return 'Az Stok';
+                          return 'Stokta';
+                        };
 
-                      return (
-                        <tr key={stockItem.productId} className="hover:bg-gray-50">
-                          <td className="border border-gray-200 px-4 py-2">
-                            <div className="flex items-center space-x-3">
-                              <img
-                                src={product.image}
-                                alt={product.name}
-                                className="w-12 h-12 object-cover rounded"
-                              />
-                              <div>
-                                <div className="font-medium">{product.name}</div>
-                                <div className="text-sm text-gray-500">₺{product.price.toFixed(2)}</div>
+                        return (
+                          <tr key={stockItem.productId} className="hover:bg-slate-50/80 transition-colors">
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              <div className="flex items-center space-x-2.5">
+                                <img
+                                  src={product.image}
+                                  alt={product.name}
+                                  className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-xl border border-slate-200 shrink-0"
+                                />
+                                <div>
+                                  <div className="font-bold text-slate-800 text-xs sm:text-sm">{product.name}</div>
+                                  <div className="text-[11px] text-emerald-700 font-bold">₺{product.price.toFixed(2)}</div>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="border border-gray-200 px-4 py-2">
-                            <span className="inline-flex items-center gap-1">
-                              {categories.find(c => c.id === product.category)?.icon}
-                              {categories.find(c => c.id === product.category)?.name}
-                            </span>
-                          </td>
-                          <td className="border border-gray-200 px-4 py-2">
-                            <input
-                              type="number"
-                              min="0"
-                              value={stockItem.quantity}
-                              onChange={(e) => updateStock(stockItem.productId, parseInt(e.target.value) || 0)}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
-                            />
-                          </td>
-                          <td className="border border-gray-200 px-4 py-2">
-                            <input
-                              type="number"
-                              min="0"
-                              value={stockItem.lowStockThreshold}
-                              onChange={(e) => setLowStockThreshold(stockItem.productId, parseInt(e.target.value) || 0)}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
-                            />
-                          </td>
-                          <td className="border border-gray-200 px-4 py-2">
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
-                              {getStatusText()}
-                            </span>
-                          </td>
-                          <td className="border border-gray-200 px-4 py-2 text-sm text-gray-500">
-                            {new Date(stockItem.lastUpdated).toLocaleDateString('tr-TR')}
-                          </td>
-                          <td className="border border-gray-200 px-4 py-2">
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => updateStock(stockItem.productId, stockItem.quantity + 1)}
-                                className="text-green-600 hover:text-green-800 text-sm font-medium"
-                              >
-                                +1
-                              </button>
-                              <button
-                                onClick={() => updateStock(stockItem.productId, Math.max(0, stockItem.quantity - 1))}
-                                className="text-red-600 hover:text-red-800 text-sm font-medium"
-                              >
-                                -1
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
+                                {categories.find(c => c.id === product.category)?.icon}
+                                {categories.find(c => c.id === product.category)?.name}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              <input
+                                type="number"
+                                min="0"
+                                value={stockItem.quantity}
+                                onChange={(e) => updateStock(stockItem.productId, parseInt(e.target.value) || 0)}
+                                className="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20"
+                              />
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              <input
+                                type="number"
+                                min="0"
+                                value={stockItem.lowStockThreshold}
+                                onChange={(e) => setLowStockThreshold(stockItem.productId, parseInt(e.target.value) || 0)}
+                                className="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-600 outline-none"
+                              />
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusColor()}`}>
+                                {getStatusText()}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-1">
+                                <button
+                                  onClick={() => updateStock(stockItem.productId, stockItem.quantity + 1)}
+                                  className="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-extrabold rounded-lg text-xs"
+                                >
+                                  +1
+                                </button>
+                                <button
+                                  onClick={() => updateStock(stockItem.productId, Math.max(0, stockItem.quantity - 1))}
+                                  className="px-2.5 py-1 bg-red-50 text-red-700 hover:bg-red-100 font-extrabold rounded-lg text-xs"
+                                >
+                                  -1
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
@@ -664,103 +665,103 @@ const AdminPage: React.FC = () => {
 
           {activeTab === 'dashboard' && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
-                <div className="text-sm text-gray-500">
-                  Hoş geldiniz! İşte mağazanızın genel durumu.
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Dashboard</h2>
+                <div className="text-xs sm:text-sm text-slate-500">
+                  Mağazanızın anlık özet verileri ve hızlı kısayollar.
                 </div>
               </div>
               
-              {/* Quick Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl text-white shadow-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-3xl">📦</div>
-                    <div className="text-sm opacity-80">Toplam</div>
+              {/* Quick Stats - 2 Columns on Mobile */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+                <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-4 sm:p-6 rounded-2xl text-white shadow-lg shadow-blue-500/10">
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
+                    <div className="text-2xl sm:text-3xl">📦</div>
+                    <div className="text-[10px] sm:text-xs font-bold uppercase tracking-wider opacity-80">Toplam</div>
                   </div>
-                  <div className="text-3xl font-bold mb-1">{adminProducts.length}</div>
-                  <div className="text-sm opacity-90">Ürün</div>
+                  <div className="text-2xl sm:text-4xl font-black mb-0.5">{adminProducts.length}</div>
+                  <div className="text-xs opacity-90 font-medium">Ürün</div>
                 </div>
                 
-                <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl text-white shadow-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-3xl">✓</div>
-                    <div className="text-sm opacity-80">Stokta</div>
+                <div className="bg-gradient-to-br from-emerald-600 to-teal-700 p-4 sm:p-6 rounded-2xl text-white shadow-lg shadow-emerald-500/10">
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
+                    <div className="text-2xl sm:text-3xl">✓</div>
+                    <div className="text-[10px] sm:text-xs font-bold uppercase tracking-wider opacity-80">Stokta</div>
                   </div>
-                  <div className="text-3xl font-bold mb-1">{adminProducts.filter(p => p.inStock).length}</div>
-                  <div className="text-sm opacity-90">Ürün</div>
+                  <div className="text-2xl sm:text-4xl font-black mb-0.5">{adminProducts.filter(p => p.inStock).length}</div>
+                  <div className="text-xs opacity-90 font-medium">Ürün</div>
                 </div>
                 
-                <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 rounded-xl text-white shadow-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-3xl">⭐</div>
-                    <div className="text-sm opacity-80">Öne Çıkan</div>
+                <div className="bg-gradient-to-br from-amber-500 to-amber-600 p-4 sm:p-6 rounded-2xl text-white shadow-lg shadow-amber-500/10">
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
+                    <div className="text-2xl sm:text-3xl">⭐</div>
+                    <div className="text-[10px] sm:text-xs font-bold uppercase tracking-wider opacity-80">Öne Çıkan</div>
                   </div>
-                  <div className="text-3xl font-bold mb-1">{adminProducts.filter(p => p.featured).length}</div>
-                  <div className="text-sm opacity-90">Ürün</div>
+                  <div className="text-2xl sm:text-4xl font-black mb-0.5">{adminProducts.filter(p => p.featured).length}</div>
+                  <div className="text-xs opacity-90 font-medium">Ürün</div>
                 </div>
                 
-                <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-xl text-white shadow-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-3xl">🆕</div>
-                    <div className="text-sm opacity-80">Yeni</div>
+                <div className="bg-gradient-to-br from-purple-600 to-purple-700 p-4 sm:p-6 rounded-2xl text-white shadow-lg shadow-purple-500/10">
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
+                    <div className="text-2xl sm:text-3xl">🆕</div>
+                    <div className="text-[10px] sm:text-xs font-bold uppercase tracking-wider opacity-80">Yeni</div>
                   </div>
-                  <div className="text-3xl font-bold mb-1">{adminProducts.filter(p => p.new).length}</div>
-                  <div className="text-sm opacity-90">Ürün</div>
+                  <div className="text-2xl sm:text-4xl font-black mb-0.5">{adminProducts.filter(p => p.new).length}</div>
+                  <div className="text-xs opacity-90 font-medium">Ürün</div>
                 </div>
               </div>
 
               {/* Quick Actions */}
-              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Hızlı İşlemler</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-sm">
+                <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-3">Hızlı İşlemler</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <button
                     onClick={() => { setActiveTab('products'); setShowAddForm(true); }}
-                    className="flex items-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+                    className="flex items-center gap-3.5 p-3.5 sm:p-4 bg-blue-50/80 hover:bg-blue-100 text-blue-900 rounded-xl transition-all border border-blue-200/80 active:scale-[0.98]"
                   >
-                    <div className="text-2xl">➕</div>
+                    <div className="text-2xl shrink-0">➕</div>
                     <div className="text-left">
-                      <div className="font-semibold text-blue-900">Yeni Ürün Ekle</div>
-                      <div className="text-xs text-blue-700">Mağazaya ürün ekleyin</div>
+                      <div className="font-bold text-xs sm:text-sm text-blue-950">Yeni Ürün Ekle</div>
+                      <div className="text-[11px] text-blue-700 font-medium mt-0.5">Mağazaya ürün ekleyin</div>
                     </div>
                   </button>
                   
                   <button
                     onClick={() => setActiveTab('slider')}
-                    className="flex items-center gap-3 p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200"
+                    className="flex items-center gap-3.5 p-3.5 sm:p-4 bg-purple-50/80 hover:bg-purple-100 text-purple-900 rounded-xl transition-all border border-purple-200/80 active:scale-[0.98]"
                   >
-                    <div className="text-2xl">🖼️</div>
+                    <div className="text-2xl shrink-0">🖼️</div>
                     <div className="text-left">
-                      <div className="font-semibold text-purple-900">Slider Düzenle</div>
-                      <div className="text-xs text-purple-700">Anasayfa slider'ını yönetin</div>
+                      <div className="font-bold text-xs sm:text-sm text-purple-950">Slider Düzenle</div>
+                      <div className="text-[11px] text-purple-700 font-medium mt-0.5">Anasayfa vitrinini yönetin</div>
                     </div>
                   </button>
                   
                   <button
                     onClick={() => setActiveTab('stock')}
-                    className="flex items-center gap-3 p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200"
+                    className="flex items-center gap-3.5 p-3.5 sm:p-4 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-900 rounded-xl transition-all border border-emerald-200/80 active:scale-[0.98]"
                   >
-                    <div className="text-2xl">📊</div>
+                    <div className="text-2xl shrink-0">📊</div>
                     <div className="text-left">
-                      <div className="font-semibold text-green-900">Stok Yönetimi</div>
-                      <div className="text-xs text-green-700">Stok durumunu güncelleyin</div>
+                      <div className="font-bold text-xs sm:text-sm text-emerald-950">Stok Yönetimi</div>
+                      <div className="text-[11px] text-emerald-700 font-medium mt-0.5">Stok durumunu güncelleyin</div>
                     </div>
                   </button>
                 </div>
               </div>
 
               {/* Category Overview */}
-              <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Kategori Dağılımı</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200/80 shadow-sm">
+                <h3 className="text-base sm:text-lg font-bold text-slate-800 mb-3">Kategori Dağılımı</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                   {categories.map(cat => {
                     const categoryProducts = adminProducts.filter(p => p.category === cat.id);
                     return (
-                      <div key={cat.id} className="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg text-center border border-gray-200">
-                        <div className="text-3xl mb-2">{cat.icon}</div>
-                        <div className="text-sm font-semibold text-gray-700 mb-1">{cat.name}</div>
-                        <div className="text-2xl font-bold text-primary-600">{categoryProducts.length}</div>
-                        <div className="text-xs text-gray-500 mt-1">
+                      <div key={cat.id} className="bg-slate-50 border border-slate-200/80 p-3 sm:p-4 rounded-xl text-center">
+                        <div className="text-2xl sm:text-3xl mb-1">{cat.icon}</div>
+                        <div className="text-xs font-bold text-slate-800 mb-0.5 truncate">{cat.name}</div>
+                        <div className="text-xl sm:text-2xl font-black text-emerald-600">{categoryProducts.length}</div>
+                        <div className="text-[10px] text-slate-400 font-medium mt-0.5">
                           {categoryProducts.filter(p => p.inStock).length} stokta
                         </div>
                       </div>
