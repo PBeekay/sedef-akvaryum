@@ -64,11 +64,9 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   
   // Slider yönetimi artık Firebase'den gelecek
   const [sliderData, setSliderData] = useState<SliderData[]>(defaultSliderData);
-  const [loadingSliders, setLoadingSliders] = useState(true); // Slider'lar için yüklenme durumu
   
   // Ürünler artık LocalStorage'dan değil, Firebase'den gelecek. Başlangıçta boş.
   const [products, setProducts] = useState<Product[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState(true); // Ürünler için yüklenme durumu
 
   // Firebase Auth ile authentication durumu
   const isAuthenticated = !!currentUser && (isAdmin || isModerator);
@@ -92,7 +90,6 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       }
 
       setSliderData(sliderList);
-      setLoadingSliders(false);
     };
 
     const unsubscribe = onSnapshot(
@@ -102,14 +99,10 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         if (process.env.NODE_ENV === 'development') {
           console.error("❌ Firebase onSnapshot slider dinlenirken hata oluştu: ", error);
         }
-        if (isMounted) {
-          setLoadingSliders(false);
-        }
       }
     );
 
     const fetchSliders = async () => {
-      setLoadingSliders(true);
       try {
         const sliderSnapshot = await getDocs(slidersCollection);
         handleSnapshot(sliderSnapshot);
@@ -119,7 +112,6 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         }
         if (isMounted) {
           setSliderData(defaultSliderData);
-          setLoadingSliders(false);
         }
       }
     };
@@ -160,7 +152,6 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       }
 
       setProducts(productList);
-      setLoadingProducts(false);
     };
 
     const unsubscribe = onSnapshot(
@@ -170,23 +161,16 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         if (process.env.NODE_ENV === 'development') {
           console.error("❌ Firebase onSnapshot sırasında hata oluştu: ", error);
         }
-        if (isMounted) {
-          setLoadingProducts(false);
-        }
       }
     );
 
     const fetchProducts = async () => {
-      setLoadingProducts(true);
       try {
         const productSnapshot = await getDocs(productsCollection);
         handleSnapshot(productSnapshot);
       } catch (error) {
         if (process.env.NODE_ENV === 'development') {
           console.error("❌ Firebase'den ürünler çekilirken hata oluştu: ", error);
-        }
-        if (isMounted) {
-          setLoadingProducts(false);
         }
       }
     };

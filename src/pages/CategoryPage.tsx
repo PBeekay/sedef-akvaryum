@@ -18,14 +18,13 @@ const CategoryPage: React.FC = () => {
 
   const [stockOnly, setStockOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeSubGroup, setActiveSubGroup] = useState<string>('all');
   const [displayCount, setDisplayCount] = useState<number>(12);
   const loadMoreRef = React.useRef<HTMLDivElement | null>(null);
 
   // Reset pagination on filter change
   React.useEffect(() => {
     setDisplayCount(12);
-  }, [categoryId, stockOnly, searchQuery, activeSubGroup, sortBy]);
+  }, [categoryId, stockOnly, searchQuery, sortBy]);
 
   // Infinite Scroll Trigger via IntersectionObserver
   React.useEffect(() => {
@@ -57,18 +56,6 @@ const CategoryPage: React.FC = () => {
       result = result.filter(p => p.inStock);
     }
 
-    if (activeSubGroup !== 'all') {
-      result = result.filter(p => {
-        const name = p.name.toLowerCase();
-        const desc = (p.description || '').toLowerCase();
-        if (activeSubGroup === 'tetras') return name.includes('tetra') || desc.includes('tetra');
-        if (activeSubGroup === 'cichlids') return name.includes('ciklet') || name.includes('cichlid') || desc.includes('ciklet');
-        if (activeSubGroup === 'livebearers') return name.includes('lepistes') || name.includes('moli') || name.includes('plati') || name.includes('kılıçkuyruk');
-        if (activeSubGroup === 'betta') return name.includes('betta') || name.includes('beta');
-        return true;
-      });
-    }
-
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       result = result.filter(p => p.name.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q)));
@@ -81,7 +68,7 @@ const CategoryPage: React.FC = () => {
       default:           result.sort((a, b) => (a.featured === b.featured ? 0 : a.featured ? -1 : 1)); break;
     }
     return result;
-  }, [allProducts, sortBy, stockOnly, searchQuery, activeSubGroup]);
+  }, [allProducts, sortBy, stockOnly, searchQuery]);
 
   const visibleProducts = useMemo(() => {
     return filteredAndSortedProducts.slice(0, displayCount);

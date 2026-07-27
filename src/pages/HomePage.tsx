@@ -15,9 +15,7 @@ const HomePage: React.FC = () => {
   const featuredProducts = React.useMemo(() => products.filter(product => product.featured), [products]);
   const newProducts = React.useMemo(() => products.filter(product => product.new), [products]);
 
-  // Limit initially visible items for performance
-  const [showAllFeatured, setShowAllFeatured] = useState(false);
-  const [showAllNew, setShowAllNew] = useState(false);
+  // Showcase Tab State
   const [activeShowcaseTab, setActiveShowcaseTab] = useState<'featured' | 'new' | 'all'>('featured');
 
   // Randomization State
@@ -35,8 +33,8 @@ const HomePage: React.FC = () => {
     }
   }, [products, featuredProducts, newProducts]);
 
-  const visibleFeatured = showAllFeatured ? featuredProducts : (randomFeatured.length > 0 ? randomFeatured : featuredProducts.slice(0, 12));
-  const visibleNew = showAllNew ? newProducts : (randomNew.length > 0 ? randomNew : newProducts.slice(0, 12));
+  const visibleFeatured = randomFeatured.length > 0 ? randomFeatured : featuredProducts.slice(0, 12);
+  const visibleNew = randomNew.length > 0 ? randomNew : newProducts.slice(0, 12);
 
   // Hero slider data from admin context
   const fallbackSlide = React.useMemo(() => ({
