@@ -46,7 +46,7 @@ const AppContent: React.FC = () => {
       <div className="min-h-screen flex flex-col">
         <Navbar />
 
-        <main id="main-content" role="main" className="flex-grow pb-20 md:pb-0" tabIndex={-1}>
+        <main id="main-content" role="main" className={`flex-grow ${!isAdminPage ? 'pb-20 md:pb-0' : ''}`} tabIndex={-1}>
           <Suspense fallback={<SuspenseLoader />}>
             <div key={location.pathname} className="page-transition">
               <Routes location={location}>
@@ -74,7 +74,7 @@ const AppContent: React.FC = () => {
           </Suspense>
         </main>
 
-        <Footer />
+        {!isAdminPage && <Footer />}
 
         {/* Floating WhatsApp Button - Hide on admin pages */}
         {!isAdminPage && (
@@ -83,16 +83,14 @@ const AppContent: React.FC = () => {
             variant="floating"
           />
         )}
-        {/* Back To Top Button */}
-        <BackToTop />
+        {/* Back To Top Button - Hide on admin pages */}
+        {!isAdminPage && <BackToTop />}
 
         {/* Scroll Progress Bar */}
         <ScrollProgressBar />
 
-
-
-        {/* Bottom Navigation (Mobile Only) */}
-        <BottomNav />
+        {/* Bottom Navigation (Mobile Only) - Hide on admin pages */}
+        {!isAdminPage && <BottomNav />}
       </div>
     </>
   );
