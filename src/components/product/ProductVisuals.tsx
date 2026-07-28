@@ -62,38 +62,16 @@ const ProductVisuals: React.FC<ProductVisualsProps> = ({ product, productImages,
 
             {/* WhatsApp Buttons */}
             <div className="space-y-4">
-                {/* WhatsApp Order Button */}
-                {['fish', 'shrimp'].includes(product.category) ? (
-                    <div className="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                        <div className="flex items-start gap-3 mb-3">
-                            <span className="text-2xl">⚠️</span>
-                            <p className="text-amber-800 text-xs leading-relaxed">
-                                <strong>Önemli Bilgilendirme:</strong> Canlı hayvanların (Balık, Karides vb.) satışı ve teslimatı, yasal düzenlemeler ve canlı sağlığı gereği <strong>sadece mağazamızdan</strong> yapılmaktadır.
-                            </p>
-                        </div>
-                        <WhatsAppButton
-                            message={`Merhaba, ${product.name} (ID: ${product.id}) hakkında stok ve mağaza bilgisi almak istiyorum.`}
-                            className="w-full py-3 justify-center text-sm font-bold shadow-md bg-amber-500 hover:bg-amber-600 text-white rounded-xl"
-                        >
-                            <span className="flex items-center gap-2">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                Mağazamızda İncele & Bilgi Al
-                            </span>
-                        </WhatsAppButton>
-                    </div>
-                ) : product.inStock ? (
+                {product.inStock ? (
                     <div className="relative group">
                         <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl blur opacity-40 group-hover:opacity-60 transition duration-500"></div>
                         <WhatsAppButton
-                            message={whatsappMessage}
+                            message={['fish', 'shrimp'].includes(product.category) ? `Merhaba, ${product.name} (ID: ${product.id}) hakkında stok ve mağaza bilgisi almak istiyorum.` : whatsappMessage}
                             className="relative py-3 px-6 text-base w-full font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
                         >
                             <span className="flex items-center justify-center gap-2">
                                 <span className="text-xl">💬</span>
-                                WhatsApp ile Sipariş Ver
+                                {['fish', 'shrimp'].includes(product.category) ? 'Mağazamızda İncele & Bilgi Al' : 'WhatsApp ile Sipariş Ver'}
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                 </svg>
@@ -114,24 +92,6 @@ const ProductVisuals: React.FC<ProductVisualsProps> = ({ product, productImages,
                         </WhatsAppButton>
                     </div>
                 )}
-
-                {/* WhatsApp Expert Chat Button */}
-                <div className="bg-gradient-to-br from-primary-50 to-ocean-50 p-4 rounded-xl border border-primary-200">
-                    <h4 className="font-bold text-sm text-primary-800 mb-2 flex items-center gap-2">
-                        <span className="text-lg">💡</span>
-                        Yardıma mı ihtiyacınız var?
-                    </h4>
-                    <p className="text-primary-700 mb-3 text-xs leading-relaxed">
-                        Bu ürün hakkında sorularınız mı var? Akvaryum uzmanlarımız size yardımcı olmak için burada!
-                    </p>
-                    <WhatsAppButton
-                        message={`Merhaba, ${product.name} ürünü hakkında teknik destek almak istiyorum.`}
-                        variant="inline"
-                        className="text-sm font-semibold hover:underline"
-                    >
-                        👨‍💼 Uzmanla Sohbet Et →
-                    </WhatsAppButton>
-                </div>
             </div>
         </div>
     );

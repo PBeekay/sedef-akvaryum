@@ -2,7 +2,6 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import BottomNav from './components/BottomNav';
 import WhatsAppButton from './components/WhatsAppButton';
 import ErrorBoundary from './components/ErrorBoundary';
 import BackToTop from './components/BackToTop';
@@ -46,7 +45,7 @@ const AppContent: React.FC = () => {
       <div className="min-h-screen flex flex-col">
         <Navbar />
 
-        <main id="main-content" role="main" className={`flex-grow ${!isAdminPage ? 'pb-20 md:pb-0' : ''}`} tabIndex={-1}>
+        <main id="main-content" role="main" className="flex-grow" tabIndex={-1}>
           <Suspense fallback={<SuspenseLoader />}>
             <div key={location.pathname} className="page-transition">
               <Routes location={location}>
@@ -88,9 +87,6 @@ const AppContent: React.FC = () => {
 
         {/* Scroll Progress Bar */}
         <ScrollProgressBar />
-
-        {/* Bottom Navigation (Mobile Only) - Hide on admin pages */}
-        {!isAdminPage && <BottomNav />}
       </div>
     </>
   );

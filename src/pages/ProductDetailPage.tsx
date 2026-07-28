@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
 import { ProductDetailSkeleton } from '../components/SkeletonLoader';
 import SEO from '../components/SEO';
 import ProductVisuals from '../components/product/ProductVisuals';
 import ProductInformation from '../components/product/ProductInformation';
-import MobileStickyAction from '../components/product/MobileStickyAction';
 import { getCategoryName } from '../data/categoryConfig';
 
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { products } = useAdmin();
+
+  // Scroll to top when product detail page opens or ID changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   // Find product directly from context
   const product = products.find(p => p.id === id);
@@ -93,7 +97,7 @@ Stok durumu ve teslimat hakkında bilgi alabilir miyim?`;
           "sku": product.id
         }}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 md:pb-0">
         {/* Breadcrumb - Enhanced */}
         <nav className="mb-8 animate-fade-in">
           <ol className="flex items-center space-x-2 text-sm bg-white/60 backdrop-blur-sm rounded-xl px-6 py-3 shadow-sm border border-gray-100">
@@ -140,8 +144,22 @@ Stok durumu ve teslimat hakkında bilgi alabilir miyim?`;
           <ProductInformation product={product} />
         </div>
 
-        {/* Mobile Sticky Action Bar */}
-        <MobileStickyAction product={product} whatsappMessage={whatsappMessage} />
+        {/* Important canlı notice before Footer for fish & shrimp */}
+        {['fish', 'shrimp'].includes(product.category) && (
+          <div className="bg-amber-50/90 border border-amber-200 rounded-2xl p-5 sm:p-6 mb-12 shadow-sm">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl sm:text-3xl shrink-0">⚠️</span>
+              <div>
+                <h4 className="text-sm sm:text-base font-bold text-amber-900 mb-1">
+                  Önemli Bilgilendirme
+                </h4>
+                <p className="text-amber-800 text-xs sm:text-sm leading-relaxed">
+                  Canlı hayvanların (Balık, Karides vb.) satışı ve teslimatı, yasal düzenlemeler ve canlı sağlığı gereği <strong>sadece mağazamızdan</strong> yapılmaktadır.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

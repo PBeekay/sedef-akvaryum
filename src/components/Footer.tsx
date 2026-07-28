@@ -125,7 +125,7 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-emerald-950/10 pt-6 pb-20 sm:pb-0 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500">
+        <div className="border-t border-emerald-950/10 pt-6 pb-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} Sedef Akvaryum. Tüm hakları saklıdır.</p>
           <div className="flex items-center gap-4 text-[11px]">
             <span>Eskişehir Akvaryum Evi</span>

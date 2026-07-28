@@ -19,6 +19,7 @@ interface StockContextType {
   setLowStockThreshold: (productId: string, threshold: number) => void;
   getLowStockProducts: () => Product[];
   initializeStockForProduct: (productId: string) => void;
+  syncWithProducts: (products: Product[]) => void;
 }
 
 const StockContext = createContext<StockContextType | undefined>(undefined);
@@ -123,6 +124,29 @@ export const StockProvider: React.FC<StockProviderProps> = ({ children }) => {
     saveStockToStorage(stockItems);
   }, [stockItems]);
 
+  // Yeni veya eksik ürünler için varsayılan stok kaydı oluştur
+  const syncWithProducts = (products: Product[]) => {
+    setStockItems(prevItems => {
+      let updated = false;
+      const newItems = [...prevItems];
+
+      products.forEach(product => {
+        const exists = newItems.some(item => item.productId === product.id);
+        if (!exists) {
+          updated = true;
+          newItems.push({
+            productId: product.id,
+            quantity: product.inStock !== false ? 25 : 0, // Varsayılan stok adedi
+            lastUpdated: new Date().toISOString(),
+            lowStockThreshold: 5
+          });
+        }
+      });
+
+      return updated ? newItems : prevItems;
+    });
+  };
+
   const getStockQuantity = (productId: string): number => {
     const stockItem = stockItems.find(item => item.productId === productId);
     return stockItem ? stockItem.quantity : 0;
@@ -208,7 +232,8 @@ export const StockProvider: React.FC<StockProviderProps> = ({ children }) => {
     getStockStatus,
     setLowStockThreshold,
     getLowStockProducts,
-    initializeStockForProduct
+    initializeStockForProduct,
+    syncWithProducts
   };
 
   return (

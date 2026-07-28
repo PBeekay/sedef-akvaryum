@@ -88,7 +88,7 @@ const ContactSection: React.FC = () => {
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="font-medium">Pazar:</span>
-                                    <span className="text-teal-700 font-bold">14:00 - 18:00</span>
+                                    <span className="text-red-600 font-bold">Kapalı</span>
                                 </div>
                             </div>
                         </div>

@@ -9,20 +9,10 @@ interface MobileStickyActionProps {
 
 const MobileStickyAction: React.FC<MobileStickyActionProps> = ({ product, whatsappMessage }) => {
     return (
-        <div className="md:hidden fixed bottom-16 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-3 safe-area-bottom">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-3 safe-area-bottom">
             <div className="flex items-center gap-3">
-                {/* Price Section */}
-                <div className="flex flex-col">
-                    <span className="text-xs text-gray-500 font-bold">Toplam Tutar</span>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-black text-primary-700">
-                            ₺{product.price.toFixed(2)}
-                        </span>
-                    </div>
-                </div>
-
                 {/* Action Button */}
-                <div className="flex-1">
+                <div className="w-full">
                     {['fish', 'shrimp'].includes(product.category) ? (
                         <WhatsAppButton
                             message={`Merhaba, ${product.name} (ID: ${product.id}) hakkında stok ve mağaza bilgisi almak istiyorum.`}

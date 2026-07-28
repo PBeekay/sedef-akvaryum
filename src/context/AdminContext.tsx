@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 // FIREBASE İÇİN GEREKLİ İMPORTLAR
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, onSnapshot, QuerySnapshot, DocumentData } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, QuerySnapshot, DocumentData } from 'firebase/firestore';
 import { db } from '../firebase'; // Projenize eklediğiniz firebase.js dosyası
 
 import { useAuth } from './AuthContext';
@@ -102,22 +102,6 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
       }
     );
 
-    const fetchSliders = async () => {
-      try {
-        const sliderSnapshot = await getDocs(slidersCollection);
-        handleSnapshot(sliderSnapshot);
-      } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error("❌ Firebase'den slider'lar çekilirken hata oluştu: ", error);
-        }
-        if (isMounted) {
-          setSliderData(defaultSliderData);
-        }
-      }
-    };
-
-    fetchSliders();
-
     return () => {
       isMounted = false;
       unsubscribe();
@@ -163,19 +147,6 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
         }
       }
     );
-
-    const fetchProducts = async () => {
-      try {
-        const productSnapshot = await getDocs(productsCollection);
-        handleSnapshot(productSnapshot);
-      } catch (error) {
-        if (process.env.NODE_ENV === 'development') {
-          console.error("❌ Firebase'den ürünler çekilirken hata oluştu: ", error);
-        }
-      }
-    };
-
-    fetchProducts();
 
     return () => {
       isMounted = false;

@@ -13,8 +13,8 @@ const CategoryPage: React.FC = () => {
   const { products } = useAdmin();
   const [sortBy, setSortBy] = useState<SortOption>('featured');
 
-  const category = categories.find(cat => cat.id === categoryId);
-  const allProducts = products.filter(product => product.category === categoryId);
+  const category = useMemo(() => categories.find(cat => cat.id === categoryId), [categoryId]);
+  const allProducts = useMemo(() => products.filter(product => product.category === categoryId), [products, categoryId]);
 
   const [stockOnly, setStockOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

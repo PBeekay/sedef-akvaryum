@@ -19,10 +19,41 @@ const AdminPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
-  const [showCategoryEditor, setShowCategoryEditor] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
   const [showSliderEditor, setShowSliderEditor] = useState(false);
   const [editingSlider, setEditingSlider] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [stockCurrentPage, setStockCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
+
+  // Custom Delete Modal State
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    productId: string | null;
+    productName: string;
+    isDeleting: boolean;
+    isSuccess: boolean;
+    error: string | null;
+  }>({
+    isOpen: false,
+    productId: null,
+    productName: '',
+    isDeleting: false,
+    isSuccess: false,
+    error: null,
+  });
+
+  // Custom Feedback Modal State (for Add/Update/Save actions)
+  const [feedbackModal, setFeedbackModal] = useState<{
+    isOpen: boolean;
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: 'success',
+    title: '',
+    message: '',
+  });
   const { 
     isAuthenticated, 
     sliderData, 
@@ -36,7 +67,14 @@ const AdminPage: React.FC = () => {
   } = useAdmin();
   
   const { logout } = useAuth();
-  const { stockItems, updateStock, setLowStockThreshold } = useStock();
+  const { stockItems, updateStock, setLowStockThreshold, syncWithProducts } = useStock();
+
+  // Sync products with stock
+  useEffect(() => {
+    if (adminProducts && adminProducts.length > 0) {
+      syncWithProducts(adminProducts);
+    }
+  }, [adminProducts, syncWithProducts]);
 
   // Authentication check
   useEffect(() => {
@@ -55,10 +93,15 @@ const AdminPage: React.FC = () => {
     { id: 'dashboard', name: 'Dashboard', icon: '🏠' },
     { id: 'products', name: 'Ürün Yönetimi', icon: '📦' },
     { id: 'stock', name: 'Stok Yönetimi', icon: '📊' },
-    { id: 'categories', name: 'Kategori Yönetimi', icon: '🏷️' },
     { id: 'slider', name: 'Slider Yönetimi', icon: '🖼️' },
     { id: 'analytics', name: 'Analitik', icon: '📈' },
   ];
+
+  // Reset pagination when search or category filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+    setStockCurrentPage(1);
+  }, [searchTerm, selectedCategory]);
 
   // Filter products based on search and category
   const filteredProducts = adminProducts.filter(product => {
@@ -68,6 +111,29 @@ const AdminPage: React.FC = () => {
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  // Filter stock items based on search and category
+  const filteredStockItems = stockItems.filter(item => {
+    const product = adminProducts.find(p => p.id === item.productId);
+    if (!product) return false;
+    const matchesSearch = product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         false;
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const stockTotalPages = Math.ceil(filteredStockItems.length / ITEMS_PER_PAGE) || 1;
+  const paginatedStockItems = filteredStockItems.slice(
+    (stockCurrentPage - 1) * ITEMS_PER_PAGE,
+    stockCurrentPage * ITEMS_PER_PAGE
+  );
 
   // Debug: Log products when they change
   useEffect(() => {
@@ -85,25 +151,42 @@ const AdminPage: React.FC = () => {
     setShowAddForm(true);
   };
 
-  const handleDeleteProduct = async (productId: string) => {
-    // Sanitize productId
-    const sanitizedId = productId.replace(/[^a-zA-Z0-9_-]/g, '');
-    if (sanitizedId !== productId) {
-      return;
+  const handleDeleteProduct = (productId: string) => {
+    const targetProd = adminProducts.find(p => p.id === productId);
+    setDeleteModal({
+      isOpen: true,
+      productId,
+      productName: targetProd?.name || 'Seçili Ürün',
+      isDeleting: false,
+      isSuccess: false,
+      error: null,
+    });
+  };
+
+  const confirmDeleteProduct = async () => {
+    if (!deleteModal.productId) return;
+    const sanitizedId = deleteModal.productId.replace(/[^a-zA-Z0-9_-]/g, '');
+
+    setDeleteModal(prev => ({ ...prev, isDeleting: true, error: null }));
+    try {
+      await deleteProduct(sanitizedId);
+      setDeleteModal(prev => ({ ...prev, isDeleting: false, isSuccess: true }));
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
+      setDeleteModal(prev => ({ ...prev, isDeleting: false, error: errorMessage }));
+      console.error('Ürün silme hatası:', error);
     }
-    
-    // Use a more secure confirmation method
-    const confirmed = window.confirm('Bu ürünü silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');
-    if (confirmed) {
-      try {
-        await deleteProduct(sanitizedId);
-        alert('✅ Ürün başarıyla silindi!');
-      } catch (error: any) {
-        const errorMessage = error?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
-        alert(`❌ Hata: ${errorMessage}`);
-        console.error('Ürün silme hatası:', error);
-      }
-    }
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      productId: null,
+      productName: '',
+      isDeleting: false,
+      isSuccess: false,
+      error: null,
+    });
   };
 
   const handleSaveProduct = async (productData: Partial<Product>) => {
@@ -111,28 +194,39 @@ const AdminPage: React.FC = () => {
       if (editingProduct) {
         // Update existing product
         await updateProduct(editingProduct.id, productData);
-        alert('✅ Ürün başarıyla güncellendi!');
+        setFeedbackModal({
+          isOpen: true,
+          type: 'success',
+          title: 'Ürün Güncellendi',
+          message: `"${productData.name || editingProduct.name}" başarıyla güncellendi.`,
+        });
       } else {
         // Add new product
         await addProduct(productData as Omit<Product, 'id'>);
-        alert('✅ Yeni ürün başarıyla eklendi!');
+        setFeedbackModal({
+          isOpen: true,
+          type: 'success',
+          title: 'Yeni Ürün Eklendi',
+          message: `"${productData.name}" mağazanıza başarıyla eklendi.`,
+        });
       }
       
       // Close form and reset state only on success
       setShowAddForm(false);
       setEditingProduct(null);
       
-      // Force a re-render by updating the active tab
       setTimeout(() => {
         setActiveTab('products');
       }, 100);
     } catch (error: any) {
-      // Show error message to user
       const errorMessage = error?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.';
-      alert(`❌ Hata: ${errorMessage}`);
+      setFeedbackModal({
+        isOpen: true,
+        type: 'error',
+        title: 'İşlem Başarısız',
+        message: errorMessage,
+      });
       console.error('Ürün kaydetme hatası:', error);
-      
-      // Don't close the form if there's an error, so user can fix and retry
     }
   };
 
@@ -142,31 +236,7 @@ const AdminPage: React.FC = () => {
   };
 
 
-  const handleEditCategory = (category: any) => {
-    setEditingCategory(category);
-    setShowCategoryEditor(true);
-  };
 
-  const handleDeleteCategory = (categoryId: string) => {
-    if (window.confirm('Bu kategoriyi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
-      // Kategori silme işlemi burada yapılacak
-    }
-  };
-
-  const handleSaveCategory = (categoryData: any) => {
-    if (editingCategory) {
-      // Kategori güncelleme
-    } else {
-      // Yeni kategori ekleme
-    }
-    setShowCategoryEditor(false);
-    setEditingCategory(null);
-  };
-
-  const handleCancelCategoryEdit = () => {
-    setShowCategoryEditor(false);
-    setEditingCategory(null);
-  };
 
   const handleAddSlider = () => {
     setEditingSlider(null);
@@ -324,64 +394,111 @@ const AdminPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {filteredProducts.map((product) => (
-                        <tr key={product.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="px-3 py-2.5 shrink-0">
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-xl border border-slate-200 shrink-0"
-                            />
-                          </td>
-                          <td className="px-3 py-2.5">
-                            <div className="font-bold text-slate-800 text-xs sm:text-sm">{product.name}</div>
-                            {product.shortDescription && (
-                              <div className="text-[11px] text-slate-400 line-clamp-1 max-w-[200px]">{product.shortDescription}</div>
-                            )}
-                          </td>
-                          <td className="px-3 py-2.5 whitespace-nowrap">
-                            <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
-                              {categories.find(c => c.id === product.category)?.icon}
-                              {categories.find(c => c.id === product.category)?.name}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2.5 font-bold text-emerald-700 whitespace-nowrap">
-                            ₺{product.price.toFixed(2)}
-                          </td>
-                          <td className="px-3 py-2.5 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              product.inStock 
-                                ? 'bg-emerald-100 text-emerald-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {product.inStock ? 'Stokta' : 'Stokta Yok'}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2.5 text-right whitespace-nowrap">
-                            <div className="flex items-center justify-end gap-1 sm:gap-2">
-                              <button
-                                onClick={() => handleEditProduct(product)}
-                                className="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold rounded-lg transition-colors text-[11px]"
-                              >
-                                Düzenle
-                              </button>
-                              <button
-                                onClick={() => handleDeleteProduct(product.id)}
-                                className="px-2.5 py-1 bg-red-50 text-red-700 hover:bg-red-100 font-bold rounded-lg transition-colors text-[11px]"
-                              >
-                                Sil
-                              </button>
-                            </div>
+                      {paginatedProducts.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-8 text-center text-slate-400 font-semibold">
+                            Ürün bulunamadı.
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        paginatedProducts.map((product) => (
+                          <tr key={product.id} className="hover:bg-slate-50/80 transition-colors">
+                            <td className="px-3 py-2.5 shrink-0">
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-xl border border-slate-200 shrink-0"
+                              />
+                            </td>
+                            <td className="px-3 py-2.5">
+                              <div className="font-bold text-slate-800 text-xs sm:text-sm">{product.name}</div>
+                              {product.shortDescription && (
+                                <div className="text-[11px] text-slate-400 line-clamp-1 max-w-[200px]">{product.shortDescription}</div>
+                              )}
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
+                                {categories.find(c => c.id === product.category)?.icon}
+                                {categories.find(c => c.id === product.category)?.name}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2.5 font-bold text-emerald-700 whitespace-nowrap">
+                              ₺{product.price.toFixed(2)}
+                            </td>
+                            <td className="px-3 py-2.5 whitespace-nowrap">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                product.inStock 
+                                  ? 'bg-emerald-100 text-emerald-800' 
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {product.inStock ? 'Stokta' : 'Stokta Yok'}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                              <div className="flex items-center justify-end gap-1 sm:gap-2">
+                                <button
+                                  onClick={() => handleEditProduct(product)}
+                                  className="px-2.5 py-1 bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold rounded-lg transition-colors text-[11px]"
+                                >
+                                  Düzenle
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteProduct(product.id)}
+                                  className="px-2.5 py-1 bg-red-50 text-red-700 hover:bg-red-100 font-bold rounded-lg transition-colors text-[11px]"
+                                >
+                                  Sil
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
               </div>
 
-              <div className="text-xs sm:text-sm font-semibold text-slate-500">
-                Toplam {filteredProducts.length} ürün bulundu
+              {/* Pagination Controls */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                <div className="text-xs sm:text-sm font-semibold text-slate-500 text-center sm:text-left">
+                  Toplam {filteredProducts.length} üründen {filteredProducts.length > 0 ? (currentPage - 1) * ITEMS_PER_PAGE + 1 : 0}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)} arası gösteriliyor
+                </div>
+                
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-1 sm:gap-2 max-w-full overflow-x-auto no-scrollbar py-1">
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0"
+                    >
+                      ←
+                    </button>
+                    
+                    <div className="flex items-center gap-1 overflow-x-auto max-w-[200px] sm:max-w-none no-scrollbar">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                            currentPage === page
+                              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0"
+                    >
+                      →
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -390,8 +507,35 @@ const AdminPage: React.FC = () => {
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <h2 className="text-2xl font-bold text-gray-800">Stok Yönetimi</h2>
-                <div className="text-sm text-gray-600">
-                  Toplam {stockItems.length} ürün stokta
+                <div className="text-sm font-semibold text-slate-500">
+                  Toplam {filteredStockItems.length} çeşit ürün listeleniyor
+                </div>
+              </div>
+
+              {/* Filters */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    placeholder="Stokta ürün ara..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:bg-white outline-none"
+                  />
+                </div>
+                <div className="sm:w-56">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full px-3.5 py-2 text-xs font-semibold bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                  >
+                    <option value="all">Tüm Kategoriler</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -453,7 +597,7 @@ const AdminPage: React.FC = () => {
                       </svg>
                     </div>
                     <div className="ml-2.5">
-                      <p className="text-[11px] font-bold text-blue-700">Toplam Ürün</p>
+                      <p className="text-[11px] font-bold text-blue-700">Toplam Stok Adedi</p>
                       <p className="text-xl font-black text-blue-950">
                         {stockItems.reduce((sum, item) => sum + item.quantity, 0)}
                       </p>
@@ -477,143 +621,144 @@ const AdminPage: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {stockItems.map((stockItem) => {
-                        const product = products.find(p => p.id === stockItem.productId);
-                        if (!product) return null;
+                      {paginatedStockItems.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-8 text-center text-slate-400 font-semibold">
+                            Aranan kriterlere uygun stok kaydı bulunamadı.
+                          </td>
+                        </tr>
+                      ) : (
+                        paginatedStockItems.map((stockItem) => {
+                          const product = adminProducts.find(p => p.id === stockItem.productId) || products.find(p => p.id === stockItem.productId);
+                          if (!product) return null;
 
-                        const getStatusColor = () => {
-                          if (stockItem.quantity === 0) return 'bg-red-100 text-red-800';
-                          if (stockItem.quantity <= stockItem.lowStockThreshold) return 'bg-amber-100 text-amber-800';
-                          return 'bg-emerald-100 text-emerald-800';
-                        };
+                          const getStatusColor = () => {
+                            if (stockItem.quantity === 0) return 'bg-red-100 text-red-800';
+                            if (stockItem.quantity <= stockItem.lowStockThreshold) return 'bg-amber-100 text-amber-800';
+                            return 'bg-emerald-100 text-emerald-800';
+                          };
 
-                        const getStatusText = () => {
-                          if (stockItem.quantity === 0) return 'Stokta Yok';
-                          if (stockItem.quantity <= stockItem.lowStockThreshold) return 'Az Stok';
-                          return 'Stokta';
-                        };
+                          const getStatusText = () => {
+                            if (stockItem.quantity === 0) return 'Stokta Yok';
+                            if (stockItem.quantity <= stockItem.lowStockThreshold) return 'Az Stok';
+                            return 'Stokta';
+                          };
 
-                        return (
-                          <tr key={stockItem.productId} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="px-3 py-2.5 whitespace-nowrap">
-                              <div className="flex items-center space-x-2.5">
-                                <img
-                                  src={product.image}
-                                  alt={product.name}
-                                  className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-xl border border-slate-200 shrink-0"
-                                />
-                                <div>
-                                  <div className="font-bold text-slate-800 text-xs sm:text-sm">{product.name}</div>
-                                  <div className="text-[11px] text-emerald-700 font-bold">₺{product.price.toFixed(2)}</div>
+                          return (
+                            <tr key={stockItem.productId} className="hover:bg-slate-50/80 transition-colors">
+                              <td className="px-3 py-2.5 whitespace-nowrap">
+                                <div className="flex items-center space-x-2.5">
+                                  <img
+                                    src={product.image}
+                                    alt={product.name}
+                                    className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-xl border border-slate-200 shrink-0"
+                                  />
+                                  <div>
+                                    <div className="font-bold text-slate-800 text-xs sm:text-sm">{product.name}</div>
+                                    <div className="text-[11px] text-emerald-700 font-bold">₺{product.price.toFixed(2)}</div>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
-                                {categories.find(c => c.id === product.category)?.icon}
-                                {categories.find(c => c.id === product.category)?.name}
-                              </span>
-                            </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap">
-                              <input
-                                type="number"
-                                min="0"
-                                value={stockItem.quantity}
-                                onChange={(e) => updateStock(stockItem.productId, parseInt(e.target.value) || 0)}
-                                className="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20"
-                              />
-                            </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap">
-                              <input
-                                type="number"
-                                min="0"
-                                value={stockItem.lowStockThreshold}
-                                onChange={(e) => setLowStockThreshold(stockItem.productId, parseInt(e.target.value) || 0)}
-                                className="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-600 outline-none"
-                              />
-                            </td>
-                            <td className="px-3 py-2.5 whitespace-nowrap">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusColor()}`}>
-                                {getStatusText()}
-                              </span>
-                            </td>
-                            <td className="px-3 py-2.5 text-right whitespace-nowrap">
-                              <div className="flex items-center justify-end gap-1">
-                                <button
-                                  onClick={() => updateStock(stockItem.productId, stockItem.quantity + 1)}
-                                  className="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-extrabold rounded-lg text-xs"
-                                >
-                                  +1
-                                </button>
-                                <button
-                                  onClick={() => updateStock(stockItem.productId, Math.max(0, stockItem.quantity - 1))}
-                                  className="px-2.5 py-1 bg-red-50 text-red-700 hover:bg-red-100 font-extrabold rounded-lg text-xs"
-                                >
-                                  -1
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
+                              </td>
+                              <td className="px-3 py-2.5 whitespace-nowrap">
+                                <span className="inline-flex items-center gap-1 font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded-lg">
+                                  {categories.find(c => c.id === product.category)?.icon}
+                                  {categories.find(c => c.id === product.category)?.name}
+                                </span>
+                              </td>
+                              <td className="px-3 py-2.5 whitespace-nowrap">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={stockItem.quantity}
+                                  onChange={(e) => updateStock(stockItem.productId, parseInt(e.target.value) || 0)}
+                                  className="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                />
+                              </td>
+                              <td className="px-3 py-2.5 whitespace-nowrap">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={stockItem.lowStockThreshold}
+                                  onChange={(e) => setLowStockThreshold(stockItem.productId, parseInt(e.target.value) || 0)}
+                                  className="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-center font-semibold text-slate-600 outline-none"
+                                />
+                              </td>
+                              <td className="px-3 py-2.5 whitespace-nowrap">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${getStatusColor()}`}>
+                                  {getStatusText()}
+                                </span>
+                              </td>
+                              <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                                <div className="flex items-center justify-end gap-1">
+                                  <button
+                                    onClick={() => updateStock(stockItem.productId, stockItem.quantity + 1)}
+                                    className="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-extrabold rounded-lg text-xs"
+                                  >
+                                    +1
+                                  </button>
+                                  <button
+                                    onClick={() => updateStock(stockItem.productId, Math.max(0, stockItem.quantity - 1))}
+                                    className="px-2.5 py-1 bg-red-50 text-red-700 hover:bg-red-100 font-extrabold rounded-lg text-xs"
+                                  >
+                                    -1
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
                     </tbody>
                   </table>
                 </div>
               </div>
+
+              {/* Stock Pagination Controls */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                <div className="text-xs sm:text-sm font-semibold text-slate-500 text-center sm:text-left">
+                  Toplam {filteredStockItems.length} üründen {filteredStockItems.length > 0 ? (stockCurrentPage - 1) * ITEMS_PER_PAGE + 1 : 0}-{Math.min(stockCurrentPage * ITEMS_PER_PAGE, filteredStockItems.length)} arası gösteriliyor
+                </div>
+                
+                {stockTotalPages > 1 && (
+                  <div className="flex items-center gap-1 sm:gap-2 max-w-full overflow-x-auto no-scrollbar py-1">
+                    <button
+                      onClick={() => setStockCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={stockCurrentPage === 1}
+                      className="px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0"
+                    >
+                      ←
+                    </button>
+                    
+                    <div className="flex items-center gap-1 overflow-x-auto max-w-[200px] sm:max-w-none no-scrollbar">
+                      {Array.from({ length: stockTotalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setStockCurrentPage(page)}
+                          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl text-xs font-bold transition-all shrink-0 ${
+                            stockCurrentPage === page
+                              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
+                              : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => setStockCurrentPage(prev => Math.min(prev + 1, stockTotalPages))}
+                      disabled={stockCurrentPage === stockTotalPages}
+                      className="px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all shrink-0"
+                    >
+                      →
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
-          {activeTab === 'categories' && (
-             <div className="space-y-6">
-               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                 <h2 className="text-2xl font-bold text-gray-800">Kategori Yönetimi</h2>
-                 <button
-                   onClick={() => {
-                     setEditingCategory(null);
-                     setShowCategoryEditor(true);
-                   }}
-                   className="btn-primary"
-                 >
-                   + Yeni Kategori Ekle
-                 </button>
-               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {categories.map((category) => (
-                  <div key={category.id} className="bg-gray-50 p-6 rounded-lg">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-3xl">{category.icon}</span>
-                      <div>
-                        <h3 className="font-semibold text-gray-800">{category.name}</h3>
-                        <p className="text-sm text-gray-500">ID: {category.id}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="text-sm text-gray-600 mb-4">
-                      Bu kategoride {adminProducts.filter(p => p.category === category.id).length} ürün bulunuyor
-                    </div>
-                    
-                                         <div className="flex gap-2">
-                       <button 
-                         onClick={() => handleEditCategory(category)}
-                         className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                       >
-                         Düzenle
-                       </button>
-                       <button 
-                         onClick={() => handleDeleteCategory(category.id)}
-                         className="text-red-600 hover:text-red-800 text-sm font-medium"
-                       >
-                         Sil
-                       </button>
-                     </div>
-                   </div>
-                 ))}
-               </div>
-             </div>
-           )}
-
-           {activeTab === 'slider' && (
+          {activeTab === 'slider' && (
              <div className="space-y-6">
                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                  <h2 className="text-2xl font-bold text-gray-800">Slider Yönetimi</h2>
@@ -894,9 +1039,9 @@ const AdminPage: React.FC = () => {
 
         {/* Add/Edit Product Modal */}
         {showAddForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-              <h3 className="text-2xl font-bold text-gray-800 mb-6">
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-6 overflow-y-auto">
+            <div className="bg-white rounded-2xl p-5 sm:p-8 max-w-2xl w-full my-auto max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-800 mb-4 sm:mb-6">
                 {editingProduct ? 'Ürün Düzenle' : 'Yeni Ürün Ekle'}
               </h3>
               
@@ -910,40 +1055,121 @@ const AdminPage: React.FC = () => {
           </div>
         )}
 
+        {/* Slider Editor Modal */}
+        {showSliderEditor && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-6 overflow-y-auto">
+            <div className="bg-white rounded-2xl p-5 sm:p-8 max-w-3xl w-full my-auto max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-100">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-800 mb-4 sm:mb-6">
+                {editingSlider ? 'Slider Düzenle' : 'Yeni Slider Ekle'}
+              </h3>
+              
+              <SliderEditor
+                slide={editingSlider}
+                onSave={handleSaveSlider}
+                onCancel={handleCancelSliderEdit}
+              />
+            </div>
+          </div>
+        )}
 
-         {/* Category Editor Modal */}
-         {showCategoryEditor && (
-           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-             <div className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-               <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                 {editingCategory ? 'Kategori Düzenle' : 'Yeni Kategori Ekle'}
-               </h3>
-               
-               <CategoryEditor
-                 category={editingCategory}
-                 onSave={handleSaveCategory}
-                 onCancel={handleCancelCategoryEdit}
-               />
-             </div>
-           </div>
-         )}
+        {/* Custom Product Delete Modal */}
+        {deleteModal.isOpen && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full my-auto shadow-2xl border border-slate-100 text-center relative overflow-hidden">
+              {deleteModal.isSuccess ? (
+                <div className="space-y-4 py-2">
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl animate-bounce">
+                    ✓
+                  </div>
+                  <h3 className="text-xl font-extrabold text-slate-800">Ürün Silindi</h3>
+                  <p className="text-sm text-slate-600">
+                    <span className="font-semibold text-slate-800">"{deleteModal.productName}"</span> mağazanızdan başarıyla kaldırıldı.
+                  </p>
+                  <div className="pt-4">
+                    <button
+                      onClick={closeDeleteModal}
+                      className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
+                    >
+                      Tamam
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-3xl">
+                    🗑️
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-extrabold text-slate-800 mb-2">Ürünü Sil</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed">
+                      <span className="font-bold text-slate-800">"{deleteModal.productName}"</span> ürününü silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
+                    </p>
+                  </div>
 
-         {/* Slider Editor Modal */}
-         {showSliderEditor && (
-           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-             <div className="bg-white rounded-xl p-8 max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-               <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                 {editingSlider ? 'Slider Düzenle' : 'Yeni Slider Ekle'}
-               </h3>
-               
-               <SliderEditor
-                 slide={editingSlider}
-                 onSave={handleSaveSlider}
-                 onCancel={handleCancelSliderEdit}
-               />
-             </div>
-           </div>
-         )}
+                  {deleteModal.error && (
+                    <div className="p-3 bg-rose-50 text-rose-700 text-xs rounded-xl font-medium border border-rose-200">
+                      ⚠️ {deleteModal.error}
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      onClick={closeDeleteModal}
+                      disabled={deleteModal.isDeleting}
+                      className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm rounded-xl border border-slate-200 transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      İptal
+                    </button>
+                    <button
+                      onClick={confirmDeleteProduct}
+                      disabled={deleteModal.isDeleting}
+                      className="flex-1 py-3 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-sm rounded-xl shadow-md shadow-rose-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                    >
+                      {deleteModal.isDeleting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Siliniyor...</span>
+                        </>
+                      ) : (
+                        'Evet, Sil'
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {/* Custom Feedback (Success/Error) Modal */}
+        {feedbackModal.isOpen && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full my-auto shadow-2xl border border-slate-100 text-center relative overflow-hidden">
+              <div className="space-y-4 py-2">
+                <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto text-3xl animate-bounce ${
+                  feedbackModal.type === 'success' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'
+                }`}>
+                  {feedbackModal.type === 'success' ? '✓' : '⚠️'}
+                </div>
+                <h3 className="text-xl font-extrabold text-slate-800">{feedbackModal.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  {feedbackModal.message}
+                </p>
+                <div className="pt-4">
+                  <button
+                    onClick={() => setFeedbackModal(prev => ({ ...prev, isOpen: false }))}
+                    className={`w-full py-3 text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer ${
+                      feedbackModal.type === 'success'
+                        ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 shadow-emerald-600/20'
+                        : 'bg-slate-800 hover:bg-slate-900 active:bg-black shadow-slate-800/20'
+                    }`}
+                  >
+                    Tamam
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -952,7 +1178,7 @@ const AdminPage: React.FC = () => {
 // Product Form Component
 interface ProductFormProps {
   product: AdminProduct | null;
-  onSave: (data: Partial<Product>) => void;
+  onSave: (data: Partial<Product>) => Promise<void> | void;
   onCancel: () => void;
   categories: typeof categories;
 }
@@ -966,7 +1192,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
     shortDescription: product?.shortDescription || '',
     image: product?.image || '',
     images: product?.images || [],
-    inStock: product?.inStock || true,
+    inStock: product?.inStock !== undefined ? product.inStock : true,
     featured: product?.featured || false,
     new: product?.new || false,
     colors: product?.colors || [],
@@ -982,7 +1208,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
     diet: product?.diet || '',
     lifespan: product?.lifespan || '',
     tankSize: product?.tankSize || '',
-    // Yeni eklenen alanlar
     quickInfo: product?.quickInfo || {
       size: '',
       temperament: '',
@@ -995,7 +1220,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
       aquariumSize: '',
       lifespan: ''
     },
-    // Bitki özellikleri için ek alanlar
     lightRequirement: product?.lightRequirement || '',
     co2Requirement: product?.co2Requirement || '',
     growthRate: product?.growthRate || '',
@@ -1003,13 +1227,53 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
     species: product?.species || '',
   });
 
+  useEffect(() => {
+    if (product) {
+      setFormData({
+        name: product.name || '',
+        category: product.category || 'fish',
+        price: product.price || 0,
+        description: product.description || '',
+        shortDescription: product.shortDescription || '',
+        image: product.image || '',
+        images: product.images || [],
+        inStock: product.inStock !== undefined ? product.inStock : true,
+        featured: product.featured || false,
+        new: product.new || false,
+        colors: product.colors || [],
+        socialBehavior: product.socialBehavior || '',
+        waterParameters: product.waterParameters || { temperature: '', pH: '', hardness: '' },
+        size: product.size || '',
+        difficulty: product.difficulty || '',
+        breeding: product.breeding || '',
+        diet: product.diet || '',
+        lifespan: product.lifespan || '',
+        tankSize: product.tankSize || '',
+        quickInfo: product.quickInfo || { size: '', temperament: '', careLevel: '' },
+        careInfo: product.careInfo || { diet: '', family: '', origin: '', aquariumSize: '', lifespan: '' },
+        lightRequirement: product.lightRequirement || '',
+        co2Requirement: product.co2Requirement || '',
+        growthRate: product.growthRate || '',
+        placement: product.placement || '',
+        species: product.species || '',
+      });
+    }
+  }, [product]);
+
   const [newImageUrl, setNewImageUrl] = useState('');
   const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({});
   const [uploading, setUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    if (isSubmitting || uploading) return;
+    setIsSubmitting(true);
+    try {
+      await onSave(formData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: string, value: any) => {
@@ -1957,17 +2221,28 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
         </label>
       </div>
 
-      <div className="flex gap-4 pt-6">
+      <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
         <button
           type="submit"
-          className="btn-primary"
+          disabled={isSubmitting || uploading}
+          className="flex-1 sm:flex-none px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          {product ? 'Güncelle' : 'Ekle'}
+          {isSubmitting ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Kaydediliyor...</span>
+            </>
+          ) : uploading ? (
+            'Görseller Yükleniyor...'
+          ) : (
+            product ? 'Ürünü Güncelle' : 'Ürünü Ekle'
+          )}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="btn-outline"
+          disabled={isSubmitting || uploading}
+          className="flex-1 sm:flex-none px-6 py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-sm rounded-xl border border-slate-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           İptal
         </button>
@@ -2034,93 +2309,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onSave, onCancel, ca
 //   );
 // };
 
-// Category Editor Component
-interface CategoryEditorProps {
-  category: any;
-  onSave: (data: any) => void;
-  onCancel: () => void;
-}
 
-const CategoryEditor: React.FC<CategoryEditorProps> = ({ category, onSave, onCancel }) => {
-  const [formData, setFormData] = useState({
-    name: category?.name || '',
-    icon: category?.icon || '🏷️',
-    description: category?.description || ''
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Kategori Adı
-        </label>
-        <input
-          type="text"
-          value={formData.name}
-          onChange={(e) => handleInputChange('name', e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          İkon (Emoji)
-        </label>
-        <input
-          type="text"
-          value={formData.icon}
-          onChange={(e) => handleInputChange('icon', e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="🏷️"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Açıklama
-        </label>
-        <textarea
-          value={formData.description}
-          onChange={(e) => handleInputChange('description', e.target.value)}
-          rows={3}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-        />
-      </div>
-
-      <div className="flex gap-4 pt-6">
-        <button
-          type="submit"
-          className="btn-primary"
-        >
-          {category ? 'Güncelle' : 'Ekle'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="btn-outline"
-        >
-          İptal
-        </button>
-      </div>
-    </form>
-  );
-};
 
 // Slider Editor Component
 interface SliderEditorProps {
   slide: any;
-  onSave: (data: any) => void;
+  onSave: (data: any) => Promise<void> | void;
   onCancel: () => void;
 }
 
@@ -2142,15 +2336,40 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
 
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [uploading, setUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (slide) {
+      setFormData({
+        title: slide.title || '',
+        subtitle: slide.subtitle || '',
+        description: slide.description || '',
+        image: slide.image || '',
+        icon: slide.icon || '🖼️',
+        buttonText: slide.buttonText || '',
+        buttonLink: slide.buttonLink || '',
+        category: slide.category || 'fish',
+        badge: slide.badge || '',
+        discountTag: slide.discountTag || '',
+        price: slide.price || '',
+        oldPrice: slide.oldPrice || ''
+      });
+    }
+  }, [slide]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Eğer resim yükleniyorsa bekle
     if (uploading) {
       alert('Lütfen resim yüklenmesini bekleyin...');
       return;
     }
-    onSave(formData);
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      await onSave(formData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -2467,17 +2686,28 @@ const SliderEditor: React.FC<SliderEditorProps> = ({ slide, onSave, onCancel }) 
         </div>
       </div>
 
-      <div className="flex gap-4 pt-6">
+      <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
         <button
           type="submit"
-          className="btn-primary"
+          disabled={isSubmitting || uploading}
+          className="flex-1 sm:flex-none px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-sm rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          {slide ? 'Güncelle' : 'Ekle'}
+          {isSubmitting ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Kaydediliyor...</span>
+            </>
+          ) : uploading ? (
+            'Resim Yükleniyor...'
+          ) : (
+            slide ? 'Slider\'ı Güncelle' : 'Slider\'ı Ekle'
+          )}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="btn-outline"
+          disabled={isSubmitting || uploading}
+          className="flex-1 sm:flex-none px-6 py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-sm rounded-xl border border-slate-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           İptal
         </button>

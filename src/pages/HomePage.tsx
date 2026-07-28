@@ -23,11 +23,8 @@ const HomePage: React.FC = () => {
   const [randomNew, setRandomNew] = useState<typeof products>([]);
 
   useEffect(() => {
-    const shuffle = (array: typeof products) => {
-      return [...array].sort(() => Math.random() - 0.5);
-    };
-
     if (products.length > 0) {
+      const shuffle = (array: typeof products) => [...array].sort(() => Math.random() - 0.5);
       setRandomFeatured(shuffle(featuredProducts).slice(0, 12));
       setRandomNew(shuffle(newProducts).slice(0, 12));
     }
