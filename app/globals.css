@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0a100e;
+  --bg-soft: #0e1613;
+  --bg-raised: #121d19;
+  --ink: #edeee6;
+  --ink-dim: #a9b6ac;
+  --ink-faint: #6d7d73;
+  --line: rgba(237, 238, 230, 0.11);
+  --line-strong: rgba(237, 238, 230, 0.22);
+  --accent: #6fa98c;
+  --accent-deep: #3e6f5c;
+  --amber: #c9a165;
+  --coral: #c9846f;
+  --stone: #8f9a8f;
+}
+
+html {
+  background-color: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  overflow-x: clip;
+  font-family: var(--font-inter), sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom polygon for aquarium stone */
+.tank-stone-clip {
+  clip-path: polygon(0 100%, 15% 30%, 55% 0, 100% 60%, 90% 100%);
+}
+
+/* Custom grid patterns */
+.bg-grid-pattern {
+  background-image: linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+}

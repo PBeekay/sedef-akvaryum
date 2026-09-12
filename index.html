@@ -1,0 +1,1071 @@
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import {
+  ChevronDown,
+  Droplets,
+  Thermometer,
+  Ruler,
+  Gauge,
+  Leaf,
+  Waves,
+  MapPin,
+  Phone,
+  Clock,
+  ArrowRight,
+  Check,
+  AlertTriangle,
+  X,
+} from "lucide-react";
+
+/* ----------------------------------------------------------------------
+   SEDEF AKVARYUM — Build Your Underwater World
+   Single-file React experience.
+---------------------------------------------------------------------- */
+
+const FONT_IMPORT = `@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&display=swap');`;
+
+const TOKENS = `
+  --bg: #0a100e;
+  --bg-soft: #0e1613;
+  --bg-raised: #121d19;
+  --ink: #edeee6;
+  --ink-dim: #a9b6ac;
+  --ink-faint: #6d7d73;
+  --line: rgba(237,238,230,0.11);
+  --line-strong: rgba(237,238,230,0.22);
+  --accent: #6fa98c;
+  --accent-deep: #3e6f5c;
+  --amber: #c9a165;
+  --coral: #c9846f;
+  --stone: #8f9a8f;
+`;
+
+/* ---------- data ---------- */
+
+const WORLDS = [
+  {
+    id: "fish",
+    tag: "Balıklar",
+    headline: "Suyun İçindeki Yaşamı Keşfet.",
+    body: "Tetra sürülerinden bettaların sakin duruşuna kadar, her tank kendi karakterini taşır.",
+    items: ["Tetra", "Rasbora", "Betta", "Canlı Doğuranlar", "Cichlid", "Dip Balıkları"],
+    cta: "Balıkları Keşfet",
+    hue: "160 28% 14%",
+    accent: "#6fa98c",
+  },
+  {
+    id: "shrimp",
+    tag: "Karidesler",
+    headline: "Küçük Canlılar. Büyük Dünyalar.",
+    body: "Nano bir tank, geniş bir ekosistem olabilir. Karidesler bunun en zarif kanıtı.",
+    items: ["Neocaridina", "Caridina", "Amano"],
+    cta: "Karidesleri Keşfet",
+    hue: "9 32% 16%",
+    accent: "#c9846f",
+  },
+  {
+    id: "plants",
+    tag: "Bitkiler",
+    headline: "Doğayı Suyun Altına Taşı.",
+    body: "Ön plandan arka plana, her kat kendi ışığını ve ritmini ister.",
+    items: ["Foreground", "Midground", "Background", "Epiphytes", "Moss"],
+    cta: "Bitkileri Keşfet",
+    hue: "150 30% 13%",
+    accent: "#8fb59a",
+  },
+  {
+    id: "hardscape",
+    tag: "Aquascaping",
+    headline: "Bir Akvaryumdan Fazlasını Tasarla.",
+    body: "Taş, kök ve substrat — bir kompozisyonun iskeletini oluşturan üç unsur.",
+    items: ["Dragon Stone", "Spider Wood", "Aquasoil", "Seiryu Stone"],
+    cta: "Aquascaping'i Keşfet",
+    hue: "38 24% 15%",
+    accent: "#c9a165",
+  },
+  {
+    id: "gear",
+    tag: "Ekipman",
+    headline: "Bir Ekosistemin Parçalarını Kur.",
+    body: "Filtrasyon, ışık, ısı ve CO₂ — görünmeyen ama her şeyi mümkün kılan katman.",
+    items: ["Filtrasyon", "Aydınlatma", "Isıtma", "CO₂", "Substrat", "Su Bakımı"],
+    cta: "Ekipmanı Keşfet",
+    hue: "200 14% 14%",
+    accent: "#8f9fa0",
+  },
+];
+
+const ARRIVALS = [
+  { name: "Blue Dream Shrimp", label: "Yeni Geldi", cat: "Karides", accent: "#c9846f" },
+  { name: "Galaxy Rasbora", label: "Mevcut", cat: "Balık", accent: "#6fa98c" },
+  { name: "Anubias Nana Petite", label: "Bitki", cat: "Bitki", accent: "#8fb59a" },
+  { name: "Dragon Stone", label: "Aquascaping", cat: "Malzeme", accent: "#c9a165" },
+  { name: "Crystal Red Shrimp", label: "Stok Sorunuz", cat: "Karides", accent: "#c9846f" },
+  { name: "Amano Shrimp", label: "Mevcut", cat: "Karides", accent: "#c9846f" },
+];
+
+const CONFIG_STEPS = [
+  {
+    q: "Akvaryumun kaç litre?",
+    key: "volume",
+    options: ["30 L", "60 L", "100 L", "200 L+"],
+  },
+  {
+    q: "Nasıl bir dünya istiyorsun?",
+    key: "style",
+    options: ["Nature Aquarium", "Community", "Shrimp", "Betta", "Iwagumi", "Jungle"],
+  },
+  {
+    q: "Deneyim seviyen?",
+    key: "level",
+    options: ["İlk Akvaryumum", "Deneyimliyim", "İleri Seviye"],
+  },
+];
+
+const BUILD_LAYERS = [
+  { n: "01", label: "Akvaryum" },
+  { n: "02", label: "Filtrasyon" },
+  { n: "03", label: "Aydınlatma" },
+  { n: "04", label: "Substrat" },
+  { n: "05", label: "Hardscape" },
+  { n: "06", label: "Bitkiler" },
+  { n: "07", label: "Canlılar" },
+];
+
+const MATCHES = [
+  { name: "Cardinal Tetra", fit: 94 },
+  { name: "Harlequin Rasbora", fit: 91 },
+  { name: "Honey Gourami", fit: 83 },
+];
+
+const COLLECTIONS = [
+  {
+    id: "nature",
+    name: "Nature",
+    title: "NATURE 60",
+    volume: "60L Akvaryum",
+    hotspots: ["Dragon Stone", "Spider Wood", "Aquasoil", "Anubias", "Cryptocoryne", "LED Işık", "Filtre", "Canlılar"],
+    accent: "#6fa98c",
+  },
+  { id: "iwagumi", name: "Iwagumi", title: "IWAGUMI 45", volume: "45L Akvaryum",
+    hotspots: ["Seiryu Stone", "Aquasoil", "Dwarf Hairgrass", "CO₂", "LED Işık", "Filtre"], accent: "#8f9a8f" },
+  { id: "jungle", name: "Jungle", title: "JUNGLE 90", volume: "90L Akvaryum",
+    hotspots: ["Spider Wood", "Java Fern", "Vallisneria", "Moss", "Filtre", "Canlılar"], accent: "#4f7a5e" },
+  { id: "shrimp", name: "Shrimp", title: "SHRIMP NANO 20", volume: "20L Akvaryum",
+    hotspots: ["Aquasoil", "Moss", "Cholla Wood", "Sünger Filtre", "Karidesler"], accent: "#c9846f" },
+  { id: "nano", name: "Nano", title: "NANO 15", volume: "15L Akvaryum",
+    hotspots: ["Mini Aquasoil", "Anubias Petite", "Nano Filtre", "LED Işık"], accent: "#c9a165" },
+  { id: "blackwater", name: "Blackwater", title: "BLACKWATER 60", volume: "60L Akvaryum",
+    hotspots: ["Ketapang Yaprağı", "Spider Wood", "Aquasoil", "Dip Balıkları"], accent: "#6d5a45" },
+];
+
+const ARTICLES = [
+  { title: "İlk Akvaryum Nasıl Kurulur?", tag: "Rehber" },
+  { title: "60 Litre Akvaryuma Hangi Balıklar Uygun?", tag: "Canlılar" },
+  { title: "Karides Akvaryumu Nasıl Kurulur?", tag: "Karides" },
+  { title: "Bitkili Akvaryum İçin Işık Seçimi", tag: "Ekipman" },
+  { title: "Filtre Nasıl Seçilir?", tag: "Ekipman" },
+  { title: "Aquascaping'e Nasıl Başlanır?", tag: "Aquascaping" },
+];
+
+const COMPAT = [
+  { name: "Amano Karidesi", status: "uyumlu" },
+  { name: "Neocaridina", status: "uyumlu" },
+  { name: "Betta", status: "dikkat" },
+  { name: "Cichlid", status: "onerilmez" },
+];
+
+/* ---------- small building blocks ---------- */
+
+function Taxonomy() {
+  return (
+    <div className="taxonomy">
+      {["BALIK", "KARİDES", "BİTKİ", "AQUASCAPING", "EKİPMAN"].map((t, i, arr) => (
+        <span key={t}>
+          {t}
+          {i < arr.length - 1 && <i>·</i>}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function SectionHeading({ eyebrow, children, align = "left" }) {
+  return (
+    <div className={`section-heading ${align}`}>
+      {eyebrow && <div className="eyebrow-line">{eyebrow}</div>}
+      <h2>{children}</h2>
+    </div>
+  );
+}
+
+/* ---------- Nav ---------- */
+
+function Nav({ onNavigate }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const links = [
+    ["Canlılar", "worlds"],
+    ["Bitkiler", "worlds"],
+    ["Aquascaping", "collections"],
+    ["Ekipman", "worlds"],
+    ["Rehber", "guide"],
+    ["Mağaza", "visit"],
+    ["İletişim", "visit"],
+  ];
+
+  return (
+    <>
+      <header className={`nav ${scrolled ? "is-scrolled" : ""}`}>
+        <button className="nav-brand" onClick={() => onNavigate("hero")}>
+          SEDEF
+        </button>
+        <nav className="nav-links">
+          {links.map(([label, target]) => (
+            <button key={label} onClick={() => onNavigate(target)}>
+              {label}
+            </button>
+          ))}
+        </nav>
+        <button className="nav-toggle" onClick={() => setOpen(true)} aria-label="Menü">
+          <span />
+          <span />
+        </button>
+      </header>
+
+      <div className={`nav-full ${open ? "is-open" : ""}`}>
+        <button className="nav-full-close" onClick={() => setOpen(false)} aria-label="Kapat">
+          <X size={22} strokeWidth={1.25} />
+        </button>
+        <div className="nav-full-list">
+          {links.map(([label, target], i) => (
+            <button
+              key={label}
+              style={{ transitionDelay: `${i * 35}ms` }}
+              onClick={() => {
+                setOpen(false);
+                onNavigate(target);
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ---------- Hero ---------- */
+
+function Hero({ id, onNavigate }) {
+  const ref = useRef(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleMove = useCallback((e) => {
+    const r = ref.current?.getBoundingClientRect();
+    if (!r) return;
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    setTilt({ x, y });
+  }, []);
+
+  return (
+    <section id={id} className="hero" ref={ref} onMouseMove={handleMove}>
+      <div
+        className="hero-scene"
+        style={{ transform: `translate3d(${tilt.x * -14}px, ${tilt.y * -10}px, 0)` }}
+      >
+        <div className="hero-glow hero-glow--a" />
+        <div className="hero-glow hero-glow--b" />
+        <div className="hero-rays" />
+        <div className="hero-grid" />
+        {Array.from({ length: 14 }).map((_, i) => (
+          <span
+            key={i}
+            className="mote"
+            style={{
+              left: `${(i * 37) % 100}%`,
+              animationDuration: `${14 + (i % 7) * 2}s`,
+              animationDelay: `${-(i * 1.3)}s`,
+              opacity: 0.15 + (i % 5) * 0.04,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="hero-content">
+        <Taxonomy />
+        <h1 className="hero-title">
+          <span className="reveal" style={{ animationDelay: "0.05s" }}>SEDEF</span>
+          <span className="reveal" style={{ animationDelay: "0.18s" }}>AKVARYUM</span>
+        </h1>
+        <p className="hero-sub reveal" style={{ animationDelay: "0.34s" }}>
+          Kendi su altı dünyanı oluştur.
+        </p>
+        <div className="hero-cta reveal" style={{ animationDelay: "0.46s" }}>
+          <button className="btn btn-ghost" onClick={() => onNavigate("worlds")}>
+            Keşfet <ChevronDown size={16} strokeWidth={1.25} />
+          </button>
+          <button className="btn btn-line" onClick={() => onNavigate("visit")}>
+            Mağazayı Keşfet
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Section 01: Worlds ---------- */
+
+function Worlds({ id }) {
+  return (
+    <section id={id} className="worlds">
+      {WORLDS.map((w, i) => (
+        <article
+          key={w.id}
+          className={`world-panel ${i % 2 ? "is-reverse" : ""}`}
+          style={{ "--panel-hue": w.hue, "--panel-accent": w.accent }}
+        >
+          <div className="world-visual">
+            <div className="world-visual-inner">
+              <span className="world-tag">{w.tag}</span>
+            </div>
+          </div>
+          <div className="world-copy">
+            <h3>{w.headline}</h3>
+            <p>{w.body}</p>
+            <ul className="world-items">
+              {w.items.map((it) => (
+                <li key={it}>{it}</li>
+              ))}
+            </ul>
+            <button className="text-link">
+              {w.cta} <ArrowRight size={15} strokeWidth={1.25} />
+            </button>
+          </div>
+        </article>
+      ))}
+    </section>
+  );
+}
+
+/* ---------- Section 02: Currently at Sedef ---------- */
+
+function Arrivals() {
+  return (
+    <section className="arrivals">
+      <SectionHeading eyebrow="Envanter">Şu An Sedef'te</SectionHeading>
+      <div className="arrivals-strip">
+        {ARRIVALS.map((a) => (
+          <div className="arrival-card" key={a.name} style={{ "--a-accent": a.accent }}>
+            <div className="arrival-swatch" />
+            <div className="arrival-meta">
+              <span className="arrival-name">{a.name}</span>
+              <span className="arrival-label">{a.label}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Section 03: Configurator ---------- */
+
+function Configurator({ id }) {
+  const [answers, setAnswers] = useState({});
+  const [hoverLayer, setHoverLayer] = useState(null);
+  const done = CONFIG_STEPS.every((s) => answers[s.key]);
+  const activeStep = CONFIG_STEPS.findIndex((s) => !answers[s.key]);
+  const step = activeStep === -1 ? CONFIG_STEPS.length - 1 : activeStep;
+
+  return (
+    <section id={id} className="configurator">
+      <SectionHeading eyebrow="İnteraktif Kurulum">Akvaryumunu Oluştur</SectionHeading>
+
+      <div className="config-grid">
+        <div className="config-questions">
+          {CONFIG_STEPS.map((s, i) => (
+            <div key={s.key} className={`config-q ${i === step ? "is-active" : ""} ${answers[s.key] ? "is-done" : ""}`}>
+              <p>{s.q}</p>
+              <div className="config-options">
+                {s.options.map((opt) => (
+                  <button
+                    key={opt}
+                    className={answers[s.key] === opt ? "is-selected" : ""}
+                    onClick={() => setAnswers((a) => ({ ...a, [s.key]: opt }))}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="config-result">
+          {!done ? (
+            <div className="config-placeholder">
+              <Waves size={26} strokeWidth={1} />
+              <p>Seçimlerini tamamladığında akvaryumun burada şekillenecek.</p>
+            </div>
+          ) : (
+            <>
+              <p className="config-result-label">
+                Senin {answers.volume} {answers.style}'un
+              </p>
+              <div className="tank">
+                <div className="tank-water" />
+                <div className="tank-substrate" />
+                <div className="tank-plant tank-plant--1" />
+                <div className="tank-plant tank-plant--2" />
+                <div className="tank-stone" />
+              </div>
+              <div className="build-layers">
+                {BUILD_LAYERS.map((l) => (
+                  <button
+                    key={l.n}
+                    className={hoverLayer === l.n ? "is-hover" : ""}
+                    onMouseEnter={() => setHoverLayer(l.n)}
+                    onMouseLeave={() => setHoverLayer(null)}
+                  >
+                    <span className="layer-n">{l.n}</span>
+                    <span>{l.label}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Section 04: Find your fish ---------- */
+
+function FishFinder() {
+  const [submitted, setSubmitted] = useState(false);
+
+  return (
+    <section className="finder">
+      <SectionHeading eyebrow="Uyumluluk">Akvaryumuna Kim Uygun?</SectionHeading>
+      <div className="finder-grid">
+        <form
+          className="finder-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setSubmitted(true);
+          }}
+        >
+          <label>
+            <span>Tank Hacmi</span>
+            <select defaultValue="60L">
+              <option>30L</option>
+              <option>60L</option>
+              <option>100L</option>
+              <option>200L+</option>
+            </select>
+          </label>
+          <label>
+            <span>Sıcaklık</span>
+            <select defaultValue="24-26°C">
+              <option>20-23°C</option>
+              <option>24-26°C</option>
+              <option>27-30°C</option>
+            </select>
+          </label>
+          <label>
+            <span>Bitkili mi?</span>
+            <select defaultValue="Evet">
+              <option>Evet</option>
+              <option>Hayır</option>
+            </select>
+          </label>
+          <label>
+            <span>Deneyim</span>
+            <select defaultValue="Deneyimliyim">
+              <option>İlk Akvaryumum</option>
+              <option>Deneyimliyim</option>
+              <option>İleri Seviye</option>
+            </select>
+          </label>
+          <button className="btn btn-line" type="submit">
+            Uygun Türleri Göster
+          </button>
+        </form>
+
+        <div className="finder-results">
+          {!submitted ? (
+            <div className="config-placeholder">
+              <Gauge size={26} strokeWidth={1} />
+              <p>Tercihlerini seç, sana uygun türleri önerelim.</p>
+            </div>
+          ) : (
+            <ul>
+              {MATCHES.map((m) => (
+                <li key={m.name}>
+                  <div className="match-row">
+                    <span>{m.name}</span>
+                    <span className="match-pct">%{m.fit} Uyum</span>
+                  </div>
+                  <div className="match-bar">
+                    <div className="match-bar-fill" style={{ width: `${m.fit}%` }} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Section 05: Species page ---------- */
+
+function SpeciesExperience() {
+  const [tab, setTab] = useState("Bakım");
+  const tabs = ["Bakım", "Beslenme", "Üreme", "Su Değerleri", "Akvaryum Düzeni"];
+  const copy = {
+    "Bakım": "Haftalık %20 su değişimi ve dengeli bir substrat, Neocaridina için yeterlidir.",
+    "Beslenme": "Alg ve biyofilmle beslenir; haftada 2-3 kez küçük porsiyonlar yeterlidir.",
+    "Üreme": "Uygun su değerlerinde kolayca üreyerek koloni oluşturur.",
+    "Su Değerleri": "Sert ve dengeli su, kabuk gelişimi için önemlidir.",
+    "Akvaryum Düzeni": "Yoğun bitki örtüsü ve moss, yavruların saklanması için gereklidir.",
+  };
+
+  const stats = [
+    { icon: Gauge, label: "Zorluk", value: "Başlangıç" },
+    { icon: Thermometer, label: "Sıcaklık", value: "18–28°C" },
+    { icon: Droplets, label: "pH", value: "6.5–8.0" },
+    { icon: Ruler, label: "Boyut", value: "2–3 cm" },
+    { icon: Leaf, label: "Mizaç", value: "Barışçıl" },
+  ];
+
+  return (
+    <section className="species">
+      <div className="species-media">
+        <div className="species-media-inner" />
+      </div>
+      <div className="species-body">
+        <span className="eyebrow-line">Neocaridina</span>
+        <h2>Red Cherry</h2>
+
+        <div className="species-stats">
+          {stats.map((s) => (
+            <div key={s.label}>
+              <s.icon size={16} strokeWidth={1.25} />
+              <div>
+                <span className="stat-label">{s.label}</span>
+                <span className="stat-value">{s.value}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <h4 className="species-sub">Birlikte Yaşayabilirler mi?</h4>
+        <ul className="compat-list">
+          {COMPAT.map((c) => (
+            <li key={c.name} className={`compat-${c.status}`}>
+              {c.status === "uyumlu" && <Check size={14} strokeWidth={1.5} />}
+              {c.status === "dikkat" && <AlertTriangle size={14} strokeWidth={1.5} />}
+              {c.status === "onerilmez" && <X size={14} strokeWidth={1.5} />}
+              <span>{c.name}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="species-tabs">
+          {tabs.map((t) => (
+            <button key={t} className={tab === t ? "is-active" : ""} onClick={() => setTab(t)}>
+              {t}
+            </button>
+          ))}
+        </div>
+        <p className="species-tab-copy">{copy[tab]}</p>
+
+        <button className="btn btn-line">Stok Durumunu Sor</button>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Section 06: Collections ---------- */
+
+function Collections({ id }) {
+  const [active, setActive] = useState(COLLECTIONS[0].id);
+  const current = COLLECTIONS.find((c) => c.id === active);
+
+  return (
+    <section id={id} className="collections">
+      <SectionHeading eyebrow="Kürasyon">Dünyanı Seç</SectionHeading>
+
+      <div className="collections-tabs">
+        {COLLECTIONS.map((c) => (
+          <button
+            key={c.id}
+            className={active === c.id ? "is-active" : ""}
+            style={{ "--c-accent": c.accent }}
+            onClick={() => setActive(c.id)}
+          >
+            {c.name}
+          </button>
+        ))}
+      </div>
+
+      <div className="collection-detail" style={{ "--c-accent": current.accent }}>
+        <div className="collection-visual" />
+        <div className="collection-info">
+          <h3>{current.title}</h3>
+          <p>{current.volume}</p>
+          <ul>
+            {current.hotspots.map((h) => (
+              <li key={h}>{h}</li>
+            ))}
+          </ul>
+          <button className="text-link">
+            Bu Akvaryumu Oluştur <ArrowRight size={15} strokeWidth={1.25} />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Section 07: Knowledge hub ---------- */
+
+function Guide({ id }) {
+  return (
+    <section id={id} className="guide">
+      <SectionHeading eyebrow="Rehber">Sedef Rehber</SectionHeading>
+      <div className="guide-list">
+        {ARTICLES.map((a) => (
+          <a className="guide-row" href="#" key={a.title} onClick={(e) => e.preventDefault()}>
+            <span className="guide-tag">{a.tag}</span>
+            <span className="guide-title">{a.title}</span>
+            <ArrowRight size={16} strokeWidth={1.25} className="guide-arrow" />
+          </a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Section 08: Visit ---------- */
+
+function Visit({ id }) {
+  return (
+    <section id={id} className="visit">
+      <div className="visit-copy">
+        <SectionHeading eyebrow="Ziyaret Et">Ekrandan Akvaryuma.</SectionHeading>
+        <p>Canlıları yakından gör, akvaryumunu birlikte planlayalım.</p>
+
+        <div className="visit-rows">
+          <div>
+            <MapPin size={16} strokeWidth={1.25} />
+            <span>Adres bilgisi mağaza tarafından sağlanacaktır.</span>
+          </div>
+          <div>
+            <Clock size={16} strokeWidth={1.25} />
+            <span>Pzt–Cmt 10:00–19:00</span>
+          </div>
+          <div>
+            <Phone size={16} strokeWidth={1.25} />
+            <span>İletişim numarası mağaza tarafından sağlanacaktır.</span>
+          </div>
+        </div>
+
+        <div className="visit-cta">
+          <button className="btn btn-line">Yol Tarifi Al</button>
+          <button className="btn btn-ghost">İletişime Geç</button>
+        </div>
+      </div>
+      <div className="visit-map">
+        <div className="map-grid" />
+        <span className="map-pin" />
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Footer ---------- */
+
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="footer-brand">SEDEF AKVARYUM</div>
+      <div className="footer-cols">
+        <div>
+          <span>Canlılar</span>
+          <span>Bitkiler</span>
+          <span>Aquascaping</span>
+        </div>
+        <div>
+          <span>Ekipman</span>
+          <span>Rehber</span>
+          <span>İletişim</span>
+        </div>
+      </div>
+      <div className="footer-legal">© {new Date().getFullYear()} Sedef Akvaryum. Tüm hakları saklıdır.</div>
+    </footer>
+  );
+}
+
+/* ---------- App ---------- */
+
+export default function SedefAkvaryum() {
+  const navigate = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <div className="sedef-root">
+      <style>{`
+        ${FONT_IMPORT}
+        .sedef-root {
+          ${TOKENS}
+          background: var(--bg);
+          color: var(--ink);
+          font-family: 'Inter', sans-serif;
+          font-weight: 400;
+          position: relative;
+          overflow-x: hidden;
+          width: 100%;
+        }
+        .sedef-root * { box-sizing: border-box; }
+        .sedef-root h1, .sedef-root h2, .sedef-root h3, .sedef-root h4 {
+          font-family: 'Fraunces', serif;
+          font-weight: 500;
+          margin: 0;
+          letter-spacing: -0.01em;
+        }
+        .sedef-root p { margin: 0; }
+        .sedef-root button { font-family: inherit; cursor: pointer; background: none; border: none; color: inherit; }
+        .sedef-root ul { list-style: none; margin: 0; padding: 0; }
+        .sedef-root select { font-family: inherit; }
+
+        .eyebrow-line {
+          font-size: 12.5px;
+          letter-spacing: 0.06em;
+          color: var(--ink-faint);
+          margin-bottom: 14px;
+        }
+        .section-heading { max-width: 640px; padding: 0 6vw; margin-bottom: 56px; }
+        .section-heading.center { margin-left: auto; margin-right: auto; text-align: center; }
+        .section-heading h2 { font-size: clamp(28px, 4vw, 44px); font-style: italic; font-weight: 400; }
+
+        .taxonomy { display: flex; gap: 8px; font-size: 12px; letter-spacing: 0.08em; color: var(--ink-dim); }
+        .taxonomy i { font-style: normal; margin-left: 8px; opacity: 0.5; }
+
+        .btn {
+          padding: 13px 26px;
+          font-size: 13.5px;
+          letter-spacing: 0.02em;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: border-color 0.35s ease, color 0.35s ease, background 0.35s ease;
+        }
+        .btn-line { border: 1px solid var(--line-strong); color: var(--ink); }
+        .btn-line:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-ghost { color: var(--ink-dim); }
+        .btn-ghost:hover { color: var(--ink); }
+
+        .text-link {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-size: 14px; color: var(--ink);
+          border-bottom: 1px solid var(--line-strong);
+          padding-bottom: 4px;
+          transition: border-color 0.3s ease, gap 0.3s ease, color 0.3s ease;
+        }
+        .text-link:hover { border-color: var(--panel-accent, var(--accent)); gap: 12px; color: var(--panel-accent, var(--accent)); }
+
+        /* ---- nav ---- */
+        .nav {
+          position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 26px 6vw;
+          transition: padding 0.4s ease, background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease;
+          border-bottom: 1px solid transparent;
+        }
+        .nav.is-scrolled {
+          padding: 15px 6vw;
+          background: rgba(10,16,14,0.78);
+          backdrop-filter: blur(14px);
+          border-bottom: 1px solid var(--line);
+        }
+        .nav-brand { font-family: 'Fraunces', serif; font-size: 17px; letter-spacing: 0.14em; }
+        .nav-links { display: none; gap: 30px; }
+        .nav-links button { font-size: 13px; color: var(--ink-dim); transition: color 0.25s ease; }
+        .nav-links button:hover { color: var(--ink); }
+        .nav-toggle { display: flex; flex-direction: column; gap: 5px; width: 26px; }
+        .nav-toggle span { display: block; height: 1px; background: var(--ink); width: 100%; }
+        @media (min-width: 900px) {
+          .nav-links { display: flex; }
+          .nav-toggle { display: none; }
+        }
+
+        .nav-full {
+          position: fixed; inset: 0; z-index: 60;
+          background: var(--bg);
+          display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+          padding: 8vw;
+          opacity: 0; pointer-events: none;
+          transition: opacity 0.4s ease;
+        }
+        .nav-full.is-open { opacity: 1; pointer-events: all; }
+        .nav-full-close { position: absolute; top: 26px; right: 6vw; }
+        .nav-full-list { display: flex; flex-direction: column; gap: 6px; }
+        .nav-full-list button {
+          font-family: 'Fraunces', serif; font-style: italic; font-size: clamp(28px, 7vw, 52px);
+          color: var(--ink-dim); text-align: left;
+          opacity: 0; transform: translateY(14px);
+          transition: opacity 0.4s ease, transform 0.4s ease, color 0.3s ease;
+        }
+        .nav-full.is-open .nav-full-list button { opacity: 1; transform: translateY(0); }
+        .nav-full-list button:hover { color: var(--accent); }
+
+        /* ---- hero ---- */
+        .hero { position: relative; min-height: 100svh; display: flex; align-items: flex-end; overflow: hidden; }
+        .hero-scene { position: absolute; inset: -5%; will-change: transform; }
+        .hero-glow {
+          position: absolute; border-radius: 50%; filter: blur(90px);
+        }
+        .hero-glow--a { width: 60vw; height: 60vw; left: -10%; top: -10%; background: radial-gradient(circle, rgba(111,169,140,0.22), transparent 70%); }
+        .hero-glow--b { width: 50vw; height: 50vw; right: -10%; bottom: 0%; background: radial-gradient(circle, rgba(201,161,101,0.10), transparent 70%); }
+        .hero-rays {
+          position: absolute; inset: 0;
+          background: linear-gradient(120deg, transparent 20%, rgba(237,238,230,0.035) 34%, transparent 46%),
+                      linear-gradient(100deg, transparent 55%, rgba(237,238,230,0.02) 64%, transparent 78%);
+        }
+        .hero-grid {
+          position: absolute; inset: 0;
+          background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+          background-size: 100% 25%, 8.333% 100%;
+          opacity: 0.35;
+          mask-image: linear-gradient(to bottom, transparent, black 55%, black 80%, transparent);
+        }
+        .mote {
+          position: absolute; bottom: -5%; width: 3px; height: 3px; border-radius: 50%;
+          background: var(--accent);
+          animation: drift linear infinite;
+        }
+        @keyframes drift {
+          from { transform: translateY(0) translateX(0); }
+          to { transform: translateY(-115vh) translateX(30px); }
+        }
+
+        .hero-content { position: relative; z-index: 2; padding: 0 6vw 8vw; width: 100%; }
+        .hero-title { display: flex; flex-direction: column; line-height: 0.92; margin: 22px 0 26px; }
+        .hero-title span {
+          font-size: clamp(58px, 13vw, 168px);
+          letter-spacing: -0.015em;
+          opacity: 0; transform: translateY(30px);
+        }
+        .reveal { animation: reveal-up 0.9s cubic-bezier(0.16,1,0.3,1) forwards; }
+        @keyframes reveal-up { to { opacity: 1; transform: translateY(0); } }
+
+        .hero-sub { font-family: 'Fraunces', serif; font-style: italic; font-size: clamp(17px, 2vw, 22px); color: var(--ink-dim); max-width: 420px; }
+        .hero-cta { display: flex; gap: 14px; margin-top: 38px; flex-wrap: wrap; }
+
+        /* ---- worlds ---- */
+        .worlds { border-top: 1px solid var(--line); }
+        .world-panel {
+          display: flex; flex-direction: column;
+          border-bottom: 1px solid var(--line);
+          background: linear-gradient(160deg, hsl(var(--panel-hue) / 55%) 0%, var(--bg) 72%);
+        }
+        @media (min-width: 900px) {
+          .world-panel { flex-direction: row; min-height: 74vh; }
+          .world-panel.is-reverse { flex-direction: row-reverse; }
+        }
+        .world-visual { flex: 1; position: relative; min-height: 42vh; border-bottom: 1px solid var(--line); }
+        @media (min-width: 900px) {
+          .world-visual { border-bottom: none; border-right: 1px solid var(--line); }
+          .is-reverse .world-visual { border-right: none; border-left: 1px solid var(--line); }
+        }
+        .world-visual-inner {
+          position: absolute; inset: 0;
+          background:
+            radial-gradient(ellipse at 30% 20%, hsl(var(--panel-hue) / 90%) 0%, transparent 55%),
+            radial-gradient(ellipse at 75% 80%, color-mix(in srgb, var(--panel-accent) 22%, transparent), transparent 60%);
+          display: flex; align-items: flex-end; padding: 28px;
+        }
+        .world-tag { font-family: 'Fraunces', serif; font-style: italic; font-size: 15px; color: var(--panel-accent); }
+        .world-copy { flex: 1; padding: 8vw 6vw; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
+        .world-copy h3 { font-size: clamp(26px, 3.4vw, 42px); font-style: italic; font-weight: 400; max-width: 480px; }
+        .world-copy p { color: var(--ink-dim); max-width: 420px; font-size: 15px; line-height: 1.6; }
+        .world-items { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+        .world-items li { font-size: 12.5px; color: var(--ink-faint); border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+
+        /* ---- arrivals ---- */
+        .arrivals { padding: 10vw 0; border-bottom: 1px solid var(--line); }
+        .arrivals-strip {
+          display: flex; gap: 1px; overflow-x: auto; padding: 0 6vw 10px;
+          scroll-snap-type: x proximity;
+        }
+        .arrival-card {
+          scroll-snap-align: start;
+          min-width: 230px; flex-shrink: 0;
+          border: 1px solid var(--line);
+          padding: 0;
+        }
+        .arrival-swatch {
+          height: 190px;
+          background: linear-gradient(155deg, color-mix(in srgb, var(--a-accent) 30%, var(--bg)), var(--bg-soft));
+          border-bottom: 1px solid var(--line);
+        }
+        .arrival-meta { padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; }
+        .arrival-name { font-family: 'Fraunces', serif; font-size: 16px; }
+        .arrival-label { font-size: 11.5px; letter-spacing: 0.05em; color: var(--a-accent); }
+
+        /* ---- configurator ---- */
+        .configurator { padding: 10vw 0; border-bottom: 1px solid var(--line); }
+        .config-grid { display: grid; gap: 40px; padding: 0 6vw; }
+        @media (min-width: 980px) { .config-grid { grid-template-columns: 0.85fr 1.15fr; gap: 70px; } }
+        .config-q { padding: 22px 0; border-bottom: 1px solid var(--line); opacity: 0.45; transition: opacity 0.4s ease; }
+        .config-q.is-active, .config-q.is-done { opacity: 1; }
+        .config-q p { font-size: 15px; margin-bottom: 16px; }
+        .config-options { display: flex; flex-wrap: wrap; gap: 10px; }
+        .config-options button {
+          border: 1px solid var(--line-strong); padding: 9px 16px; font-size: 13px; color: var(--ink-dim);
+          transition: all 0.25s ease;
+        }
+        .config-options button:hover { border-color: var(--accent); color: var(--ink); }
+        .config-options button.is-selected { border-color: var(--accent); color: var(--accent); background: rgba(111,169,140,0.08); }
+
+        .config-result { border: 1px solid var(--line); padding: 36px; min-height: 420px; display: flex; flex-direction: column; }
+        .config-placeholder { margin: auto; text-align: center; color: var(--ink-faint); display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 240px; font-size: 13.5px; }
+        .config-result-label { font-family: 'Fraunces', serif; font-style: italic; font-size: 18px; margin-bottom: 22px; }
+
+        .tank { position: relative; height: 200px; border: 1px solid var(--line-strong); overflow: hidden; margin-bottom: 26px; background: var(--bg-soft); }
+        .tank-water { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(111,169,140,0.16), rgba(111,169,140,0.03)); }
+        .tank-substrate { position: absolute; left: 0; right: 0; bottom: 0; height: 18%; background: linear-gradient(180deg, #3a2f22, #241c15); }
+        .tank-plant { position: absolute; bottom: 18%; width: 3px; background: var(--accent); transform-origin: bottom; animation: sway 5s ease-in-out infinite; }
+        .tank-plant--1 { left: 18%; height: 90px; animation-delay: 0s; }
+        .tank-plant--2 { left: 26%; height: 60px; animation-delay: -2s; }
+        .tank-stone { position: absolute; right: 20%; bottom: 18%; width: 46px; height: 26px; background: #4a4640; clip-path: polygon(0 100%, 15% 30%, 55% 0, 100% 60%, 90% 100%); }
+        @keyframes sway { 0%,100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+
+        .build-layers { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+        .build-layers button { background: var(--bg); padding: 13px 16px; display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--ink-dim); transition: background 0.25s ease, color 0.25s ease; }
+        .build-layers button.is-hover, .build-layers button:hover { background: var(--bg-raised); color: var(--ink); }
+        .layer-n { color: var(--ink-faint); font-size: 11px; }
+
+        /* ---- finder ---- */
+        .finder { padding: 10vw 0; border-bottom: 1px solid var(--line); }
+        .finder-grid { display: grid; gap: 40px; padding: 0 6vw; }
+        @media (min-width: 980px) { .finder-grid { grid-template-columns: 0.8fr 1.2fr; gap: 70px; } }
+        .finder-form { display: flex; flex-direction: column; gap: 18px; }
+        .finder-form label { display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; color: var(--ink-faint); }
+        .finder-form select { background: var(--bg-soft); border: 1px solid var(--line-strong); color: var(--ink); padding: 11px 14px; font-size: 14px; }
+        .finder-form .btn { margin-top: 10px; align-self: flex-start; }
+        .finder-results { border: 1px solid var(--line); padding: 36px; min-height: 300px; display: flex; flex-direction: column; }
+        .finder-results ul { display: flex; flex-direction: column; gap: 22px; }
+        .match-row { display: flex; justify-content: space-between; font-size: 14.5px; margin-bottom: 9px; }
+        .match-pct { color: var(--accent); font-size: 12.5px; }
+        .match-bar { height: 2px; background: var(--line); }
+        .match-bar-fill { height: 100%; background: var(--accent); }
+
+        /* ---- species ---- */
+        .species { display: flex; flex-direction: column; border-bottom: 1px solid var(--line); }
+        @media (min-width: 980px) { .species { flex-direction: row; min-height: 82vh; } }
+        .species-media { flex: 1; min-height: 40vh; border-bottom: 1px solid var(--line); position: relative; }
+        @media (min-width: 980px) { .species-media { border-bottom: none; border-right: 1px solid var(--line); } }
+        .species-media-inner { position: absolute; inset: 0; background: radial-gradient(ellipse at 40% 30%, rgba(201,132,111,0.28), transparent 60%), var(--bg-soft); }
+        .species-body { flex: 1; padding: 8vw 6vw; display: flex; flex-direction: column; gap: 22px; }
+        .species-body h2 { font-size: clamp(30px, 3.6vw, 46px); font-style: italic; font-weight: 400; }
+        .species-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 22px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+        .species-stats > div { display: flex; align-items: center; gap: 10px; color: var(--ink-dim); }
+        .stat-label { display: block; font-size: 10.5px; color: var(--ink-faint); }
+        .stat-value { display: block; font-size: 14px; color: var(--ink); }
+        .species-sub { font-size: 15px; font-style: italic; font-weight: 400; }
+        .compat-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .compat-list li { display: flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 7px 12px; border: 1px solid var(--line-strong); }
+        .compat-uyumlu { color: var(--accent); border-color: var(--accent) !important; }
+        .compat-dikkat { color: var(--amber); border-color: var(--amber) !important; }
+        .compat-onerilmez { color: var(--coral); border-color: var(--coral) !important; }
+        .species-tabs { display: flex; flex-wrap: wrap; gap: 4px 18px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+        .species-tabs button { font-size: 12.5px; color: var(--ink-faint); padding-bottom: 4px; border-bottom: 1px solid transparent; }
+        .species-tabs button.is-active { color: var(--ink); border-color: var(--accent); }
+        .species-tab-copy { color: var(--ink-dim); font-size: 14px; line-height: 1.6; min-height: 44px; }
+
+        /* ---- collections ---- */
+        .collections { padding: 10vw 0; border-bottom: 1px solid var(--line); }
+        .collections-tabs { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 6vw; margin-bottom: 40px; }
+        .collections-tabs button { border: 1px solid var(--line-strong); padding: 9px 18px; font-size: 13px; color: var(--ink-dim); transition: all 0.25s ease; }
+        .collections-tabs button:hover { color: var(--ink); }
+        .collections-tabs button.is-active { border-color: var(--c-accent); color: var(--c-accent); }
+        .collection-detail { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+        @media (min-width: 900px) { .collection-detail { flex-direction: row; } }
+        .collection-visual { flex: 1; min-height: 40vh; background: radial-gradient(ellipse at 60% 40%, color-mix(in srgb, var(--c-accent) 24%, transparent), var(--bg-soft) 65%); border-bottom: 1px solid var(--line); }
+        @media (min-width: 900px) { .collection-visual { border-bottom: none; border-right: 1px solid var(--line); } }
+        .collection-info { flex: 1; padding: 6vw; display: flex; flex-direction: column; gap: 18px; justify-content: center; }
+        .collection-info h3 { font-size: clamp(26px, 3vw, 36px); }
+        .collection-info p { color: var(--ink-faint); font-size: 13px; }
+        .collection-info ul { display: flex; flex-wrap: wrap; gap: 10px 16px; margin: 6px 0; }
+        .collection-info li { font-size: 12.5px; color: var(--ink-dim); border-bottom: 1px solid var(--line); padding-bottom: 2px; }
+
+        /* ---- guide ---- */
+        .guide { padding: 10vw 0; border-bottom: 1px solid var(--line); }
+        .guide-list { border-top: 1px solid var(--line); }
+        .guide-row {
+          display: flex; align-items: center; gap: 24px;
+          padding: 26px 6vw; border-bottom: 1px solid var(--line);
+          text-decoration: none; color: inherit;
+          transition: background 0.3s ease, padding-left 0.3s ease;
+        }
+        .guide-row:hover { background: var(--bg-soft); padding-left: calc(6vw + 10px); }
+        .guide-tag { font-size: 11px; color: var(--ink-faint); width: 90px; flex-shrink: 0; }
+        .guide-title { font-family: 'Fraunces', serif; font-style: italic; font-size: clamp(17px, 2.4vw, 24px); font-weight: 400; flex: 1; }
+        .guide-arrow { color: var(--ink-faint); transition: transform 0.3s ease; flex-shrink: 0; }
+        .guide-row:hover .guide-arrow { transform: translateX(6px); color: var(--accent); }
+
+        /* ---- visit ---- */
+        .visit { display: flex; flex-direction: column; border-bottom: 1px solid var(--line); }
+        @media (min-width: 900px) { .visit { flex-direction: row; min-height: 70vh; } }
+        .visit-copy { flex: 1; padding: 10vw 6vw; display: flex; flex-direction: column; gap: 26px; justify-content: center; }
+        .visit-copy .section-heading { padding: 0; margin-bottom: 0; }
+        .visit-copy > p { color: var(--ink-dim); max-width: 380px; font-size: 15px; }
+        .visit-rows { display: flex; flex-direction: column; gap: 14px; }
+        .visit-rows > div { display: flex; align-items: center; gap: 12px; font-size: 13.5px; color: var(--ink-dim); }
+        .visit-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+        .visit-map { flex: 1; position: relative; min-height: 40vh; background: var(--bg-soft); border-top: 1px solid var(--line); }
+        @media (min-width: 900px) { .visit-map { border-top: none; border-left: 1px solid var(--line); } }
+        .map-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 36px 36px; }
+        .map-pin { position: absolute; left: 48%; top: 46%; width: 10px; height: 10px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 6px rgba(201,132,111,0.18); }
+
+        /* ---- footer ---- */
+        .footer { padding: 8vw 6vw 5vw; display: flex; flex-direction: column; gap: 40px; }
+        .footer-brand { font-family: 'Fraunces', serif; font-size: clamp(34px, 6vw, 64px); }
+        .footer-cols { display: flex; gap: 60px; flex-wrap: wrap; }
+        .footer-cols div { display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--ink-dim); }
+        .footer-legal { font-size: 11.5px; color: var(--ink-faint); border-top: 1px solid var(--line); padding-top: 22px; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .reveal, .mote, .tank-plant { animation: none !important; opacity: 1 !important; transform: none !important; }
+        }
+      `}</style>
+
+      <Nav onNavigate={navigate} />
+      <Hero id="hero" onNavigate={navigate} />
+      <Worlds id="worlds" />
+      <Arrivals />
+      <Configurator id="configurator" />
+      <FishFinder />
+      <SpeciesExperience />
+      <Collections id="collections" />
+      <Guide id="guide" />
+      <Visit id="visit" />
+      <Footer />
+    </div>
+  );
+}

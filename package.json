@@ -1,100 +1,27 @@
 {
-  "name": "pet-shop-website",
+  "name": "sedef-akvaryum",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/",
-  "dependencies": {
-    "@types/dompurify": "^3.0.5",
-    "@types/node": "^16.18.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "bcryptjs": "^3.0.2",
-    "dompurify": "^3.2.6",
-    "firebase": "^10.7.1",
-    "jose": "^6.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-ga4": "^2.1.0",
-    "react-router-dom": "^6.8.0",
-    "react-scripts": "^5.0.1",
-    "typescript": "^4.9.0",
-    "web-vitals": "^2.1.0"
-  },
   "scripts": {
-    "start": "react-scripts start",
-    "start:3001": "cross-env PORT=3001 react-scripts start",
-    "start:4000": "cross-env PORT=4000 react-scripts start",
-    "start:8080": "cross-env PORT=8080 react-scripts start",
-    "build": "react-scripts build",
-    "build:analyze": "cross-env GENERATE_SOURCEMAP=false react-scripts build && npx webpack-bundle-analyzer build/static/js/*.js",
-    "build:prod": "cross-env GENERATE_SOURCEMAP=false react-scripts build && npm run optimize:css",
-    "build:secure": "cross-env GENERATE_SOURCEMAP=false NODE_ENV=production react-scripts build && npm run optimize:css",
-    "build:analyze-bundle": "npm run build:prod && npx webpack-bundle-analyzer build/static/js/*.js",
-    "build:lighthouse": "npm run build:prod && npm run lighthouse",
-    "test": "react-scripts test",
-    "test:coverage": "react-scripts test --coverage --watchAll=false --passWithNoTests",
-    "test:ci": "react-scripts test --coverage --watchAll=false --ci --passWithNoTests",
-    "test:security": "npm audit && npm run test:ci",
-    "eject": "react-scripts eject",
-    "lighthouse": "npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html",
-    "performance": "npm run build:prod && npm run lighthouse",
-    "performance:dev": "npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-dev-report.html",
-    "analyze:webpack": "npx webpack-bundle-analyzer build/static/js/*.js",
-    "analyze:size": "npx size-limit",
-    "preview:build": "npx serve -s build",
-    "clean": "rimraf build node_modules/.cache",
-    "cache:clear": "npm run clean && npm start",
-    "security:audit": "npm audit --audit-level=moderate",
-    "security:fix": "npm audit fix",
-    "export:data": "npx ts-node scripts/export-data.ts",
-    "optimize:css": "npx ts-node -O \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/inline-css.ts",
-    "postbuild": "npm run optimize:css"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "dependencies": {
+    "framer-motion": "^12.4.7",
+    "lucide-react": "^0.475.0",
+    "next": "^15.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.8.0",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/jest": "^30.0.0",
-    "autoprefixer": "^10.4.0",
-    "cross-env": "^7.0.3",
-    "jest": "^27.5.1",
-    "jest-environment-jsdom": "^30.1.1",
-    "postcss": "^8.4.0",
-    "rimraf": "^5.0.5",
-    "serve": "^14.2.1",
-    "size-limit": "^10.0.0",
-    "tailwindcss": "^3.3.0",
-    "ts-node": "^10.9.2",
-    "webpack-bundle-analyzer": "^4.9.1",
-    "yaml": "^2.9.0"
-  },
-  "size-limit": [
-    {
-      "path": "build/static/js/*.js",
-      "limit": "500 KB"
-    },
-    {
-      "path": "build/static/css/*.css",
-      "limit": "100 KB"
-    }
-  ]
+    "@types/node": "^20.17.19",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3"
+  }
 }
